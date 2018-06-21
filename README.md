@@ -7,15 +7,14 @@ Run Android Messages as a desktop app, a la iMessage. For those of us that prefe
 Inspired by:
 
 * [Google Play Music Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
-* [a Reddit post on r/Android]
-(https://www.reddit.com/r/Android/comments/8shv6q/web_messages/e106a8r/)
+* [a Reddit post on r/Android](https://www.reddit.com/r/Android/comments/8shv6q/web_messages/e106a8r/)
 
 Based on:
 
 * [electron-boilerplate](https://github.com/szwacz/electron-boilerplate)
 
 # Download
-Head over to the [releases](releases) page!
+Head over to the [releases](https://github.com/chrisknepper/android-messages-desktop/releases) page!
 
 **Important note:** I don't have signing certificates yet. It can still run on both Windows and macOS, but the [process to get it running on macOS](https://www.macworld.com/article/3094865/macs/how-to-run-apps-that-are-not-from-the-app-store-in-macos-sierra.html) is cumbersome. I'm working on getting certificates now.
 
