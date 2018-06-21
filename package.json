@@ -3,7 +3,6 @@
   "productName": "Android Messages",
   "description": "Google's Android Messages web client, as a desktop app",
   "version": "0.0.1",
-  "private": true,
   "author": "Chris Knepper <chris82thekid@gmail.com>",
   "copyright": "© 2018 Chris Knepper",
   "homepage": "https://github.com/chrisknepper/android-messages-desktop",
@@ -22,7 +21,21 @@
     "directories": {
       "buildResources": "resources"
     },
-    "publish": null
+    "mac": {
+      "category": "public.app-category.social-networking",
+      "target": [
+        "zip",
+        "dmg"
+      ]
+    },
+    "linux": {
+      "category": "Chat",
+      "target": [
+        "deb",
+        "AppImage",
+        "snap"
+      ]
+    }
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
