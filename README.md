@@ -20,6 +20,18 @@ Head over to the [releases](https://github.com/chrisknepper/android-messages-des
 
 **Important note 2:** We currently have builds for Windows and macOS. I'd love to be able to do Linux releases, but I have little knowledge of Linux packaging.
 
+# TODOs / Roadmap (rough order of priority):
+- [ ] Make sure it actually works
+- [ ] Release signed binaries for macOS
+- [ ] Make an icon
+- [ ] Remove left-over code from electron-boilerplate
+- [ ] Correct tests
+- [ ] Release signed binaries for Windows
+- [ ] Release packages for Linux
+- [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
+- [ ] Make a website? (if it gets popular enough)
+- [ ] Support customization/custom options a la Google Play Music Desktop Player?
+
 # Development
 Make sure you have [Node.js](https://nodejs.org) installed, then run the following in your terminal:
 
