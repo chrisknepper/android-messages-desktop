@@ -28,6 +28,7 @@ Head over to the [releases](https://github.com/chrisknepper/android-messages-des
 - [ ] Correct tests
 - [ ] Release signed binaries for Windows
 - [ ] Release packages for Linux
+- [ ] Handling updates (something sqirrel?)
 - [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
 - [ ] Make a website? (if it gets popular enough)
 - [ ] Support customization/custom options a la Google Play Music Desktop Player?
