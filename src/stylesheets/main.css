@@ -1,0 +1,49 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  color: #525252;
+}
+
+a {
+  text-decoration: none;
+  color: #cb3837;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+}
+
+#androidMessagesWebview {
+  width: 100%;
+  height: 100%;
+}
+
+#loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #335ec9;
+  opacity: 1;
+  transition: opacity 0.4s 0.4s ease-in-out;
+}
+
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}

@@ -1,0 +1,62 @@
+{
+  "name": "android-messages-desktop",
+  "productName": "Android Messages",
+  "description": "Google's Android Messages web client, as a desktop app",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Chris Knepper <chris82thekid@gmail.com>",
+  "copyright": "© 2018 Chris Knepper",
+  "homepage": "https://github.com/chrisknepper/android-messages-desktop",
+  "bugs": {
+    "url": "https://github.com/chrisknepper/android-messages-desktop/issues"
+  },
+  "main": "app/background.js",
+  "build": {
+    "appId": "com.knepper.android-messages-desktop",
+    "files": [
+      "app/**/*",
+      "resources/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "resources"
+    },
+    "publish": null
+  },
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "preunit": "webpack --config=build/webpack.unit.config.js --env=test --display=none",
+    "unit": "electron-mocha temp/specs.js --renderer --require source-map-support/register",
+    "pree2e": "webpack --config=build/webpack.app.config.js --env=test --display=none && webpack --config=build/webpack.e2e.config.js --env=test --display=none",
+    "e2e": "mocha temp/e2e.js --require source-map-support/register",
+    "test": "npm run unit && npm run e2e",
+    "start": "node build/start.js",
+    "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl"
+  },
+  "dependencies": {
+    "about-window": "^1.11.1",
+    "fs-jetpack": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.5",
+    "@babel/preset-env": "^7.0.0-beta.5",
+    "babel-loader": "^8.0.0-beta.0",
+    "babel-plugin-transform-object-rest-spread": "^7.0.0-beta.3",
+    "chai": "^4.1.0",
+    "css-loader": "^0.28.7",
+    "electron": "2.0.2",
+    "electron-builder": "^20.15.1",
+    "electron-mocha": "^6.0.4",
+    "file-loader": "^1.1.11",
+    "friendly-errors-webpack-plugin": "^1.6.1",
+    "mocha": "^5.2.0",
+    "source-map-support": "^0.5.0",
+    "spectron": "^3.7.2",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.4",
+    "webpack-merge": "^4.1.0",
+    "webpack-node-externals": "^1.6.0"
+  }
+}
