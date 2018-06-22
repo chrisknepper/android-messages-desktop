@@ -1,4 +1,4 @@
-# ![Android Messages Desktop logo](resources/icons/64x64.png) Android Messages™ Desktop
+# <img src="resources/icons/64x64.png" alt="Android Messages Desktop logo" title="Android Messages Desktop logo" /> Android Messages™ Desktop
 
 Run Android Messages as a desktop app, a la iMessage. For those of us that prefer not to have a browser tab always open for this sort of thing.
 
