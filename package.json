@@ -1,7 +1,7 @@
 {
   "name": "android-messages-desktop",
   "productName": "Android Messages",
-  "description": "Google's Android Messages web client, as a desktop app",
+  "description": "Messages for web, as a desktop app",
   "version": "0.0.1",
   "author": "Chris Knepper <chris82thekid@gmail.com>",
   "copyright": "© 2018 Chris Knepper",
