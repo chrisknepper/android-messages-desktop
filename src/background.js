@@ -11,6 +11,7 @@ import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import { IS_WINDOWS } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -31,6 +32,13 @@ const setApplicationMenu = () => {
 if (env.name !== 'production') {
   const userDataPath = app.getPath('userData');
   app.setPath('userData', `${userDataPath} (${env.name})`);
+}
+
+if (IS_WINDOWS) {
+  // Stupid, DUMB calls that have to be made to let notifications come through on Windows (only Windows 10?)
+  // See: https://github.com/electron/electron/issues/10864#issuecomment-382519150
+  app.setAppUserModelId('com.knepper.android-messages-desktop');
+  app.setAsDefaultProtocolClient('android-messages-desktop');
 }
 
 app.on('ready', () => {
