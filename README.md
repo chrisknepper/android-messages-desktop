@@ -26,11 +26,11 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
 - [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](../../commit/8492023))
-- [x] Make an icon (done via df625ba)
+- [x] Make an icon (done via [df625ba](../../commit/df625ba))
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
-- [x] Release packages for Linux (done via 41ed205)
-- [x] Handling updates (done via 625bf6d)
+- [x] Release packages for Linux (done via [41ed205](../../commit/41ed205))
+- [x] Handling updates (done via [625bf6d](../../commit/625bf6d))
 - [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
 - [ ] Release signed binaries for Windows
 - [ ] Make a website? (if it gets popular enough)
