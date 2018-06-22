@@ -1,14 +1,14 @@
-import "./stylesheets/main.css";
+import './stylesheets/main.css';
 
-import "./helpers/context_menu.js";
-import "./helpers/external_links.js";
+import './helpers/context_menu.js';
+import './helpers/external_links.js';
 
 const state = {
   loaded: false
 };
 
-import { remote } from "electron";
-import jetpack from "fs-jetpack";
+import { remote } from 'electron';
+import jetpack from 'fs-jetpack';
 
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
@@ -22,7 +22,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
     
 
     if (permission === 'notifications') {
-      return callback(true) // Approve
+      return callback(true); // Approve
     }
 
     // if (!url.startsWith('https://my-website.com')) {

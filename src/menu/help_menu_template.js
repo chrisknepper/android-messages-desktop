@@ -3,11 +3,11 @@ import { IS_MAC } from '../constants';
 import { aboutMenu } from './items/about';
 
 export const helpMenuTemplate = {
-  label: "Help",
+  label: 'Help',
   submenu: [
     {
-        label: "Learn More",
-        click: () => shell.openExternal('https://google.com')
+        label: 'Learn More',
+        click: () => shell.openExternal('https://github.com/chrisknepper/android-messages-desktop/')
     }
   ]
 };
