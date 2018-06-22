@@ -23,14 +23,17 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
+test
+84920234d1f5cb668a944cb91fe1cc6faece8513
+
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
-- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via chrisknepper/android-messages-desktop@84920234d1f5cb668a944cb91fe1cc6faece8513)
-- [x] Make an icon (done via chrisknepper/android-messages-desktop@df625ba808df78ec6f3574144c27eabc322381f5)
+- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via chrisknepper/android-messages-desktop@84920234d1f5cb668a944cb91fe1cc6faece8513 )
+- [x] Make an icon (done via chrisknepper/android-messages-desktop@df625ba808df78ec6f3574144c27eabc322381f5 )
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
-- [x] Release packages for Linux (done via chrisknepper/android-messages-desktop@41ed2059f85784956ab6f4b9b4925b3e99bf4dcf)
-- [x] Handling updates (done via chrisknepper/android-messages-desktop@625bf6d2d43904df99473c5bfb6ad9df945af080)
+- [x] Release packages for Linux (done via chrisknepper/android-messages-desktop@41ed2059f85784956ab6f4b9b4925b3e99bf4dcf )
+- [x] Handling updates (done via chrisknepper/android-messages-desktop@625bf6d2d43904df99473c5bfb6ad9df945af080 )
 - [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
 - [ ] Release signed binaries for Windows
 - [ ] Make a website? (if it gets popular enough)
