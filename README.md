@@ -24,7 +24,7 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
 test
-84920234d1f5cb668a944cb91fe1cc6faece8513
+jlord/sheetsee.js@a5c3785ed8d6a35868bc169f07e40e889087fd2e
 
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
