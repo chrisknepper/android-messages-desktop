@@ -1,4 +1,4 @@
-# <a href="#" style="pointer-events: none"><img src="resources/icons/48x48.png" alt="Android Messages Desktop logo" title="Android Messages Desktop logo" /></a> Android Messages™ Desktop
+# <a href="#"><img src="resources/icons/48x48.png" alt="Android Messages Desktop logo" title="Android Messages Desktop logo" /></a> Android Messages™ Desktop
 
 Run Android Messages as a desktop app, a la iMessage. For those of us that prefer not to have a browser tab always open for this sort of thing.
 
@@ -25,7 +25,7 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
-- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via 8492023)
+- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [commit/8492023])
 - [x] Make an icon (done via df625ba)
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
