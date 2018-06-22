@@ -25,7 +25,7 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
-- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](commit/8492023))
+- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](chrisknepper/android-messages-desktop/commit/8492023))
 - [x] Make an icon (done via df625ba)
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
