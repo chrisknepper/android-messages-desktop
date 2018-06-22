@@ -14,22 +14,25 @@ Based on:
 * [electron-boilerplate](https://github.com/szwacz/electron-boilerplate)
 
 # Download
-Head over to the [releases](https://github.com/chrisknepper/android-messages-desktop/releases) page!
+Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
+* For Mac, choose the **dmg**
+* For Windows, choose the **exe**
+* For Linux, choose either the **deb**, the **snap**, or the **AppImage**
 
-**Important note:** I don't have signing certificates yet. It can still run on both Windows and macOS, but the [process to get it running on macOS](https://www.macworld.com/article/3094865/macs/how-to-run-apps-that-are-not-from-the-app-store-in-macos-sierra.html) is cumbersome. I'm working on getting certificates now.
+**Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
-**Important note 2:** We currently have builds for Windows and macOS. I'd love to be able to do Linux releases, but I have little knowledge of Linux packaging.
+**Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
-- [ ] Release signed binaries for macOS
-- [ ] Make an icon
+- [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via 8492023)
+- [x] Make an icon (done via df625ba)
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
-- [ ] Release signed binaries for Windows
-- [ ] Release packages for Linux
-- [ ] Handling updates (something sqirrel?)
+- [x] Release packages for Linux (done via 41ed205)
+- [x] Handling updates (done via 625bf6d)
 - [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
+- [ ] Release signed binaries for Windows
 - [ ] Make a website? (if it gets popular enough)
 - [ ] Support customization/custom options a la Google Play Music Desktop Player?
 
