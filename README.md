@@ -2,6 +2,9 @@
 
 Run Android Messages as a desktop app, a la iMessage. For those of us that prefer not to have a browser tab always open for this sort of thing.
 
+<a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
+<a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
+
 ### Disclaimer: I have not tested this at all because Google has still not made the web messages feature available to me.
 
 Inspired by:
@@ -22,8 +25,6 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
-
-<a href="#"><img src="assets/screenshots/1.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
