@@ -23,6 +23,8 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
+<a href="#"><img src="assets/screenshots/1.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
+
 # TODOs / Roadmap (rough order of priority):
 - [ ] Make sure it actually works
 - [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](../../commit/8492023))
