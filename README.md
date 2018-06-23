@@ -5,7 +5,7 @@ Run Android Messages as a desktop app, a la iMessage. For those of us that prefe
 <a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 <a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 
-### Disclaimer: I have not tested this at all because Google has still not made the web messages feature available to me.
+### Disclaimer: I have ~~not~~ barely tested this at all because Google has still not made the web messages feature available to me. I rooted my old Nexus 5X to force-enable the feature so I could make sure the syncing worked, as seen in the screenshots above.
 
 Inspired by:
 
