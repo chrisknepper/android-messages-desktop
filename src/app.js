@@ -7,7 +7,8 @@ const state = {
   loaded: false
 };
 
-import { remote } from 'electron';
+import { remote, shell } from 'electron';
+import url from 'url';
 import jetpack from 'fs-jetpack';
 
 const app = remote.app;
@@ -48,4 +49,11 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
+});
+
+androidMessagesWebview.addEventListener('new-window', (e) => {
+  const protocol = url.parse(e.url).protocol;
+  if (protocol === 'http:' || protocol === 'https:') {
+    shell.openExternal(e.url); // Open clicked links in user's default browser
+  }
 });
