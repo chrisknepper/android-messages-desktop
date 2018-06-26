@@ -2,10 +2,12 @@
 
 Run Android Messages as a desktop app, a la iMessage. For those of us that prefer not to have a browser tab always open for this sort of thing.
 
+**Not affiliated with Google in any way. Android is a trademark of Google LLC.**
+
 <a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 <a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 
-### Disclaimer: I have ~~not~~ barely tested this at all because Google has still not made the web messages feature available to me. I rooted my old Nexus 5X to force-enable the feature so I could make sure the syncing worked, as seen in the screenshots above.
+### Disclaimer: I have tested this with my Pixel on both macOS High Sierra nad Windows 10. Normal functionality seems to work, but help testing and feedback is greatly appreciated!
 
 Inspired by:
 
