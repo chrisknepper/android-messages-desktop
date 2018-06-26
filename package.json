@@ -50,7 +50,7 @@
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
-    "generate-icons": "electron-icon-maker --input=./assets/android_messages_desktop_icon.png --output=./assets/output"
+    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
   },
   "dependencies": {
     "about-window": "^1.11.1",
@@ -66,11 +66,11 @@
     "css-loader": "^0.28.7",
     "electron": "2.0.2",
     "electron-builder": "^20.15.1",
-    "electron-icon-maker": "0.0.4",
     "electron-mocha": "^6.0.4",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^5.2.0",
+    "png2icons": "^1.0.1",
     "source-map-support": "^0.5.0",
     "spectron": "^3.7.2",
     "style-loader": "^0.21.0",
