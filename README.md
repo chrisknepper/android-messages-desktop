@@ -7,7 +7,7 @@ Run Android Messages as a desktop app, a la iMessage. For those of us that prefe
 <a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 <a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
 
-### Disclaimer: I have tested this with my Pixel on both macOS High Sierra nad Windows 10. Normal functionality seems to work, but help testing and feedback is greatly appreciated!
+### Disclaimer: I have tested this with my Pixel on both macOS High Sierra and Windows 10. Normal functionality seems to work, but help testing and feedback is greatly appreciated!
 
 Inspired by:
 
