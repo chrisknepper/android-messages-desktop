@@ -5,17 +5,19 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu } from 'electron';
+import { app, Menu, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
-import { IS_WINDOWS } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
+
+let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen
 
 const setApplicationMenu = () => {
   const menus = baseMenuTemplate;
@@ -58,11 +60,73 @@ app.on('ready', () => {
     })
   );
 
-  if (env.name === 'development') {
+  app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
+
+  if (IS_MAC) {
+    let quitViaContext = false;
+    app.on('before-quit', () => {
+      quitViaContext = true;
+    });
+
+    mainWindow.on('close', (event) => {
+      if (!quitViaContext) {
+        event.preventDefault();
+        mainWindow.hide();
+      }
+    });
+
+    app.on('activate', () => {
+      mainWindow.show();
+    });
+  }
+
+  if (IS_WINDOWS) {
+    mainWindow.on('close', (event) => {
+      app.quit();
+    });
+
+    tray = new Tray(__dirname + '../../resources/icon.ico');
+
+    let contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show',
+        click: () => {
+          mainWindow.show();
+        }
+      },
+      {
+        label: 'Quit',
+        click: () => {
+          app.quit();
+        }
+      }
+    ]);
+
+    tray.setContextMenu(contextMenu);
+
+    tray.on('double-click', (event) => {
+      event.preventDefault();
+      mainWindow.show();
+    });
+
+    mainWindow.on('minimize', (event) => {
+      event.preventDefault();
+      // TODO: Hide the window via mainWindow.hide() instead of minimizing?
+      // Hiding would allow the icon to disappear from the taskbar if it's not pinned,
+      // but if it's pinned, hidden, then clicked, results in a duplicate instance of the app...
+      // Possible solution: https://github.com/electron/electron/blob/v0.36.10/docs/api/app.md#appmakesingleinstancecallback
+      mainWindow.minimize();
+    });
+  }
+
+  // TODO: Better UX for Linux...likely similar to Windows as far as tray behavior
+  if (IS_LINUX) {
+    app.on('window-all-closed', (event) => {
+      app.quit();
+    });
+  }
+
+  if (IS_DEV) {
     mainWindow.openDevTools();
   }
-});
-
-app.on('window-all-closed', () => {
-  app.quit();
 });
