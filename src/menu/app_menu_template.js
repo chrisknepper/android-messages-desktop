@@ -13,6 +13,14 @@ export const appMenuTemplate = {
             type: 'separator',
         },
         {
+            label: 'Hide Android Messages Desktop',
+            accelerator: 'Command+H',
+            click: () => app.mainWindow && app.mainWindow.hide()
+        },
+        {
+            type: 'separator',
+        },
+        {
             label: 'Quit',
             accelerator: 'Command+Q',
             click: () => app.quit(),
