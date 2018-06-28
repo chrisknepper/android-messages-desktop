@@ -4,8 +4,10 @@ Run Android Messages as a desktop app, a la iMessage. For those of us that prefe
 
 **Not affiliated with Google in any way. Android is a trademark of Google LLC.**
 
-<a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
-<a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop screenshot" title="Android Messages Desktop screenshot" /></a> 
+<a href="#"><img src="assets/screenshots/windows.png" alt="Android Messages Desktop Windows screenshot" title="Android Messages Desktop screenshot" /></a> 
+<a href="#"><img src="assets/screenshots/mac.png" alt="Android Messages Desktop macOS screenshot" title="Android Messages Desktop screenshot" /></a> 
+<a href="#"><img src="assets/screenshots/windows_tray_icon.png" alt="Android Messages Desktop tray icon in Windows" title="Android Messages Desktop screenshot" /></a> 
+<a href="#"><img src="assets/screenshots/mac_notification_badge.png" alt="Android Messages Desktop notification badge in macOS" title="Android Messages Desktop screenshot" /></a> 
 
 ### Disclaimer: I have tested this with my Pixel on both macOS High Sierra and Windows 10. Normal functionality seems to work, but help testing and feedback is greatly appreciated!
 
@@ -28,15 +30,21 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
+# Features
+* System notifications when a text comes in
+* Notification badges on macOS
+* Minimize to tray on Windows
+* TBD...
+
 # TODOs / Roadmap (rough order of priority):
-- [ ] Make sure it actually works
+- [x] Make sure it actually works (definitely works as of v0.1.0, done via [8068ed2](../../commit/8068ed2))
 - [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](../../commit/8492023))
 - [x] Make an icon (done via [df625ba](../../commit/df625ba))
 - [ ] Remove left-over code from electron-boilerplate
 - [ ] Correct tests
 - [x] Release packages for Linux (done via [41ed205](../../commit/41ed205))
 - [x] Handling updates (done via [625bf6d](../../commit/625bf6d))
-- [ ] Platform-specific UX enhancements (i.e. badges in macOS dock)
+- [x] Platform-specific UX enhancements (i.e. badges in macOS dock) (this specific enhancement is in as of v0.1.0, done via [8068ed2](../../commit/8068ed2)) **UX enhancements and features are now being worked on with issues submitted by users**
 - [ ] Release signed binaries for Windows
 - [ ] Make a website? (if it gets popular enough)
 - [ ] Support customization/custom options a la Google Play Music Desktop Player?
