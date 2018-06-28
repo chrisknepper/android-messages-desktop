@@ -128,10 +128,6 @@ if (isSecondInstance) {
 
       mainWindow.on('minimize', (event) => {
         event.preventDefault();
-        // TODO: Hide the window via mainWindow.hide() instead of minimizing?
-        // Hiding would allow the icon to disappear from the taskbar if it's not pinned,
-        // but if it's pinned, hidden, then clicked, results in a duplicate instance of the app...
-        // Possible solution: https://github.com/electron/electron/blob/v0.36.10/docs/api/app.md#appmakesingleinstancecallback
         mainWindow.hide();
       });
     }
