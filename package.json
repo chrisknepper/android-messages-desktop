@@ -54,6 +54,8 @@
   },
   "dependencies": {
     "about-window": "^1.11.1",
+    "electron": "^2.0.2",
+    "electron-settings": "^3.2.0",
     "electron-updater": "^2.21.10",
     "fs-jetpack": "^1.0.0"
   },
@@ -64,7 +66,6 @@
     "babel-plugin-transform-object-rest-spread": "^7.0.0-beta.3",
     "chai": "^4.1.0",
     "css-loader": "^0.28.7",
-    "electron": "2.0.2",
     "electron-builder": "^20.15.1",
     "electron-mocha": "^6.0.4",
     "file-loader": "^1.1.11",

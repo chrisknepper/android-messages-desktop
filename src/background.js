@@ -9,8 +9,10 @@ import { app, Menu, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
+import { prefMenu } from './menu/pref_menu';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
 
 // Special module holding environment variables which you declared
@@ -41,6 +43,7 @@ if (isSecondInstance) {
     if (env.name !== 'production') {
       menus.push(devMenuTemplate);
     }
+    menus.push(prefMenu);
     menus.push(helpMenuTemplate);
     Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
   };
@@ -61,13 +64,23 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
+    let autoHideMenuPref = false;
+    if (!settings.has("autoHideMenuPref")) {
+      settings.set("autoHideMenuPref", autoHideMenuPref);
+    } else {
+      autoHideMenuPref = settings.get("autoHideMenuPref");
+    }
+
+    // Sets checked status based on user prefs
+    prefMenu.submenu[0].checked = autoHideMenuPref;
     setApplicationMenu();
+
     autoUpdater.checkForUpdatesAndNotify();
 
     mainWindow = createWindow('main', {
       width: 1100,
       height: 800,
-      autoHideMenuBar: true
+      autoHideMenuBar: autoHideMenuPref
     });
 
     mainWindow.loadURL(
