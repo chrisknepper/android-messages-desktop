@@ -66,7 +66,8 @@ if (isSecondInstance) {
 
     mainWindow = createWindow('main', {
       width: 1100,
-      height: 800
+      height: 800,
+      autoHideMenuBar: true
     });
 
     mainWindow.loadURL(
