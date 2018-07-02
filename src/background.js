@@ -64,13 +64,13 @@ if (isSecondInstance) {
 
   app.on('ready', () => {
     if (!IS_MAC) {
+      // Sets checked status based on user prefs
       if (!settings.has("autoHideMenuPref")) {
         settings.set("autoHideMenuPref", false);
       }
       settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
     }
 
-    // Sets checked status based on user prefs
     setApplicationMenu();
 
     autoUpdater.checkForUpdatesAndNotify();
