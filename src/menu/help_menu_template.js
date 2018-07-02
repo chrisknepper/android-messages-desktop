@@ -8,7 +8,7 @@ export const helpMenuTemplate = {
     {
         label: 'Learn More',
         click: () => shell.openExternal('https://github.com/chrisknepper/android-messages-desktop/')
-    },
+    }
   ]
 };
 

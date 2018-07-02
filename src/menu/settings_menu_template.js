@@ -1,7 +1,7 @@
 import settings from "electron-settings";
 
-export const prefMenu = {
-  label: "Preferences",
+export const settingsMenu = {
+  label: "Settings",
   submenu: [
     {
       label: "Toggle Auto Hide Menu Bar",

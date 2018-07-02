@@ -1,5 +1,4 @@
 import { app, BrowserWindow } from "electron";
-import settings from "electron-settings";
 
 export const devMenuTemplate = {
   label: "Development",

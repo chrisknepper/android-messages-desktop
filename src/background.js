@@ -9,7 +9,7 @@ import { app, Menu, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
-import { prefMenu } from './menu/pref_menu';
+import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import settings from 'electron-settings';
@@ -43,7 +43,6 @@ if (isSecondInstance) {
     if (env.name !== 'production') {
       menus.push(devMenuTemplate);
     }
-    menus.push(prefMenu);
     menus.push(helpMenuTemplate);
     Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
   };
@@ -64,15 +63,14 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
-    let autoHideMenuPref = false;
-    if (!settings.has("autoHideMenuPref")) {
-      settings.set("autoHideMenuPref", autoHideMenuPref);
-    } else {
-      autoHideMenuPref = settings.get("autoHideMenuPref");
+    if (!IS_MAC) {
+      if (!settings.has("autoHideMenuPref")) {
+        settings.set("autoHideMenuPref", false);
+      }
+      settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
     }
 
     // Sets checked status based on user prefs
-    prefMenu.submenu[0].checked = autoHideMenuPref;
     setApplicationMenu();
 
     autoUpdater.checkForUpdatesAndNotify();
@@ -80,7 +78,7 @@ if (isSecondInstance) {
     mainWindow = createWindow('main', {
       width: 1100,
       height: 800,
-      autoHideMenuBar: autoHideMenuPref
+      autoHideMenuBar: settings.get("autoHideMenuPref")
     });
 
     mainWindow.loadURL(
