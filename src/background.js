@@ -9,8 +9,10 @@ import { app, Menu, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
+import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
 
 // Special module holding environment variables which you declared
@@ -61,12 +63,22 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
+    if (!IS_MAC) {
+      // Sets checked status based on user prefs
+      if (!settings.has("autoHideMenuPref")) {
+        settings.set("autoHideMenuPref", false);
+      }
+      settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
+    }
+
     setApplicationMenu();
+
     autoUpdater.checkForUpdatesAndNotify();
 
     mainWindow = createWindow('main', {
       width: 1100,
-      height: 800
+      height: 800,
+      autoHideMenuBar: settings.get("autoHideMenuPref")
     });
 
     mainWindow.loadURL(
