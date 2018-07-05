@@ -15,7 +15,7 @@ export const appMenuTemplate = {
         {
             label: 'Hide Android Messages Desktop',
             accelerator: 'Command+H',
-            click: () => app.mainWindow && app.mainWindow.hide()
+            click: () => app.hide()
         },
         {
             type: 'separator',

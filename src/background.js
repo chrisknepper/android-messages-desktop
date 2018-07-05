@@ -98,6 +98,7 @@ if (isSecondInstance) {
       });
 
       mainWindow.on('close', (event) => {
+        console.log('close window called');
         if (!quitViaContext) {
           event.preventDefault();
           mainWindow.hide();
