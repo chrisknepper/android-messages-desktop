@@ -1,4 +1,5 @@
 import { app } from 'electron';
+import { IS_MAC } from './constants';
 
 export const trayMenuTemplate = [
   {
@@ -6,10 +7,18 @@ export const trayMenuTemplate = [
     click: () => {
       if (app.mainWindow) {
         if (app.mainWindow.isVisible()) {
-          app.hide();
+          if (IS_MAC) {
+            app.hide();
+          } else {
+            app.mainWindow.show();
+          }
         } else {
-          app.show();
-          app.focus();
+          if (IS_MAC) {
+            app.show();
+            app.focus();
+          } else {
+            app.mainWindow.show();
+          }
         }
       }
     }
