@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { IS_MAC } from './constants';
+import { IS_MAC } from '.../constants';
 
 export const trayMenuTemplate = [
   {
