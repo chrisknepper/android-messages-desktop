@@ -11,6 +11,7 @@ import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
+import { trayMenuTemplate } from './menu/tray_menu_template';
 import createWindow from './helpers/window';
 import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
@@ -37,6 +38,7 @@ if (isSecondInstance) {
   app.quit()
 } else {
   let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen
+  let trayIconPath;
 
   const setApplicationMenu = () => {
     const menus = baseMenuTemplate;
@@ -60,6 +62,11 @@ if (isSecondInstance) {
     // See: https://github.com/electron/electron/issues/10864#issuecomment-382519150
     app.setAppUserModelId('com.knepper.android-messages-desktop');
     app.setAsDefaultProtocolClient('android-messages-desktop');
+
+    // Windows is verrry specific about where and how it wants the tray icon path to be referenced
+    trayIconPath = __dirname + '../../resources/icon.ico';
+  } else {
+    trayIconPath = 'resources/icon.png';
   }
 
   app.on('ready', () => {
@@ -89,6 +96,10 @@ if (isSecondInstance) {
       })
     );
 
+    tray = new Tray(trayIconPath);
+    let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray.setContextMenu(trayContextMenu);
+
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
     if (IS_MAC) {
@@ -110,30 +121,7 @@ if (isSecondInstance) {
       });
     }
 
-    if (IS_WINDOWS) {
-      mainWindow.on('close', (event) => {
-        app.quit();
-      });
-
-      tray = new Tray(__dirname + '../../resources/icon.ico');
-
-      let contextMenu = Menu.buildFromTemplate([
-        {
-          label: 'Show',
-          click: () => {
-            mainWindow.show();
-          }
-        },
-        {
-          label: 'Quit',
-          click: () => {
-            app.quit();
-          }
-        }
-      ]);
-
-      tray.setContextMenu(contextMenu);
-
+    if (!IS_MAC) {
       tray.on('double-click', (event) => {
         event.preventDefault();
         mainWindow.show();
@@ -146,11 +134,11 @@ if (isSecondInstance) {
     }
 
     // TODO: Better UX for Linux...likely similar to Windows as far as tray behavior
-    if (IS_LINUX) {
-      app.on('window-all-closed', (event) => {
-        app.quit();
-      });
-    }
+    // if (IS_LINUX) {
+    //   app.on('window-all-closed', (event) => {
+    //     app.quit();
+    //   });
+    // }
 
     if (IS_DEV) {
       mainWindow.openDevTools();
