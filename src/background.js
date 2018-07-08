@@ -63,8 +63,8 @@ if (isSecondInstance) {
     app.setAppUserModelId('com.knepper.android-messages-desktop');
     app.setAsDefaultProtocolClient('android-messages-desktop');
 
-    // Windows is verrry specific about where and how it wants the tray icon path to be referenced
-    trayIconPath = __dirname + '../../resources/icon.ico';
+    // Re-use regular app .ico for the tray icon on Windows
+    trayIconPath = path.join(__dirname, '..', 'resources', 'icon.ico');
   } else {
     const trayIconFileName = IS_MAC ? 'icon_mac.png' : 'icon.png';
     trayIconPath = path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
