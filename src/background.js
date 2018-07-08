@@ -121,7 +121,7 @@ if (isSecondInstance) {
       });
     }
 
-    if (!IS_MAC) {
+    if (IS_WINDOWS) {
       tray.on('double-click', (event) => {
         event.preventDefault();
         mainWindow.show();
@@ -133,12 +133,10 @@ if (isSecondInstance) {
       });
     }
 
-    // TODO: Better UX for Linux...likely similar to Windows as far as tray behavior
-    // if (IS_LINUX) {
-    //   app.on('window-all-closed', (event) => {
-    //     app.quit();
-    //   });
-    // }
+    // TODO: Maybe make this a preference for non-Mac users?
+    // app.on('window-all-closed', (event) => {
+    //   app.quit();
+    // });
 
     if (IS_DEV) {
       mainWindow.openDevTools();
