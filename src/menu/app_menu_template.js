@@ -1,16 +1,18 @@
 import { app } from 'electron';
-import { aboutMenu } from './items/about';
+import { aboutMenuItem } from './items/about';
+import { checkForUpdatesMenuItem } from './items/check_for_updates';
 
 // This is the "Application" menu, which is only used on macOS
 export const appMenuTemplate = {
     label: 'Android Messages',
     submenu: [,
-        {
-            label: 'About Android Messages Desktop',
-            click: () => aboutMenu()
-        },
+        aboutMenuItem,
         {
             type: 'separator',
+        },
+        checkForUpdatesMenuItem,
+        {
+            type: 'separator'
         },
         {
             label: 'Hide Android Messages Desktop',
