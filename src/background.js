@@ -103,20 +103,31 @@ if (isSecondInstance) {
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
-    if (IS_MAC) {
-      let quitViaContext = false;
-      app.on('before-quit', () => {
-        quitViaContext = true;
-      });
 
-      mainWindow.on('close', (event) => {
-        console.log('close window called');
-        if (!quitViaContext) {
-          event.preventDefault();
-          mainWindow.hide();
+    let quitViaContext = false;
+    app.on('before-quit', () => {
+      quitViaContext = true;
+    });
+
+    mainWindow.on('close', (event) => {
+      console.log('close window called');
+      if (!quitViaContext) {
+        event.preventDefault();
+        mainWindow.hide();
+        if (IS_WINDOWS) {
+          const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
+          if (!seenMinimizeToTrayWarning) {
+            tray.displayBalloon({
+              title: 'Android Messages',
+              content: 'Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.'
+            });
+            settings.set('seenMinimizeToTrayWarningPref', true);
+          }
         }
-      });
+      }
+    });
 
+    if (IS_MAC) {
       app.on('activate', () => {
         mainWindow.show();
       });
@@ -127,16 +138,15 @@ if (isSecondInstance) {
         event.preventDefault();
         mainWindow.show();
       });
-
-      mainWindow.on('minimize', (event) => {
-        event.preventDefault();
-        mainWindow.hide();
-      });
     }
 
-    // TODO: Maybe make this a preference for non-Mac users?
+    // TODO: Maybe make these (aka minimize-to-tray behavior) a preference for non-Mac users?
     // app.on('window-all-closed', (event) => {
     //   app.quit();
+    // });
+    // mainWindow.on('minimize', (event) => {
+    //   event.preventDefault();
+    //   mainWindow.hide();
     // });
 
     if (IS_DEV) {
