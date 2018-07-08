@@ -10,7 +10,7 @@ export const trayMenuTemplate = [
           if (IS_MAC) {
             app.hide();
           } else {
-            app.mainWindow.show();
+            app.mainWindow.hide();
           }
         } else {
           if (IS_MAC) {
