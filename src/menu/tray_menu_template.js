@@ -3,7 +3,7 @@ import { IS_MAC } from '../constants';
 
 export const trayMenuTemplate = [
   {
-    label: 'Toggle Show/Hide',
+    label: 'Show/Hide Android Messages',
     click: () => {
       if (app.mainWindow) {
         if (app.mainWindow.isVisible()) {
@@ -13,12 +13,7 @@ export const trayMenuTemplate = [
             app.mainWindow.hide();
           }
         } else {
-          if (IS_MAC) {
-            app.show();
-            app.focus();
-          } else {
-            app.mainWindow.show();
-          }
+          app.mainWindow.show();
         }
       }
     }
@@ -27,7 +22,7 @@ export const trayMenuTemplate = [
     type: 'separator'
   },
   {
-    label: 'Quit',
+    label: 'Quit Android Messages',
     click: () => {
         app.quit();
     }

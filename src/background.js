@@ -66,7 +66,8 @@ if (isSecondInstance) {
     // Windows is verrry specific about where and how it wants the tray icon path to be referenced
     trayIconPath = __dirname + '../../resources/icon.ico';
   } else {
-    trayIconPath = 'resources/icon.png';
+    const trayIconFileName = IS_MAC ? 'icon_mac.png' : 'icon.png';
+    trayIconPath = path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
   }
 
   app.on('ready', () => {
