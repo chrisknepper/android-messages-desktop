@@ -1,3 +1,5 @@
+import path from 'path';
+
 import './stylesheets/main.css';
 
 import './helpers/context_menu.js';
@@ -6,7 +8,7 @@ import './helpers/external_links.js';
 import { remote, shell } from 'electron';
 import url from 'url';
 import jetpack from 'fs-jetpack';
-import { IS_MAC } from './constants';
+import { IS_MAC, IS_LINUX } from './constants';
 
 const state = {
   loaded: false,
@@ -15,6 +17,10 @@ const state = {
 
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
+
+if (IS_LINUX) {
+  app.mainWindow.setIcon(path.join(__dirname, '..', 'resources', 'icons', '128x128.png'))
+}
 
 // TODO: Insert or update webview here instead of in the HTML file to make testing (swapping URLs) easier
 
