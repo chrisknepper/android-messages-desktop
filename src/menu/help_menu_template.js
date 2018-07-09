@@ -1,6 +1,6 @@
 import { shell } from 'electron';
 import { IS_MAC } from '../constants';
-import { aboutMenu } from './items/about';
+import { aboutMenuItem } from './items/about';
 
 export const helpMenuTemplate = {
   label: 'Help',
@@ -13,8 +13,5 @@ export const helpMenuTemplate = {
 };
 
 if (!IS_MAC) {
-    helpMenuTemplate.submenu.push({
-        label: 'About Android Messages Desktop',
-        click: () => aboutMenu()
-    });
+    helpMenuTemplate.submenu.push(aboutMenuItem);
 }

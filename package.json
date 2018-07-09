@@ -50,6 +50,8 @@
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
+    "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
+    "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
     "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
   },
   "dependencies": {
