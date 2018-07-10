@@ -76,7 +76,11 @@ if (isSecondInstance) {
       if (!settings.has("autoHideMenuPref")) {
         settings.set("autoHideMenuPref", false);
       }
+      if (!settings.has("startInTrayPref")) {
+        settings.set("startInTrayPref", false);
+      }
       settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
+      settingsMenu.submenu[1].checked = settings.get("startInTrayPref");
     }
 
     setApplicationMenu();
@@ -152,5 +156,11 @@ if (isSecondInstance) {
     if (IS_DEV) {
       mainWindow.openDevTools();
     }
+
+    // If user has selected "Start In Tray" minimize window
+    if (settings.get("startInTrayPref")) {
+      mainWindow.hide();
+    }
+
   });
 }

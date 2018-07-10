@@ -12,6 +12,15 @@ export const settingsMenu = {
         item.checked = autoHideMenuPref;
         window.setAutoHideMenuBar(autoHideMenuPref);
       }
+    },
+    {
+      label: "Start In Tray",
+      type: "checkbox",
+      click: (item, window) => {
+        const startInTrayPref = !settings.get("startInTrayPref");
+        settings.set("startInTrayPref", startInTrayPref);
+        item.checked = startInTrayPref;
+      }
     }
   ]
 };
