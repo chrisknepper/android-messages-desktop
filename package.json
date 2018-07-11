@@ -2,7 +2,7 @@
   "name": "android-messages-desktop",
   "productName": "Android Messages",
   "description": "Messages for web, as a desktop app",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "author": "Chris Knepper <chris82thekid@gmail.com>",
   "copyright": "© 2018 Chris Knepper",
   "homepage": "https://github.com/chrisknepper/android-messages-desktop",
@@ -50,10 +50,13 @@
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
+    "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
+    "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
     "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
   },
   "dependencies": {
     "about-window": "^1.11.1",
+    "electron-settings": "^3.2.0",
     "electron-updater": "^2.21.10",
     "fs-jetpack": "^1.0.0"
   },

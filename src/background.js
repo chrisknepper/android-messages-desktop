@@ -9,8 +9,11 @@ import { app, Menu, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
+import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
+import { trayMenuTemplate } from './menu/tray_menu_template';
 import createWindow from './helpers/window';
+import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
 
 // Special module holding environment variables which you declared
@@ -35,6 +38,7 @@ if (isSecondInstance) {
   app.quit()
 } else {
   let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen
+  let trayIconPath;
 
   const setApplicationMenu = () => {
     const menus = baseMenuTemplate;
@@ -58,15 +62,31 @@ if (isSecondInstance) {
     // See: https://github.com/electron/electron/issues/10864#issuecomment-382519150
     app.setAppUserModelId('com.knepper.android-messages-desktop');
     app.setAsDefaultProtocolClient('android-messages-desktop');
+
+    // Re-use regular app .ico for the tray icon on Windows
+    trayIconPath = path.join(__dirname, '..', 'resources', 'icon.ico');
+  } else {
+    const trayIconFileName = IS_MAC ? 'icon_mac.png' : 'icon.png';
+    trayIconPath = path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
   }
 
   app.on('ready', () => {
+    if (!IS_MAC) {
+      // Sets checked status based on user prefs
+      if (!settings.has("autoHideMenuPref")) {
+        settings.set("autoHideMenuPref", false);
+      }
+      settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
+    }
+
     setApplicationMenu();
+
     autoUpdater.checkForUpdatesAndNotify();
 
     mainWindow = createWindow('main', {
       width: 1100,
-      height: 800
+      height: 800,
+      autoHideMenuBar: settings.get("autoHideMenuPref")
     });
 
     mainWindow.loadURL(
@@ -77,67 +97,57 @@ if (isSecondInstance) {
       })
     );
 
+    tray = new Tray(trayIconPath);
+    let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray.setContextMenu(trayContextMenu);
+
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
-    if (IS_MAC) {
-      let quitViaContext = false;
-      app.on('before-quit', () => {
-        quitViaContext = true;
-      });
 
-      mainWindow.on('close', (event) => {
-        if (!quitViaContext) {
-          event.preventDefault();
-          mainWindow.hide();
+    let quitViaContext = false;
+    app.on('before-quit', () => {
+      quitViaContext = true;
+    });
+
+    mainWindow.on('close', (event) => {
+      console.log('close window called');
+      if (!quitViaContext) {
+        event.preventDefault();
+        mainWindow.hide();
+        if (IS_WINDOWS) {
+          const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
+          if (!seenMinimizeToTrayWarning) {
+            tray.displayBalloon({
+              title: 'Android Messages',
+              content: 'Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.'
+            });
+            settings.set('seenMinimizeToTrayWarningPref', true);
+          }
         }
-      });
+      }
+    });
 
+    if (IS_MAC) {
       app.on('activate', () => {
         mainWindow.show();
       });
     }
 
     if (IS_WINDOWS) {
-      mainWindow.on('close', (event) => {
-        app.quit();
-      });
-
-      tray = new Tray(__dirname + '../../resources/icon.ico');
-
-      let contextMenu = Menu.buildFromTemplate([
-        {
-          label: 'Show',
-          click: () => {
-            mainWindow.show();
-          }
-        },
-        {
-          label: 'Quit',
-          click: () => {
-            app.quit();
-          }
-        }
-      ]);
-
-      tray.setContextMenu(contextMenu);
-
       tray.on('double-click', (event) => {
         event.preventDefault();
         mainWindow.show();
       });
-
-      mainWindow.on('minimize', (event) => {
-        event.preventDefault();
-        mainWindow.hide();
-      });
     }
 
-    // TODO: Better UX for Linux...likely similar to Windows as far as tray behavior
-    if (IS_LINUX) {
-      app.on('window-all-closed', (event) => {
-        app.quit();
-      });
-    }
+    // TODO: Maybe make these (aka minimize-to-tray behavior) a preference for non-Mac users?
+    // app.on('window-all-closed', (event) => {
+    //   app.quit();
+    // });
+    // mainWindow.on('minimize', (event) => {
+    //   event.preventDefault();
+    //   mainWindow.hide();
+    // });
 
     if (IS_DEV) {
       mainWindow.openDevTools();
