@@ -90,7 +90,8 @@ if (isSecondInstance) {
     mainWindow = createWindow('main', {
       width: 1100,
       height: 800,
-      autoHideMenuBar: settings.get("autoHideMenuPref")
+      autoHideMenuBar: settings.get("autoHideMenuPref"),
+      show: !settings.get("startInTrayPref") //Starts in tray if set
     });
 
     mainWindow.loadURL(
@@ -144,6 +145,12 @@ if (isSecondInstance) {
       });
     }
 
+    if (IS_LINUX) {
+      tray.on('click', () => {
+        mainWindow.show();
+      });
+    }
+
     // TODO: Maybe make these (aka minimize-to-tray behavior) a preference for non-Mac users?
     // app.on('window-all-closed', (event) => {
     //   app.quit();
@@ -156,11 +163,5 @@ if (isSecondInstance) {
     if (IS_DEV) {
       mainWindow.openDevTools();
     }
-
-    // If user has selected "Start In Tray" minimize window
-    if (settings.get("startInTrayPref")) {
-      mainWindow.hide();
-    }
-
   });
 }
