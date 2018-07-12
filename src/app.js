@@ -18,10 +18,6 @@ const state = {
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
 
-if (IS_LINUX) {
-  app.mainWindow.setIcon(path.join(__dirname, '..', 'resources', 'icons', '128x128.png'))
-}
-
 // TODO: Insert or update webview here instead of in the HTML file to make testing (swapping URLs) easier
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
