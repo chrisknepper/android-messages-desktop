@@ -65,7 +65,7 @@ const popupContextMenu = (event) => {
           label: `Save ${mediaType} As...`,
           click: () => {
             // This call *would* do this in one line, but is only a thing in IE (???)
-            // document.execCommand('SaveAs', true, currentlySelectedMedia);
+            // document.execCommand('SaveAs', true, event.target.src);
             const link = document.createElement('a');
             link.href = event.target.src;
             // Leaving the URL root results in the file extension being truncated.
