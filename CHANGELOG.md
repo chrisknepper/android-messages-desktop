@@ -1,4 +1,4 @@
-## [0.4.0] - 2018-07-12
+## [0.4.0] - 2018-07-13
 ### Added
 - Right-click context menu with support for cut/copy/paste/undo/redo/save image/save video
 - Builds for pacman package manager (used by Arch Linux and related distros)
