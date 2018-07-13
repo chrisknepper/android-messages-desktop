@@ -24,7 +24,7 @@ Based on:
 Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
 * For Mac, choose the **dmg**
 * For Windows, choose the **exe**
-* For Linux, choose either the **deb**, the **snap**, or the **AppImage**
+* For Linux, choose either the **deb**, the **snap**, the **pacman**, or the **AppImage**
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
@@ -40,7 +40,7 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 - [x] Make sure it actually works (definitely works as of v0.1.0, done via [8068ed2](../../commit/8068ed2))
 - [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](../../commit/8492023))
 - [x] Make an icon (done via [df625ba](../../commit/df625ba))
-- [ ] Remove left-over code from electron-boilerplate
+- [x] Remove left-over code from electron-boilerplate (done via [4e7638a](../../commit/4e7638a))
 - [ ] Correct tests
 - [x] Release packages for Linux (done via [41ed205](../../commit/41ed205))
 - [x] Handling updates (done via [625bf6d](../../commit/625bf6d))
