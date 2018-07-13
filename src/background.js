@@ -83,11 +83,23 @@ if (isSecondInstance) {
 
     autoUpdater.checkForUpdatesAndNotify();
 
-    mainWindow = createWindow('main', {
+    // mainWindow = createWindow('main', {
+    //   width: 1100,
+    //   height: 800,
+    //   autoHideMenuBar: settings.get("autoHideMenuPref")
+    // });
+
+    const mainWindowOptions = {
       width: 1100,
       height: 800,
       autoHideMenuBar: settings.get("autoHideMenuPref")
-    });
+    };
+
+    if (IS_LINUX) {
+      mainWindowOptions.icon = path.join(__dirname, '..', 'resources', 'icons', '128x128.png')
+    };
+
+    mainWindow = createWindow('main', mainWindowOptions);
 
     mainWindow.loadURL(
       url.format({
