@@ -56,7 +56,6 @@ const standardInputMenu = Menu.buildFromTemplate(standardMenuTemplate);
 const textInputMenu = Menu.buildFromTemplate(textMenuTemplate);
 
 const popupContextMenu = (event) => {
-  console.log('context menu event', event);
   switch (event.target.nodeName) {
     case 'VIDEO':
     case 'IMG':
