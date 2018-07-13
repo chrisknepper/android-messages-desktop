@@ -83,12 +83,6 @@ if (isSecondInstance) {
 
     autoUpdater.checkForUpdatesAndNotify();
 
-    // mainWindow = createWindow('main', {
-    //   width: 1100,
-    //   height: 800,
-    //   autoHideMenuBar: settings.get("autoHideMenuPref")
-    // });
-
     const mainWindowOptions = {
       width: 1100,
       height: 800,
