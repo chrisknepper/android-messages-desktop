@@ -4,8 +4,15 @@
 - Builds for pacman package manager (used by Arch Linux and related distros)
 - Changelog (with shortcut to changelog in Help menu)
 
+### Changed
+- Update README.md
+- On launch, open dev tools for the webview when in dev mode
+
 ### Fixed
 - App icon not showing or showing sporadically on Linux
+
+### Removed
+- Some dead code/comments
 
 ## [0.3.0] - 2018-07-08
 ### Added
@@ -68,6 +75,7 @@
 
 ## [0.0.2] - 2018-06-22
 ### Added
+- Signed app binary for macOS
 - Notifications on Windows
 - Builds for various Linux distros/package managers
 - A real icon
