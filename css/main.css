@@ -1,5 +1,50 @@
-body {
-    color: #fff;
-    background: blue;
-    font-family: sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+h1 {
+    font-size: 2rem;
+    white-space: normal;
+}
+
+body {
+    color: #333;
+    font-family: sans-serif;
+    position: relative;
+}
+
+#nav {
+    background: #fff;
+}
+
+.intro {
+    /*height: 100vh;*/
+}
+
+.alt {
+    color: #fff;
+    background: #365fcd;
+}
+
+.logo {
+    width: 64px;
+    height: auto;
+}
+
+.screenshot {
+    max-width: 75%;
+}
+
+@media (max-width: 767px) {
+
+    h1 {
+        font-size: 0.8rem;
+    }
+
+    .intro {
+        height: auto;
+    }
+
+ }
