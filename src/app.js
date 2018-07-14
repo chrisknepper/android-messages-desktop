@@ -2,13 +2,12 @@ import path from 'path';
 
 import './stylesheets/main.css';
 
-import './helpers/context_menu.js';
 import './helpers/external_links.js';
 
 import { remote, shell } from 'electron';
 import url from 'url';
 import jetpack from 'fs-jetpack';
-import { IS_MAC, IS_LINUX } from './constants';
+import { IS_MAC, IS_DEV } from './constants';
 
 const state = {
   loaded: false,
@@ -17,8 +16,6 @@ const state = {
 
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
-
-// TODO: Insert or update webview here instead of in the HTML file to make testing (swapping URLs) easier
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
 
@@ -68,6 +65,9 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
   if (!state.loaded) {
     state.loaded = true;
     loader.classList.add('hidden');
+    if (IS_DEV) {
+      androidMessagesWebview.getWebContents().openDevTools();
+    }
   }
 
 });
