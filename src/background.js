@@ -87,12 +87,18 @@ if (isSecondInstance) {
 
     autoUpdater.checkForUpdatesAndNotify();
 
-    mainWindow = createWindow('main', {
+    const mainWindowOptions = {
       width: 1100,
       height: 800,
       autoHideMenuBar: settings.get("autoHideMenuPref"),
       show: !settings.get("startInTrayPref") //Starts in tray if set
-    });
+    };
+
+    if (IS_LINUX) {
+      mainWindowOptions.icon = path.join(__dirname, '..', 'resources', 'icons', '128x128.png')
+    }
+
+    mainWindow = createWindow('main', mainWindowOptions);
 
     mainWindow.loadURL(
       url.format({
