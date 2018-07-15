@@ -96,7 +96,7 @@ if (isSecondInstance) {
 
     if (IS_LINUX) {
       mainWindowOptions.icon = path.join(__dirname, '..', 'resources', 'icons', '128x128.png')
-    }
+    };
 
     mainWindow = createWindow('main', mainWindowOptions);
 
