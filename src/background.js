@@ -71,6 +71,9 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
+
+    const trayEnabled = settings.get('trayEnabledPref', IS_WINDOWS);
+
     if (!IS_MAC) {
       // Sets checked status based on user prefs
       if (!settings.has("autoHideMenuPref")) {
@@ -103,9 +106,12 @@ if (isSecondInstance) {
       })
     );
 
-    tray = new Tray(trayIconPath);
-    let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-    tray.setContextMenu(trayContextMenu);
+    if (trayEnabled) {
+      tray = new Tray(trayIconPath);
+      let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+      tray.setContextMenu(trayContextMenu);
+    }
+
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
@@ -120,7 +126,7 @@ if (isSecondInstance) {
       if (!quitViaContext) {
         event.preventDefault();
         mainWindow.hide();
-        if (IS_WINDOWS) {
+        if (IS_WINDOWS && trayEnabled) {
           const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
           if (!seenMinimizeToTrayWarning) {
             tray.displayBalloon({
@@ -139,7 +145,7 @@ if (isSecondInstance) {
       });
     }
 
-    if (IS_WINDOWS) {
+    if (trayEnabled && IS_WINDOWS) {
       tray.on('double-click', (event) => {
         event.preventDefault();
         mainWindow.show();

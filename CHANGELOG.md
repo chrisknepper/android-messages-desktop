@@ -1,3 +1,5 @@
+# Changelog
+
 ## [0.4.0] - 2018-07-14
 ### Added
 - Right-click context menu with support for cut/copy/paste/undo/redo/save image/save video

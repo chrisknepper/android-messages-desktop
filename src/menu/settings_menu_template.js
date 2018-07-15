@@ -12,6 +12,16 @@ export const settingsMenu = {
         item.checked = autoHideMenuPref;
         window.setAutoHideMenuBar(autoHideMenuPref);
       }
+    },
+    {
+      label: "Enable Tray Icon",
+      type: "checkbox",
+      click: (item, window) => {
+        const trayEnabledPref = !settings.get("trayEnabledPref");
+        settings.set("trayEnabledPref", trayEnabledPref);
+        item.checked = trayEnabledPref;
+        //window.setAutoHideMenuBar(trayEnabledPref);
+      }
     }
   ]
 };
