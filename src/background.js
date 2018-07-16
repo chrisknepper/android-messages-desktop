@@ -79,7 +79,11 @@ if (isSecondInstance) {
       if (!settings.has("autoHideMenuPref")) {
         settings.set("autoHideMenuPref", false);
       }
+      if (!settings.has("startInTrayPref")) {
+        settings.set("startInTrayPref", false);
+      }
       settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
+      settingsMenu.submenu[1].checked = settings.get("startInTrayPref");
     }
 
     setApplicationMenu();
@@ -89,7 +93,8 @@ if (isSecondInstance) {
     const mainWindowOptions = {
       width: 1100,
       height: 800,
-      autoHideMenuBar: settings.get("autoHideMenuPref")
+      autoHideMenuBar: settings.get("autoHideMenuPref"),
+      show: !settings.get("startInTrayPref") //Starts in tray if set
     };
 
     if (IS_LINUX) {
@@ -148,6 +153,12 @@ if (isSecondInstance) {
     if (trayEnabled && IS_WINDOWS) {
       tray.on('double-click', (event) => {
         event.preventDefault();
+        mainWindow.show();
+      });
+    }
+
+    if (IS_LINUX) {
+      tray.on('click', () => {
         mainWindow.show();
       });
     }
