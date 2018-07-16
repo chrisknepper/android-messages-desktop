@@ -1,33 +1,37 @@
 import settings from "electron-settings";
+import { IS_MAC } from '../constants';
 
 export const settingsMenu = {
-  label: "Settings",
+  label: IS_MAC ? 'Preferences' : 'Settings',
   submenu: [
     {
-      label: "Auto Hide Menu Bar",
-      type: "checkbox",
+      // This option doesn't apply to Mac, so this hides it but keeps the order of menu items
+      // to make updating based on array indices easier.
+      visible: (!IS_MAC),
+      label: 'Auto Hide Menu Bar',
+      type: 'checkbox',
       click: (item, window) => {
-        const autoHideMenuPref = !settings.get("autoHideMenuPref");
-        settings.set("autoHideMenuPref", autoHideMenuPref);
+        const autoHideMenuPref = !settings.get('autoHideMenuPref');
+        settings.set('autoHideMenuPref', autoHideMenuPref);
         item.checked = autoHideMenuPref;
         window.setAutoHideMenuBar(autoHideMenuPref);
       }
     },
     {
-      label: "Start In Tray",
-      type: "checkbox",
+      label: 'Start In Tray',
+      type: 'checkbox',
       click: (item) => {
-        const startInTrayPref = !settings.get("startInTrayPref");
-        settings.set("startInTrayPref", startInTrayPref);
+        const startInTrayPref = !settings.get('startInTrayPref');
+        settings.set('startInTrayPref', startInTrayPref);
         item.checked = startInTrayPref;
       }
     },
     {
-      label: "Enable Tray Icon",
-      type: "checkbox",
+      label: 'Enable Tray Icon',
+      type: 'checkbox',
       click: (item) => {
-        const trayEnabledPref = !settings.get("trayEnabledPref");
-        settings.set("trayEnabledPref", trayEnabledPref);
+        const trayEnabledPref = !settings.get('trayEnabledPref');
+        settings.set('trayEnabledPref', trayEnabledPref);
         item.checked = trayEnabledPref;
         //window.setAutoHideMenuBar(trayEnabledPref);
       }

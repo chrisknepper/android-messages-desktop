@@ -72,19 +72,17 @@ if (isSecondInstance) {
 
   app.on('ready', () => {
 
+    const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const trayEnabled = settings.get('trayEnabledPref', IS_WINDOWS);
+    const startInTray = settings.get('startInTrayPref', false);
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
-      if (!settings.has("autoHideMenuPref")) {
-        settings.set("autoHideMenuPref", false);
-      }
-      if (!settings.has("startInTrayPref")) {
-        settings.set("startInTrayPref", false);
-      }
-      settingsMenu.submenu[0].checked = settings.get("autoHideMenuPref");
-      settingsMenu.submenu[1].checked = settings.get("startInTrayPref");
+      settingsMenu.submenu[0].checked = autoHideMenuBar;
     }
+
+    settingsMenu.submenu[1].checked = startInTray;
+    settingsMenu.submenu[2].checked = trayEnabled;
 
     setApplicationMenu();
 
@@ -93,8 +91,8 @@ if (isSecondInstance) {
     const mainWindowOptions = {
       width: 1100,
       height: 800,
-      autoHideMenuBar: settings.get("autoHideMenuPref"),
-      show: !settings.get("startInTrayPref") //Starts in tray if set
+      autoHideMenuBar: autoHideMenuBar,
+      show: !(startInTray) //Starts in tray if set
     };
 
     if (IS_LINUX) {
@@ -157,7 +155,7 @@ if (isSecondInstance) {
       });
     }
 
-    if (IS_LINUX) {
+    if (trayEnabled && IS_LINUX) {
       tray.on('click', () => {
         mainWindow.show();
       });
