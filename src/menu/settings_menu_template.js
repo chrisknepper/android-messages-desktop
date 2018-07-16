@@ -18,7 +18,8 @@ export const settingsMenu = {
       }
     },
     {
-      label: 'Start In Tray',
+      enabled: IS_MAC ? true : (!settings.get('trayEnabledPref')),
+      label: IS_MAC ? 'Start Hidden' : 'Start In Tray',
       type: 'checkbox',
       click: (item) => {
         const startInTrayPref = !settings.get('startInTrayPref');
@@ -27,7 +28,7 @@ export const settingsMenu = {
       }
     },
     {
-      label: 'Enable Tray Icon',
+      label: IS_MAC ? 'Enable Menu Bar Icon' : 'Enable Tray Icon',
       type: 'checkbox',
       click: (item) => {
         const trayEnabledPref = !settings.get('trayEnabledPref');

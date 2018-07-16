@@ -73,17 +73,30 @@ if (isSecondInstance) {
   app.on('ready', () => {
 
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
-    let trayEnabled = settings.get('trayEnabledPref', IS_WINDOWS);
+    let trayEnabled = settings.get('trayEnabledPref', (!IS_LINUX));
     const startInTray = settings.get('startInTrayPref', false);
     settings.watch('trayEnabledPref', (newValue, oldValue) => {
       if (newValue && !tray) {
         tray = new Tray(trayIconPath);
         let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
         tray.setContextMenu(trayContextMenu);
+        settingsMenu.submenu[1].enabled = true;
       }
-      if ((!newValue) && tray) {
-        tray.destroy();
-        tray = null;
+      if (!newValue) {
+        if (tray) {
+          tray.destroy();
+          tray = null;
+          if ((!IS_MAC) && mainWindow) {
+            if (!mainWindow.isVisible()) {
+              mainWindow.show();
+            }
+          }
+        }
+        if (!IS_MAC) {
+          settings.set('startInTrayPref', false);
+          settingsMenu.submenu[1].checked = false;
+          settingsMenu.submenu[1].enabled = false;
+        }
       }
       trayEnabled = newValue;
     });
