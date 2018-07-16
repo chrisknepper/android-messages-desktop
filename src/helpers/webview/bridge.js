@@ -5,3 +5,7 @@ const popupContextMenu = require('./context_menu.js');
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 window.addEventListener('contextmenu', popupContextMenu);
+
+window.addEventListener('focus', (event) => {
+    console.log('we got focus', event);
+});
