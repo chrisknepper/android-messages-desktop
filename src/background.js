@@ -104,6 +104,7 @@ if (isSecondInstance) {
     if (!IS_MAC) {
       // Sets checked status based on user prefs
       settingsMenu.submenu[0].checked = autoHideMenuBar;
+      settingsMenu.submenu[1].enabled = trayEnabled;
     }
 
     settingsMenu.submenu[1].checked = startInTray;
