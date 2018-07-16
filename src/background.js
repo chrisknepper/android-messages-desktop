@@ -73,8 +73,20 @@ if (isSecondInstance) {
   app.on('ready', () => {
 
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
-    const trayEnabled = settings.get('trayEnabledPref', IS_WINDOWS);
+    let trayEnabled = settings.get('trayEnabledPref', IS_WINDOWS);
     const startInTray = settings.get('startInTrayPref', false);
+    settings.watch('trayEnabledPref', (newValue, oldValue) => {
+      if (newValue && !tray) {
+        tray = new Tray(trayIconPath);
+        let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+        tray.setContextMenu(trayContextMenu);
+      }
+      if ((!newValue) && tray) {
+        tray.destroy();
+        tray = null;
+      }
+      trayEnabled = newValue;
+    });
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
