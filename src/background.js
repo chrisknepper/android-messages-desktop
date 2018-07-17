@@ -71,6 +71,12 @@ if (isSecondInstance) {
     const startInTray = settings.get('startInTrayPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
 
+    if (IS_MAC) {
+      app.on('activate', () => {
+        mainWindow.show();
+      });
+    }
+
     if (!IS_MAC) {
       // Sets checked status based on user prefs
       settingsMenu.submenu[0].checked = autoHideMenuBar;
@@ -108,6 +114,7 @@ if (isSecondInstance) {
     );
 
     trayManager.startIfEnabled();
+    trayManager.setupEventListeners();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 

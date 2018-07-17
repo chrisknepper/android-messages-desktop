@@ -48,12 +48,6 @@ export default class TrayManager {
   }
 
   setupEventListeners() {
-    if (IS_MAC) {
-      app.on('activate', () => {
-        mainWindow.show();
-      });
-    }
-
     if (this.enabled && IS_WINDOWS) {
       this.tray.on('double-click', (event) => {
         event.preventDefault();
