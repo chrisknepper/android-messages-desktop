@@ -5,13 +5,12 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu, Tray } from 'electron';
+import { app, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
-import { trayMenuTemplate } from './menu/tray_menu_template';
 import createWindow from './helpers/window';
 import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
@@ -19,6 +18,7 @@ import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
+import TrayManager from './helpers/tray/tray_manager';
 
 let mainWindow = null;
 
@@ -35,10 +35,9 @@ const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) 
 });
 
 if (isSecondInstance) {
-  app.quit()
+  app.quit();
 } else {
-  let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen!
-  let trayIconPath;
+  let trayManager = null;
 
   const setApplicationMenu = () => {
     const menus = baseMenuTemplate;
@@ -62,37 +61,29 @@ if (isSecondInstance) {
     // See: https://github.com/electron/electron/issues/10864#issuecomment-382519150
     app.setAppUserModelId('com.knepper.android-messages-desktop');
     app.setAsDefaultProtocolClient('android-messages-desktop');
-
-    // Re-use regular app .ico for the tray icon on Windows
-    trayIconPath = path.join(__dirname, '..', 'resources', 'icon.ico');
-  } else {
-    const trayIconFileName = IS_MAC ? 'icon_mac.png' : 'icon.png';
-    trayIconPath = path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
   }
 
   app.on('ready', () => {
+    trayManager = new TrayManager();
 
+    // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
-    // Enable tray/menu bar icon by default except on Linux -- the system having a tray is less of a guarantee on Linux.
-    let trayEnabled = settings.get('trayEnabledPref', (!IS_LINUX));
     const startInTray = settings.get('startInTrayPref', false);
     settings.watch('trayEnabledPref', (newValue, oldValue) => {
+      trayManager.enabled = newValue;
       if (newValue) {
         if (!IS_MAC) {
           // Must get a live reference to the menu item when updating their properties from outside of them.
           let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
           liveStartInTrayMenuItemRef.enabled = true;
         }
-        if (!tray) {
-          tray = new Tray(trayIconPath);
-          let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-          tray.setContextMenu(trayContextMenu);
+        if (!trayManager.tray) {
+          trayManager.startIfEnabled();
         }
       }
       if (!newValue) {
-        if (tray) {
-          tray.destroy();
-          tray = null;
+        if (trayManager.tray) {
+          trayManager.destroy();
           if ((!IS_MAC) && mainWindow) {
             if (!mainWindow.isVisible()) {
               mainWindow.show();
@@ -114,17 +105,16 @@ if (isSecondInstance) {
           app.exit(0);
         }
       }
-      trayEnabled = newValue;
     });
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
       settingsMenu.submenu[0].checked = autoHideMenuBar;
-      settingsMenu.submenu[1].enabled = trayEnabled;
+      settingsMenu.submenu[1].enabled = trayManager.enabled;
     }
 
     settingsMenu.submenu[1].checked = startInTray;
-    settingsMenu.submenu[2].checked = trayEnabled;
+    settingsMenu.submenu[2].checked = trayManager.enabled;
 
     setApplicationMenu();
 
@@ -138,7 +128,9 @@ if (isSecondInstance) {
     };
 
     if (IS_LINUX) {
-      mainWindowOptions.icon = path.join(__dirname, '..', 'resources', 'icons', '128x128.png')
+      // Setting the icon in Linux tends to be finicky without explicitly setting it like this.
+      // See: https://github.com/electron/electron/issues/6205
+      mainWindowOptions.icon = path.join(__dirname, '..', 'resources', 'icons', '128x128.png');
     };
 
     mainWindow = createWindow('main', mainWindowOptions);
@@ -151,12 +143,7 @@ if (isSecondInstance) {
       })
     );
 
-    if (trayEnabled) {
-      tray = new Tray(trayIconPath);
-      let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-      tray.setContextMenu(trayContextMenu);
-    }
-
+    trayManager.startIfEnabled();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
@@ -170,7 +157,7 @@ if (isSecondInstance) {
       if (IS_MAC) {
         return quitViaContext;
       } else {
-        if (trayEnabled) {
+        if (trayManager.enabled) {
           return quitViaContext;
         }
         return true;
@@ -182,46 +169,9 @@ if (isSecondInstance) {
       if (!shouldExitOnMainWindowClosed()) {
         event.preventDefault();
         mainWindow.hide();
-        if (IS_WINDOWS && trayEnabled) {
-          const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
-          if (!seenMinimizeToTrayWarning) {
-            tray.displayBalloon({
-              title: 'Android Messages',
-              content: 'Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.'
-            });
-            settings.set('seenMinimizeToTrayWarningPref', true);
-          }
-        }
+        trayManager.showMinimizeToTrayWarning();
       }
     });
-
-    if (IS_MAC) {
-      app.on('activate', () => {
-        mainWindow.show();
-      });
-    }
-
-    if (trayEnabled && IS_WINDOWS) {
-      tray.on('double-click', (event) => {
-        event.preventDefault();
-        mainWindow.show();
-      });
-    }
-
-    if (trayEnabled && IS_LINUX) {
-      tray.on('click', () => {
-        mainWindow.show();
-      });
-    }
-
-    // TODO: Maybe make these (aka minimize-to-tray behavior) a preference for non-Mac users?
-    // app.on('window-all-closed', (event) => {
-    //   app.quit();
-    // });
-    // mainWindow.on('minimize', (event) => {
-    //   event.preventDefault();
-    //   mainWindow.hide();
-    // });
 
     if (IS_DEV) {
       mainWindow.openDevTools();
