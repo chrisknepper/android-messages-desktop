@@ -48,16 +48,16 @@ export default class TrayManager {
   }
 
   setupEventListeners() {
-    if (this.enabled && IS_WINDOWS) {
+    if (this.enabled && IS_WINDOWS && app.mainWindow) {
       this.tray.on('double-click', (event) => {
         event.preventDefault();
-        mainWindow.show();
+        app.mainWindow.show();
       });
     }
 
-    if (this.enabled && IS_LINUX) {
+    if (this.enabled && IS_LINUX && app.mainWindow) {
       this.tray.on('click', () => {
-        mainWindow.show();
+        app.mainWindow.show();
       });
     }
   }
@@ -103,9 +103,9 @@ export default class TrayManager {
     if (!newValue) {
       if (this.tray) {
         this.destroy();
-        if ((!IS_MAC) && mainWindow) {
-          if (!mainWindow.isVisible()) {
-            mainWindow.show();
+        if ((!IS_MAC) && app.mainWindow) {
+          if (!app.mainWindow.isVisible()) {
+            app.mainWindow.show();
           }
         }
       }
