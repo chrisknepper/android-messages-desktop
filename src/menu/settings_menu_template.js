@@ -1,5 +1,6 @@
+import { dialog } from 'electron';
 import settings from "electron-settings";
-import { IS_MAC, SETTING_TRAY_ENABLED } from '../constants';
+import { IS_MAC, SETTING_TRAY_ENABLED, IS_LINUX } from '../constants';
 
 export const settingsMenu = {
   label: IS_MAC ? 'Preferences' : 'Settings',
@@ -32,8 +33,24 @@ export const settingsMenu = {
       type: 'checkbox',
       click: (item) => {
         const trayEnabledPref = !settings.get(SETTING_TRAY_ENABLED);
-        settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
-        item.checked = trayEnabledPref;
+        let confirmClose = true;
+        if (IS_LINUX && !trayEnabledPref) {
+          let dialogAnswer = dialog.showMessageBox({
+            type: 'question',
+            buttons: ['Restart', 'Cancel'],
+            title: 'App Restart Required',
+            message: 'Changing this setting requires Android Messages to be restarted. Click Restart to apply this setting change and restart Android Messages.'
+          });
+          if (dialogAnswer === 1) {
+            confirmClose = true;
+            item.checked = true; // Don't incorrectly flip checkmark if user canceled the dialog
+          }
+        }
+
+        if (confirmClose) {
+          settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
+          item.checked = trayEnabledPref;
+        }
       }
     }
   ]

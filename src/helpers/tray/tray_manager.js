@@ -62,7 +62,9 @@ export default class TrayManager {
         });
       }
 
-      if (IS_LINUX && app.mainWindow) {
+      // This actually has no effect. Electron docs say that click event is ignored on Linux for
+      // AppIndicator tray, but I can't find a way to not use AppIndicator for Linux tray.
+      if (IS_LINUX) {
         this.tray.on('click', () => {
           if (app.mainWindow) {
             app.mainWindow.show();
