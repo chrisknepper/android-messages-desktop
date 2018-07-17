@@ -140,6 +140,8 @@ if (isSecondInstance) {
         event.preventDefault();
         mainWindow.hide();
         trayManager.showMinimizeToTrayWarning();
+      } else {
+        app.quit(); // If we don't explicitly call this, the webview windows gets destroyed but background process still runs.
       }
     });
 
