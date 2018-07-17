@@ -18,7 +18,7 @@ export const settingsMenu = {
       }
     },
     {
-      enabled: true,
+      id: 'startInTrayMenuItem',
       label: IS_MAC ? 'Start Hidden' : 'Start In Tray',
       type: 'checkbox',
       click: (item) => {
@@ -34,7 +34,6 @@ export const settingsMenu = {
         const trayEnabledPref = !settings.get('trayEnabledPref');
         settings.set('trayEnabledPref', trayEnabledPref);
         item.checked = trayEnabledPref;
-        //window.setAutoHideMenuBar(trayEnabledPref);
       }
     }
   ]

@@ -37,7 +37,7 @@ const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) 
 if (isSecondInstance) {
   app.quit()
 } else {
-  let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen
+  let tray; // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen!
   let trayIconPath;
 
   const setApplicationMenu = () => {
@@ -73,14 +73,21 @@ if (isSecondInstance) {
   app.on('ready', () => {
 
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
+    // Enable tray/menu bar icon by default except on Linux -- the system having a tray is less of a guarantee on Linux.
     let trayEnabled = settings.get('trayEnabledPref', (!IS_LINUX));
     const startInTray = settings.get('startInTrayPref', false);
     settings.watch('trayEnabledPref', (newValue, oldValue) => {
-      if (newValue && !tray) {
-        tray = new Tray(trayIconPath);
-        let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-        tray.setContextMenu(trayContextMenu);
-        settingsMenu.submenu[1].enabled = true;
+      if (newValue) {
+        if (!IS_MAC) {
+          // Must get a live reference to the menu item when updating their properties from outside of them.
+          let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
+          liveStartInTrayMenuItemRef.enabled = true;
+        }
+        if (!tray) {
+          tray = new Tray(trayIconPath);
+          let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+          tray.setContextMenu(trayContextMenu);
+        }
       }
       if (!newValue) {
         if (tray) {
@@ -93,9 +100,12 @@ if (isSecondInstance) {
           }
         }
         if (!IS_MAC) {
+          // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
+          // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
           settings.set('startInTrayPref', false);
-          settingsMenu.submenu[1].checked = false;
-          settingsMenu.submenu[1].enabled = false;
+          let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
+          liveStartInTrayMenuItemRef.enabled = false;
+          liveStartInTrayMenuItemRef.checked = false;
         }
       }
       trayEnabled = newValue;
@@ -150,9 +160,20 @@ if (isSecondInstance) {
       quitViaContext = true;
     });
 
+    const shouldExitOnMainWindowClosed = () => {
+      if (IS_MAC) {
+        return quitViaContext;
+      } else {
+        if (trayEnabled) {
+          return quitViaContext;
+        }
+        return true;
+      }
+    };
+
     mainWindow.on('close', (event) => {
       console.log('close window called');
-      if (!quitViaContext) {
+      if (!shouldExitOnMainWindowClosed()) {
         event.preventDefault();
         mainWindow.hide();
         if (IS_WINDOWS && trayEnabled) {
