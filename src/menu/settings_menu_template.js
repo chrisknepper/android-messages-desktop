@@ -39,7 +39,7 @@ export const settingsMenu = {
             type: 'question',
             buttons: ['Restart', 'Cancel'],
             title: 'App Restart Required',
-            message: 'Changing this setting requires Android Messages to be restarted. Unsent text messages may be deleted. Click Restart to apply this setting change and restart Android Messages.'
+            message: 'Changing this setting requires Android Messages to be restarted.\n\nUnsent text messages may be deleted. Click Restart to apply this setting change and restart Android Messages.'
           });
           if (dialogAnswer === 1) {
             confirmClose = true;
