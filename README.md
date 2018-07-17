@@ -33,7 +33,9 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 # Features
 * System notifications when a text comes in
 * Notification badges on macOS
-* Minimize to tray on Windows
+* Run in background on Windows / Linux / macOS
+* Minimize to tray on WIndows / Linux
+* Menu bar support on macOS
 * TBD...
 
 # TODOs / Roadmap (rough order of priority):
