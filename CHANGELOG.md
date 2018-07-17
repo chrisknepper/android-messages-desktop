@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0] - 2018-07-17
+### Added
+- Setting to start in tray (automatically hide app on start)
+- Setting to make tray/menu bar functionality optional
+- Preferences on Mac
+
+### Changed
+- Default to enabling tray only on Windows and Mac
+- Refine window minimizing and closing UX further:
+    - On Windows and Linux, closing window when tray icon is disabled now closes the app entirely
+    - On Windows and Linux, when the tray icon is disabled, the option to start in tray is disabled
+- Make certain UI language more platform-specific
+- KNOWN ISSUE: Toggling the tray from on to off while using Linux requires an app restart for now
+
+### Fixed
+- Mac tray (menu bar) icon now inverts correctly when selected or Finder is in dark mode
+
 ## [0.4.0] - 2018-07-14
 ### Added
 - Right-click context menu with support for cut/copy/paste/undo/redo/save image/save video
