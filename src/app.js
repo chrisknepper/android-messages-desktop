@@ -69,7 +69,7 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
       androidMessagesWebview.getWebContents().openDevTools();
     }
     app.mainWindow.on('focus', () => {
-      //androidMessagesWebview.dispatchEvent(new Event('focus'));
+      androidMessagesWebview.dispatchEvent(new Event('focus'));
     });
   }
 
