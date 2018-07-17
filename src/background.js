@@ -107,6 +107,12 @@ if (isSecondInstance) {
           liveStartInTrayMenuItemRef.enabled = false;
           liveStartInTrayMenuItemRef.checked = false;
         }
+        if (IS_LINUX) {
+          // On Linux, the call to tray.destroy doesn't seem to work, causing multiple instances of the tray icon.
+          // Work around this by quickly restarting the app.
+          app.relaunch();
+          app.exit(0);
+        }
       }
       trayEnabled = newValue;
     });
