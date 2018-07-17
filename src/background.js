@@ -12,13 +12,13 @@ import { devMenuTemplate } from './menu/dev_menu_template';
 import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
-import TrayManager from './helpers/tray/tray_manager';
 
 let mainWindow = null;
 
@@ -69,43 +69,7 @@ if (isSecondInstance) {
     // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
-    settings.watch('trayEnabledPref', (newValue, oldValue) => {
-      trayManager.enabled = newValue;
-      if (newValue) {
-        if (!IS_MAC) {
-          // Must get a live reference to the menu item when updating their properties from outside of them.
-          let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
-          liveStartInTrayMenuItemRef.enabled = true;
-        }
-        if (!trayManager.tray) {
-          trayManager.startIfEnabled();
-        }
-      }
-      if (!newValue) {
-        if (trayManager.tray) {
-          trayManager.destroy();
-          if ((!IS_MAC) && mainWindow) {
-            if (!mainWindow.isVisible()) {
-              mainWindow.show();
-            }
-          }
-        }
-        if (!IS_MAC) {
-          // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
-          // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
-          settings.set('startInTrayPref', false);
-          let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
-          liveStartInTrayMenuItemRef.enabled = false;
-          liveStartInTrayMenuItemRef.checked = false;
-        }
-        if (IS_LINUX) {
-          // On Linux, the call to tray.destroy doesn't seem to work, causing multiple instances of the tray icon.
-          // Work around this by quickly restarting the app.
-          app.relaunch();
-          app.exit(0);
-        }
-      }
-    });
+    settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs

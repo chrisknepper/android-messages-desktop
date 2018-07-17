@@ -1,5 +1,5 @@
 import settings from "electron-settings";
-import { IS_MAC } from '../constants';
+import { IS_MAC, SETTING_TRAY_ENABLED } from '../constants';
 
 export const settingsMenu = {
   label: IS_MAC ? 'Preferences' : 'Settings',
@@ -31,8 +31,8 @@ export const settingsMenu = {
       label: IS_MAC ? 'Enable Menu Bar Icon' : 'Enable Tray Icon',
       type: 'checkbox',
       click: (item) => {
-        const trayEnabledPref = !settings.get('trayEnabledPref');
-        settings.set('trayEnabledPref', trayEnabledPref);
+        const trayEnabledPref = !settings.get(SETTING_TRAY_ENABLED);
+        settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
         item.checked = trayEnabledPref;
       }
     }

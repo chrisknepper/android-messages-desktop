@@ -16,11 +16,15 @@ const IS_LINUX = (osName === 'linux');
 // Environment
 const IS_DEV = (env.name === 'development');
 
+// Settings
+const SETTING_TRAY_ENABLED = 'trayEnabledPref';
+
 export {
     osName,
     osNameFriendly,
     IS_WINDOWS,
     IS_MAC,
     IS_LINUX,
-    IS_DEV
+    IS_DEV,
+    SETTING_TRAY_ENABLED
 };
