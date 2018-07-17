@@ -13,6 +13,7 @@
     - On Windows and Linux, when the tray icon is disabled, the option to start in tray is disabled
 - Make certain UI language more platform-specific
 - KNOWN ISSUE: Toggling the tray from on to off while using Linux requires an app restart for now
+- Refactor some tray code into a new class to manage it, TrayManager
 
 ### Fixed
 - Mac tray (menu bar) icon now inverts correctly when selected or Finder is in dark mode
