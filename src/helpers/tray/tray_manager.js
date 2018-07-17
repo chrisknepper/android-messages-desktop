@@ -47,26 +47,28 @@ export default class TrayManager {
     }
   }
 
-  setupEventListeners() {
-    if (this.enabled && IS_WINDOWS && app.mainWindow) {
-      this.tray.on('double-click', (event) => {
-        event.preventDefault();
-        app.mainWindow.show();
-      });
-    }
-
-    if (this.enabled && IS_LINUX && app.mainWindow) {
-      this.tray.on('click', () => {
-        app.mainWindow.show();
-      });
-    }
-  }
-
   startIfEnabled() {
     if (this.enabled) {
       this.tray = new Tray(this.trayIconPath);
       let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
       this.tray.setContextMenu(trayContextMenu);
+
+      if (IS_WINDOWS) {
+        this.tray.on('double-click', (event) => {
+          event.preventDefault();
+          if (app.mainWindow) {
+            app.mainWindow.show();
+          }
+        });
+      }
+
+      if (IS_LINUX && app.mainWindow) {
+        this.tray.on('click', () => {
+          if (app.mainWindow) {
+            app.mainWindow.show();
+          }
+        });
+      }
     }
   }
 

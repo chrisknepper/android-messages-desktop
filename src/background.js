@@ -114,7 +114,6 @@ if (isSecondInstance) {
     );
 
     trayManager.startIfEnabled();
-    trayManager.setupEventListeners();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
