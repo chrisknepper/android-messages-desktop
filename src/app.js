@@ -24,6 +24,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
     const url = webContents.getURL()
 
     if (permission === 'notifications') {
+      // TODO: Move this to our custom notification creation in background.js
       /*
        * We always get a "notification" in dev mode when the app starts due to calling setPermissionRequestHandler,
        * which accepts the permission to send browser notifications on behalf of the user--this false
@@ -39,7 +40,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
 
       // TODO: Provide visual indicators for Windows/Linux, possibly via mainWindow.setOverlayIcon
 
-      return callback(true); // Approve
+      return callback(false); // Prevent webview's notification from coming through (we roll our own)
     }
 
     if (!url.startsWith('https://messages.android.com')) {
@@ -69,6 +70,8 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
       androidMessagesWebview.getWebContents().openDevTools();
     }
     app.mainWindow.on('focus', () => {
+      // Make sure the webview gets a focus event on its window/DOM when the app window does,
+      // this makes automatic text input focus work.
       androidMessagesWebview.dispatchEvent(new Event('focus'));
     });
   }

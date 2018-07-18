@@ -5,7 +5,7 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu } from 'electron';
+import { app, Menu, ipcMain, Notification } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -117,6 +117,24 @@ if (isSecondInstance) {
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
+    ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
+      if (msg.options) {
+        const customNotification = new Notification({
+          title: msg.title,
+          // TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
+          // the sender's picture/avatar here...or we could create our own on the spot via canvas somehow?
+          icon: msg.options.icon,
+          body: msg.options.body,
+          silent: false
+        });
+
+        customNotification.on('click', () => {
+          mainWindow.show();
+        });
+
+        customNotification.show();
+      }
+    });
 
     let quitViaContext = false;
     app.on('before-quit', () => {
