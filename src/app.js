@@ -29,7 +29,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
        * notification should not result in an indicator for the user to see.
        */
 
-      // TODO: Provide visual indicators for Windows/Linux, possibly via mainWindow.setOverlayIcon
+      // TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
 
       return callback(false); // Prevent webview's notification from coming through (we roll our own)
     }

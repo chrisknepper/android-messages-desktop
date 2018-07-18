@@ -120,13 +120,17 @@ if (isSecondInstance) {
     trayManager.startIfEnabled();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
-
-    if (IS_MAC) {
-      mainWindow.on('focus', () => {
+    
+    mainWindow.on('focus', () => {
+      if (IS_MAC) {
         state.unreadNotificationCount = 0;
         app.dock.setBadge('');
-      });
-    }
+      }
+
+      if (IS_WINDOWS && trayManager.overlayVisible) {
+        trayManager.toggleOverlay(false);
+      }
+    });
 
     ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
       if (msg.options) {
@@ -145,6 +149,8 @@ if (isSecondInstance) {
             app.dock.setBadge('' + state.unreadNotificationCount);
           }
         }
+
+        trayManager.toggleOverlay(true);
 
         customNotification.on('click', () => {
           mainWindow.show();
