@@ -136,8 +136,17 @@ if (isSecondInstance) {
       if (msg.options) {
         const customNotification = new Notification({
           title: msg.title,
-          // TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
-          // the sender's picture/avatar here...or we could create our own on the spot via canvas somehow?
+          /*
+           * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
+           * the sender's picture/avatar here.
+           *
+           * We may be able to just do it live by:
+           * 1. Traversing the DOM for the conversation which matches the sender
+           * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+           * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
+           * This would likely also require copying computed style properties into the element to ensure it looks right.
+           * There also appears to be a library: http://html2canvas.hertzen.com
+           */
           icon: msg.options.icon,
           body: msg.options.body,
           silent: false
