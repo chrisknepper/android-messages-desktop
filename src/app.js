@@ -10,18 +10,16 @@ import jetpack from 'fs-jetpack';
 import { IS_MAC, IS_DEV } from './constants';
 
 const state = {
-  loaded: false,
-  unreadNotificationCount: 0
+  loaded: false
 };
 
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
-
   // Intercept request for notifications and accept it
   androidMessagesWebview.getWebContents().session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const url = webContents.getURL()
+    const url = webContents.getURL();
 
     if (permission === 'notifications') {
       // TODO: Move this to our custom notification creation in background.js
@@ -29,14 +27,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
        * We always get a "notification" in dev mode when the app starts due to calling setPermissionRequestHandler,
        * which accepts the permission to send browser notifications on behalf of the user--this false
        * notification should not result in an indicator for the user to see.
-       * TODO: Figure out a way to modify and override notifications to solve this and other issues.
        */
-      if (IS_MAC) {
-        if (app.mainWindow && !(app.mainWindow.isFocused())) {
-          state.unreadNotificationCount += 1;
-          app.dock.setBadge('' + state.unreadNotificationCount);
-        }
-      }
 
       // TODO: Provide visual indicators for Windows/Linux, possibly via mainWindow.setOverlayIcon
 
@@ -47,13 +38,6 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
       return callback(false); // Deny
     }
   });
-
-  if (IS_MAC && app.mainWindow) {
-    app.mainWindow.on('focus', () => {
-      state.unreadNotificationCount = 0;
-      app.dock.setBadge('');
-    })
-  }
 });
 
 androidMessagesWebview.addEventListener('did-finish-load', () => { // just before onLoad

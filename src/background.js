@@ -20,6 +20,10 @@ import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVI
 // in config/env_xxx.json file.
 import env from 'env';
 
+const state = {
+  unreadNotificationCount: 0
+};
+
 let mainWindow = null;
 
 // Prevent multiple instances of the app which causes many problems with an app like ours
@@ -117,6 +121,13 @@ if (isSecondInstance) {
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
+    if (IS_MAC) {
+      mainWindow.on('focus', () => {
+        state.unreadNotificationCount = 0;
+        app.dock.setBadge('');
+      });
+    }
+
     ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
       if (msg.options) {
         const customNotification = new Notification({
@@ -127,6 +138,13 @@ if (isSecondInstance) {
           body: msg.options.body,
           silent: false
         });
+
+        if (IS_MAC) {
+          if (!mainWindow.isFocused()) {
+            state.unreadNotificationCount += 1;
+            app.dock.setBadge('' + state.unreadNotificationCount);
+          }
+        }
 
         customNotification.on('click', () => {
           mainWindow.show();
