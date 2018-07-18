@@ -42,7 +42,7 @@ export const settingsMenu = {
             message: 'Changing this setting requires Android Messages to be restarted.\n\nUnsent text messages may be deleted. Click Restart to apply this setting change and restart Android Messages.'
           });
           if (dialogAnswer === 1) {
-            confirmClose = true;
+            confirmClose = false;
             item.checked = true; // Don't incorrectly flip checkmark if user canceled the dialog
           }
         }
