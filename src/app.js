@@ -1,20 +1,16 @@
-import path from 'path';
-
 import './stylesheets/main.css';
 
 import './helpers/external_links.js';
 
 import { remote, shell } from 'electron';
 import url from 'url';
-import jetpack from 'fs-jetpack';
-import { IS_MAC, IS_DEV } from './constants';
+import { IS_DEV } from './constants';
 
 const state = {
   loaded: false
 };
 
 const app = remote.app;
-const appDir = jetpack.cwd(app.getAppPath());
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
   // Intercept request for notifications and accept it
@@ -22,14 +18,14 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
     const url = webContents.getURL();
 
     if (permission === 'notifications') {
-      // TODO: Move this to our custom notification creation in background.js
       /*
-       * We always get a "notification" in dev mode when the app starts due to calling setPermissionRequestHandler,
-       * which accepts the permission to send browser notifications on behalf of the user--this false
-       * notification should not result in an indicator for the user to see.
+       * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
+       * which accepts the permission to send browser notifications on behalf of the user.
+       * This "notification" should fire before we start listening for notifications,
+       * and should not cause problems.
+       * TODO: Move this to a helper
+       * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
        */
-
-      // TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
 
       return callback(false); // Prevent webview's notification from coming through (we roll our own)
     }

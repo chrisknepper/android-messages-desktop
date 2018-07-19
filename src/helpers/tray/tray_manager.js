@@ -153,7 +153,7 @@ export default class TrayManager {
   }
 
   toggleOverlay(toggle) {
-    if (IS_WINDOWS && this.tray) {
+    if (IS_WINDOWS && this.tray && toggle !== this.overlayVisible) {
       if (toggle) {
         this.tray.setImage(this.overlayIconPath);
       } else {
