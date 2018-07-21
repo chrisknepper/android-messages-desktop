@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0] - 2018-07-20
+### Added
+- Visual indicator (badge) to Windows tray icon when notification comes in
+- Link to package for this app on AUR (for Arch Linux users)
+
+### Changed
+- Clicking notification now makes app visible and focused
+- Under the hood: Method of displaying notification (with our bridge/ipc)
+- Update README.md
+
+### Fixed
+- Linux now respects your choice when asking to restart the app
+- Typos in README.md corrected
+
 ## [0.5.0] - 2018-07-17
 ### Added
 - Setting to start in tray (automatically hide app on start)
