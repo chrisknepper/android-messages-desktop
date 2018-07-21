@@ -4,6 +4,7 @@ import { trayMenuTemplate } from '../../menu/tray_menu_template';
 import { IS_MAC, IS_LINUX, IS_WINDOWS, SETTING_TRAY_ENABLED } from '../../constants';
 import settings from 'electron-settings';
 
+// TODO: Make this static
 export default class TrayManager {
   constructor() {
     // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen!
@@ -11,6 +12,8 @@ export default class TrayManager {
     // Enable tray/menu bar icon by default except on Linux -- the system having a tray is less of a guarantee on Linux.
     this._enabled = settings.get(SETTING_TRAY_ENABLED, (!IS_LINUX));
     this._iconPath = this.setTrayIconPath();
+    this._overlayIconPath = this.setOverlayIconPath();
+    this._overlayVisible = false;
 
     this.handleTrayEnabledToggle = this.handleTrayEnabledToggle.bind(this);
   }
@@ -35,6 +38,18 @@ export default class TrayManager {
     return this._iconPath;
   }
 
+  get overlayIconPath() {
+    return this._overlayIconPath;
+  }
+
+  get overlayVisible() {
+    return this._overlayVisible;
+  }
+
+  set overlayVisible(visible) {
+    this._overlayVisible = visible;
+  }
+
   setTrayIconPath() {
     if (IS_WINDOWS) {
         // Re-use regular app .ico for the tray icon on Windows.
@@ -45,6 +60,13 @@ export default class TrayManager {
         const trayIconFileName = IS_MAC ? 'icon_macTemplate.png' : 'icon.png';
         return path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
     }
+  }
+
+  setOverlayIconPath() {
+    if (IS_WINDOWS) {
+      return path.join(__dirname, '..', 'resources', 'tray', 'tray_with_badge.ico');
+    }
+    return null;
   }
 
   startIfEnabled() {
@@ -127,6 +149,17 @@ export default class TrayManager {
         app.relaunch();
         app.exit(0);
       }
+    }
+  }
+
+  toggleOverlay(toggle) {
+    if (IS_WINDOWS && this.tray && toggle !== this.overlayVisible) {
+      if (toggle) {
+        this.tray.setImage(this.overlayIconPath);
+      } else {
+        this.tray.setImage(this.trayIconPath);
+      }
+      this.overlayVisible = toggle;
     }
   }
 

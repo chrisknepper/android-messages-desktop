@@ -1,58 +1,39 @@
-import path from 'path';
-
 import './stylesheets/main.css';
 
 import './helpers/external_links.js';
 
 import { remote, shell } from 'electron';
 import url from 'url';
-import jetpack from 'fs-jetpack';
-import { IS_MAC, IS_DEV } from './constants';
+import { IS_DEV } from './constants';
 
 const state = {
-  loaded: false,
-  unreadNotificationCount: 0
+  loaded: false
 };
 
 const app = remote.app;
-const appDir = jetpack.cwd(app.getAppPath());
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
-
   // Intercept request for notifications and accept it
   androidMessagesWebview.getWebContents().session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const url = webContents.getURL()
+    const url = webContents.getURL();
 
     if (permission === 'notifications') {
       /*
-       * We always get a "notification" in dev mode when the app starts due to calling setPermissionRequestHandler,
-       * which accepts the permission to send browser notifications on behalf of the user--this false
-       * notification should not result in an indicator for the user to see.
-       * TODO: Figure out a way to modify and override notifications to solve this and other issues.
+       * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
+       * which accepts the permission to send browser notifications on behalf of the user.
+       * This "notification" should fire before we start listening for notifications,
+       * and should not cause problems.
+       * TODO: Move this to a helper
+       * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
        */
-      if (IS_MAC) {
-        if (app.mainWindow && !(app.mainWindow.isFocused())) {
-          state.unreadNotificationCount += 1;
-          app.dock.setBadge('' + state.unreadNotificationCount);
-        }
-      }
 
-      // TODO: Provide visual indicators for Windows/Linux, possibly via mainWindow.setOverlayIcon
-
-      return callback(true); // Approve
+      return callback(false); // Prevent the webview's notification from coming through (we roll our own)
     }
 
     if (!url.startsWith('https://messages.android.com')) {
       return callback(false); // Deny
     }
   });
-
-  if (IS_MAC && app.mainWindow) {
-    app.mainWindow.on('focus', () => {
-      state.unreadNotificationCount = 0;
-      app.dock.setBadge('');
-    })
-  }
 });
 
 androidMessagesWebview.addEventListener('did-finish-load', () => { // just before onLoad
@@ -69,6 +50,8 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
       androidMessagesWebview.getWebContents().openDevTools();
     }
     app.mainWindow.on('focus', () => {
+      // Make sure the webview gets a focus event on its window/DOM when the app window does,
+      // this makes automatic text input focus work.
       androidMessagesWebview.dispatchEvent(new Event('focus'));
     });
   }

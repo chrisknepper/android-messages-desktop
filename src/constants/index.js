@@ -19,6 +19,9 @@ const IS_DEV = (env.name === 'development');
 // Settings
 const SETTING_TRAY_ENABLED = 'trayEnabledPref';
 
+// Events
+const EVENT_WEBVIEW_NOTIFICATION = 'messages-webview-notification';
+
 export {
     osName,
     osNameFriendly,
@@ -26,5 +29,6 @@ export {
     IS_MAC,
     IS_LINUX,
     IS_DEV,
-    SETTING_TRAY_ENABLED
+    SETTING_TRAY_ENABLED,
+    EVENT_WEBVIEW_NOTIFICATION
 };

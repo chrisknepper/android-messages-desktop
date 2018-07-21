@@ -5,7 +5,7 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu } from 'electron';
+import { app, Menu, ipcMain, Notification } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
@@ -14,11 +14,15 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
+
+const state = {
+  unreadNotificationCount: 0
+};
 
 let mainWindow = null;
 
@@ -116,7 +120,54 @@ if (isSecondInstance) {
     trayManager.startIfEnabled();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
+    
+    mainWindow.on('focus', () => {
+      if (IS_MAC) {
+        state.unreadNotificationCount = 0;
+        app.dock.setBadge('');
+      }
 
+      if (IS_WINDOWS && trayManager.overlayVisible) {
+        trayManager.toggleOverlay(false);
+      }
+    });
+
+    ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
+      if (msg.options) {
+        const customNotification = new Notification({
+          title: msg.title,
+          /*
+           * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
+           * the sender's picture/avatar here.
+           *
+           * We may be able to just do it live by:
+           * 1. Traversing the DOM for the conversation which matches the sender
+           * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+           * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
+           * This would likely also require copying computed style properties into the element to ensure it looks right.
+           * There also appears to be a library: http://html2canvas.hertzen.com
+           */
+          icon: msg.options.icon,
+          body: msg.options.body,
+          silent: false
+        });
+
+        if (IS_MAC) {
+          if (!mainWindow.isFocused()) {
+            state.unreadNotificationCount += 1;
+            app.dock.setBadge('' + state.unreadNotificationCount);
+          }
+        }
+
+        trayManager.toggleOverlay(true);
+
+        customNotification.once('click', () => {
+          mainWindow.show();
+        });
+
+        customNotification.show();
+      }
+    });
 
     let quitViaContext = false;
     app.on('before-quit', () => {
@@ -141,7 +192,7 @@ if (isSecondInstance) {
         mainWindow.hide();
         trayManager.showMinimizeToTrayWarning();
       } else {
-        app.quit(); // If we don't explicitly call this, the webview windows gets destroyed but background process still runs.
+        app.quit(); // If we don't explicitly call this, the webview and mainWindow get destroyed but background process still runs.
       }
     });
 
