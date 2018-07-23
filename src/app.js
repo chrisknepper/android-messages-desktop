@@ -27,7 +27,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
        * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
        */
 
-      return callback(false); // Prevent the webview's notification from coming through (we roll our own)
+      return callback(true); // Prevent the webview's notification from coming through (we roll our own)
     }
 
     if (!url.startsWith('https://messages.android.com')) {

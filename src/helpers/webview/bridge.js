@@ -12,13 +12,20 @@ const OriginalBrowserNotification = Notification;
 
 // Override the webview's window's instance of the Notification class and forward them to the main process
 // Necessary to generate and send a custom notification via Electron instead of just forwarding the webview one.
-Notification = function(title, options) {
+Notification = function (title, options) {
+    let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the ipc event fires
     ipc.send(EVENT_WEBVIEW_NOTIFICATION, {
         title,
         options
     });
 
-    return new OriginalBrowserNotification(title, options); // Still send the webview notification event so the ipc event fires
+    const originalAddEventListener = notificationToSend.addEventListener;
+    notificationToSend.addEventListener = function (type, listener, options) {
+        console.log('calling addEventListener', type, listener, options);
+        originalAddEventListener.call(notificationToSend, type, listener, options);
+    }
+
+    return notificationToSend;
 };
 Notification.prototype = OriginalBrowserNotification.prototype;
 Notification.permission = OriginalBrowserNotification.permission;

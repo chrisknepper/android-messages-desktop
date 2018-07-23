@@ -161,11 +161,31 @@ if (isSecondInstance) {
 
         trayManager.toggleOverlay(true);
 
-        customNotification.once('click', () => {
-          mainWindow.show();
-        });
+        // customNotification.once('click', () => {
+        //   mainWindow.show();
+        //   // event.sender.session.setPermissionRequestHandler((webContents, permission, callback) => {
+        //   //   const url = webContents.getURL();
 
-        customNotification.show();
+        //   //   if (permission === 'notifications') {
+        //   //     /*
+        //   //      * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
+        //   //      * which accepts the permission to send browser notifications on behalf of the user.
+        //   //      * This "notification" should fire before we start listening for notifications,
+        //   //      * and should not cause problems.
+        //   //      * TODO: Move this to a helper
+        //   //      * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
+        //   //      */
+
+        //   //     return callback(false); // Prevent the webview's notification from coming through (we roll our own)
+        //   //   }
+
+        //   //   if (!url.startsWith('https://messages.android.com')) {
+        //   //     return callback(false); // Deny
+        //   //   }
+        //   // });
+        // });
+
+        //customNotification.show();
       }
     });
 
