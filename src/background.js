@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -161,31 +161,14 @@ if (isSecondInstance) {
 
         trayManager.toggleOverlay(true);
 
-        // customNotification.once('click', () => {
-        //   mainWindow.show();
-        //   // event.sender.session.setPermissionRequestHandler((webContents, permission, callback) => {
-        //   //   const url = webContents.getURL();
+        customNotification.once('click', () => {
+          mainWindow.show();
+        });
 
-        //   //   if (permission === 'notifications') {
-        //   //     /*
-        //   //      * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
-        //   //      * which accepts the permission to send browser notifications on behalf of the user.
-        //   //      * This "notification" should fire before we start listening for notifications,
-        //   //      * and should not cause problems.
-        //   //      * TODO: Move this to a helper
-        //   //      * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
-        //   //      */
+        global.currentNotification = customNotification;
+        event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
-        //   //     return callback(false); // Prevent the webview's notification from coming through (we roll our own)
-        //   //   }
-
-        //   //   if (!url.startsWith('https://messages.android.com')) {
-        //   //     return callback(false); // Deny
-        //   //   }
-        //   // });
-        // });
-
-        //customNotification.show();
+        customNotification.show();
       }
     });
 
