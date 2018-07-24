@@ -11,10 +11,25 @@ window.addEventListener('contextmenu', popupContextMenu);
 const OriginalBrowserNotification = Notification;
 
 // Override the webview's window's instance of the Notification class and forward them to the main process
-// Necessary to generate and send a custom notification via Electron instead of just forwarding the webview one.
+// Necessary to generate and send a custom notification via Electron instead of just forwarding the webview (Google) ones.
 Notification = function (title, options) {
-    let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the ipc event fires
+    let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
+    /*
+     * Google's own notifications have a click event listener which takes care of highlighting
+     * the conversation a notification belongs to, but this click listener does not carry over
+     * when we block Google's and create our own Electron notification.
+     *
+     * What I would like to do here is just pass the listener function over IPC and call it in
+     * the main process.
+     *
+     * However, Electron does not support sending functions or otherwise non-JSON data across IPC.
+     * To solve this and be able to have both our click event listener (so we can show the app
+     * window) and Google's (so the converstaion gets selected/highlighted), when the main process
+     * asyncronously receives the notification data, it asyncronously sends a message back at which
+     * time we can reliably get a reference to the Electron notification and attach Google's click
+     * event listener.
+     */
     let originalClickListener = null;
 
     const originalAddEventListener = notificationToSend.addEventListener;
@@ -22,6 +37,8 @@ Notification = function (title, options) {
         if (type === 'click') {
             originalClickListener = listener;
         } else {
+            // Let all other event listeners be called, though they shouldn't have any effect
+            // because the original notification is blocked in the renderer process.
             originalAddEventListener.call(notificationToSend, type, listener, options);
         }
     }

@@ -165,6 +165,8 @@ if (isSecondInstance) {
           mainWindow.show();
         });
 
+        // Allows us to marry our custom notification and its behavior with the helpful behavior
+        // (conversation highlighting) that Google provides. See the webview bridge for details.
         global.currentNotification = customNotification;
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
