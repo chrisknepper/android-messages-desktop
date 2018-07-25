@@ -1,6 +1,6 @@
 import { dialog } from 'electron';
 import settings from "electron-settings";
-import { IS_MAC, SETTING_TRAY_ENABLED, IS_LINUX } from '../constants';
+import { IS_LINUX, IS_MAC, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../constants';
 
 export const settingsMenu = {
   label: IS_MAC ? 'Preferences' : 'Settings',
@@ -55,3 +55,31 @@ export const settingsMenu = {
     }
   ]
 };
+
+// Electron doesn't seem to support the visible property for submenus, so push it instead of hiding it in non-Windows
+// See: https://github.com/electron/electron/issues/8703
+if (IS_WINDOWS) {
+  settingsMenu.submenu.push(
+    {
+      label: 'Open from Tray On...',
+      submenu: [
+        {
+          label: 'Double-click',
+          type: 'radio',
+          click: (item) => {
+            settings.set(SETTING_TRAY_CLICK_SHORTCUT, 'double-click');
+            item.checked = true;
+          }
+        },
+        {
+          label: 'Single-click',
+          type: 'radio',
+          click: (item) => {
+            settings.set(SETTING_TRAY_CLICK_SHORTCUT, 'click');
+            item.checked = true;
+          }
+        }
+      ]
+    }
+  );
+}

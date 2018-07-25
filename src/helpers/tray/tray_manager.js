@@ -1,7 +1,7 @@
 import path from 'path';
 import { app, Tray, Menu } from 'electron';
 import { trayMenuTemplate } from '../../menu/tray_menu_template';
-import { IS_MAC, IS_LINUX, IS_WINDOWS, SETTING_TRAY_ENABLED } from '../../constants';
+import { IS_MAC, IS_LINUX, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../../constants';
 import settings from 'electron-settings';
 
 // TODO: Make this static
@@ -14,8 +14,10 @@ export default class TrayManager {
     this._iconPath = this.setTrayIconPath();
     this._overlayIconPath = this.setOverlayIconPath();
     this._overlayVisible = false;
+    this._clickShortcut = settings.get(SETTING_TRAY_CLICK_SHORTCUT, 'double-click');
 
     this.handleTrayEnabledToggle = this.handleTrayEnabledToggle.bind(this);
+    this.handleTrayClickShortcutToggle = this.handleTrayClickShortcutToggle.bind(this);
   }
 
   get tray() {
@@ -50,6 +52,14 @@ export default class TrayManager {
     this._overlayVisible = visible;
   }
 
+  get clickShortcut() {
+    return this._clickShortcut;
+  }
+
+  set clickShortcut(shortcut) {
+    this._clickShortcut = shortcut;
+  }
+
   setTrayIconPath() {
     if (IS_WINDOWS) {
         // Re-use regular app .ico for the tray icon on Windows.
@@ -75,25 +85,31 @@ export default class TrayManager {
       this.tray = new Tray(this.trayIconPath);
       let trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
       this.tray.setContextMenu(trayContextMenu);
+      this.setupEventListeners();
+    }
+  }
 
-      if (IS_WINDOWS) {
-        this.tray.on('double-click', (event) => {
-          event.preventDefault();
-          if (app.mainWindow) {
-            app.mainWindow.show();
-          }
-        });
-      }
+  setupEventListeners() {
+    if (IS_WINDOWS) {
+      this.tray.on(this.clickShortcut, this.handleTrayClick);
+    }
 
-      // This actually has no effect. Electron docs say that click event is ignored on Linux for
-      // AppIndicator tray, but I can't find a way to not use AppIndicator for Linux tray.
-      if (IS_LINUX) {
-        this.tray.on('click', () => {
-          if (app.mainWindow) {
-            app.mainWindow.show();
-          }
-        });
-      }
+    // This actually has no effect. Electron docs say that click event is ignored on Linux for
+    // AppIndicator tray, but I can't find a way to not use AppIndicator for Linux tray.
+    if (IS_LINUX) {
+      this.tray.on('click', this.handleTrayClick);
+    }
+  }
+
+  destroyEventListeners() {
+    this.tray.removeListener('click', this.handleTrayClick);
+    this.tray.removeListener('double-click', this.handleTrayClick);
+  }
+
+  handleTrayClick(event) {
+    event.preventDefault();
+    if (app.mainWindow) {
+      app.mainWindow.show();
     }
   }
 
@@ -151,6 +167,12 @@ export default class TrayManager {
         app.exit(0);
       }
     }
+  }
+
+  handleTrayClickShortcutToggle(newValue, oldValue) {
+    this.clickShortcut = newValue;
+    this.destroyEventListeners();
+    this.setupEventListeners();
   }
 
   toggleOverlay(toggle) {

@@ -18,6 +18,7 @@ const IS_DEV = (env.name === 'development');
 
 // Settings
 const SETTING_TRAY_ENABLED = 'trayEnabledPref';
+const SETTING_TRAY_CLICK_SHORTCUT = 'trayClickShortcut';
 
 // Events
 const EVENT_WEBVIEW_NOTIFICATION = 'messages-webview-notification';
@@ -31,6 +32,7 @@ export {
     IS_LINUX,
     IS_DEV,
     SETTING_TRAY_ENABLED,
+    SETTING_TRAY_CLICK_SHORTCUT,
     EVENT_WEBVIEW_NOTIFICATION,
     EVENT_NOTIFICATION_REFLECT_READY
 };

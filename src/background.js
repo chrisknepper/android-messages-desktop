@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -74,6 +74,7 @@ if (isSecondInstance) {
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
+    settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
 
     if (IS_MAC) {
       app.on('activate', () => {
@@ -89,6 +90,11 @@ if (isSecondInstance) {
 
     settingsMenu.submenu[2].checked = startInTray;
     settingsMenu.submenu[1].checked = trayManager.enabled;
+
+   if (IS_WINDOWS) {
+      settingsMenu.submenu[3].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
+      settingsMenu.submenu[3].submenu[1].checked = (trayManager.clickShortcut === 'click');
+   }
 
     setApplicationMenu();
 
