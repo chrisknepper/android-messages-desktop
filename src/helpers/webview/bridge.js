@@ -10,8 +10,17 @@ window.addEventListener('contextmenu', popupContextMenu);
 
 const OriginalBrowserNotification = Notification;
 
-// Override the webview's window's instance of the Notification class and forward them to the main process
-// Necessary to generate and send a custom notification via Electron instead of just forwarding the webview (Google) ones.
+/*
+ * Override the webview's window's instance of the Notification class and forward their data to the
+ * main process. This is Necessary to generate and send a custom notification via Electron instead
+ * of just forwarding the webview (Google) ones.
+ *
+ * Derived from:
+ * https://github.com/electron/electron/blob/master/docs/api/ipc-main.md#sending-messages
+ * https://stackoverflow.com/questions/2891096/addeventlistener-using-apply
+ * https://stackoverflow.com/questions/31231622/event-listener-for-web-notification
+ * https://stackoverflow.com/questions/1421257/intercept-javascript-event
+ */
 Notification = function (title, options) {
     let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 

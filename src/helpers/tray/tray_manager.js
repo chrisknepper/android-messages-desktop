@@ -57,6 +57,7 @@ export default class TrayManager {
     } else {
         // Mac tray icon filename MUST end in 'Template' and contain only black and transparent pixels.
         // Otherwise, automatic inversion and dark mode appearance won't work.
+        // See: https://stackoverflow.com/questions/41664208/electron-tray-icon-change
         const trayIconFileName = IS_MAC ? 'icon_macTemplate.png' : 'icon.png';
         return path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
     }
