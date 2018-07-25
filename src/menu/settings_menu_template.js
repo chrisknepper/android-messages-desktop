@@ -19,16 +19,6 @@ export const settingsMenu = {
       }
     },
     {
-      id: 'startInTrayMenuItem',
-      label: IS_MAC ? 'Start Hidden' : 'Start In Tray',
-      type: 'checkbox',
-      click: (item) => {
-        const startInTrayPref = !settings.get('startInTrayPref');
-        settings.set('startInTrayPref', startInTrayPref);
-        item.checked = startInTrayPref;
-      }
-    },
-    {
       label: IS_MAC ? 'Enable Menu Bar Icon' : 'Enable Tray Icon',
       type: 'checkbox',
       click: (item) => {
@@ -51,6 +41,16 @@ export const settingsMenu = {
           settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
           item.checked = trayEnabledPref;
         }
+      }
+    },
+    {
+      id: 'startInTrayMenuItem',
+      label: IS_MAC ? 'Start Hidden' : 'Start In Tray',
+      type: 'checkbox',
+      click: (item) => {
+        const startInTrayPref = !settings.get('startInTrayPref');
+        settings.set('startInTrayPref', startInTrayPref);
+        item.checked = startInTrayPref;
       }
     }
   ]
