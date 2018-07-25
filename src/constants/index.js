@@ -21,6 +21,7 @@ const SETTING_TRAY_ENABLED = 'trayEnabledPref';
 
 // Events
 const EVENT_WEBVIEW_NOTIFICATION = 'messages-webview-notification';
+const EVENT_NOTIFICATION_REFLECT_READY = 'messages-webview-reflect-ready';
 
 export {
     osName,
@@ -30,5 +31,6 @@ export {
     IS_LINUX,
     IS_DEV,
     SETTING_TRAY_ENABLED,
-    EVENT_WEBVIEW_NOTIFICATION
+    EVENT_WEBVIEW_NOTIFICATION,
+    EVENT_NOTIFICATION_REFLECT_READY
 };

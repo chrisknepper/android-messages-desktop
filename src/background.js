@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -164,6 +164,11 @@ if (isSecondInstance) {
         customNotification.once('click', () => {
           mainWindow.show();
         });
+
+        // Allows us to marry our custom notification and its behavior with the helpful behavior
+        // (conversation highlighting) that Google provides. See the webview bridge for details.
+        global.currentNotification = customNotification;
+        event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
       }
