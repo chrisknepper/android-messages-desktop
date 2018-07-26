@@ -61,6 +61,7 @@ export const settingsMenu = {
 if (IS_WINDOWS) {
   settingsMenu.submenu.push(
     {
+      id: 'trayClickShortcutMenuItem',
       label: 'Open from Tray On...',
       submenu: [
         {

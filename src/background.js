@@ -92,6 +92,7 @@ if (isSecondInstance) {
     settingsMenu.submenu[1].checked = trayManager.enabled;
 
    if (IS_WINDOWS) {
+      settingsMenu.submenu[3].enabled = trayManager.enabled;
       settingsMenu.submenu[3].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
       settingsMenu.submenu[3].submenu[1].checked = (trayManager.clickShortcut === 'click');
    }

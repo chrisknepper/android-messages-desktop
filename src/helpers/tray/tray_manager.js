@@ -133,11 +133,16 @@ export default class TrayManager {
 
   handleTrayEnabledToggle(newValue, oldValue) {
     this.enabled = newValue;
+    let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
+    let livetrayClickShortcutMenuItemRef = Menu.getApplicationMenu().getMenuItemById('trayClickShortcutMenuItem');
+
     if (newValue) {
       if (!IS_MAC) {
         // Must get a live reference to the menu item when updating their properties from outside of them.
-        let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
         liveStartInTrayMenuItemRef.enabled = true;
+      }
+      if (IS_WINDOWS) {
+        livetrayClickShortcutMenuItemRef.enabled = true;
       }
       if (!this.tray) {
         this.startIfEnabled();
@@ -156,9 +161,11 @@ export default class TrayManager {
         // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
         // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
         settings.set('startInTrayPref', false);
-        let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
         liveStartInTrayMenuItemRef.enabled = false;
         liveStartInTrayMenuItemRef.checked = false;
+      }
+      if (IS_WINDOWS) {
+        livetrayClickShortcutMenuItemRef.enabled = false;
       }
       if (IS_LINUX) {
         // On Linux, the call to tray.destroy doesn't seem to work, causing multiple instances of the tray icon.
