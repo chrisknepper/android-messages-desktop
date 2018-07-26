@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.0] - 2018-07-25
+### Added
+- Toggle for tray shortcut to make app visible on Windows (single or double-click, previously there was no preference and the shortcut was double-click)
+
+### Changed
+- Under the hood: Overhaul communication between main process and webview to faciliate notification customization
+
+### Fixed
+- Clicking a notification now highlights that conversation (this was working before 0.6.0 and accidentally broken when making app visible on notification click...now clicking shows the app *and* highlights the conversation 🎉)
+
 ## [0.6.0] - 2018-07-20
 ### Added
 - Visual indicator (badge) to Windows tray icon when notification comes in
