@@ -1,12 +1,25 @@
 // This script is injected into the webview.
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
-const popupContextMenu = require('./context_menu.js');
+//const popupContextMenu = require('./context_menu.js');
 const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
-const { ipcRenderer, remote } = require('electron')
+const { ipcRenderer, remote } = require('electron');
+
+const SpellCheckHandler = require('electron-spellchecker/lib/spell-check-handler').default;
+const ContextMenuListener = require('electron-spellchecker/lib/context-menu-listener').default;
+const ContextMenuBuilder = require('electron-spellchecker/lib/context-menu-builder').default;
+
+window.spellCheckHandler = new SpellCheckHandler();
+setTimeout(() => window.spellCheckHandler.attachToInput(), 1000);
+
+window.spellCheckHandler.provideHintText('This is probably the language that you want to check in');
+window.spellCheckHandler.autoUnloadDictionariesOnBlur();
+
+window.contextMenuBuilder = new ContextMenuBuilder(window.spellCheckHandler, null, true);
+window.contextMenuListener = new ContextMenuListener((info) => { window.contextMenuBuilder.showPopupMenu(info); });
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-window.addEventListener('contextmenu', popupContextMenu);
+//window.addEventListener('contextmenu', popupContextMenu);
 
 const OriginalBrowserNotification = Notification;
 
