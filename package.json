@@ -57,7 +57,9 @@
   },
   "dependencies": {
     "about-window": "^1.11.1",
+    "electron-editor-context-menu": "^1.1.1",
     "electron-settings": "^3.2.0",
+    "electron-spell-check-provider": "^1.1.1",
     "electron-updater": "^2.21.10",
     "fs-jetpack": "^1.0.0"
   },
@@ -71,6 +73,7 @@
     "electron": "2.0.2",
     "electron-builder": "^20.15.1",
     "electron-mocha": "^6.0.4",
+    "electron-rebuild": "^1.8.1",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^5.2.0",
