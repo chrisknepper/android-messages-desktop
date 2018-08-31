@@ -24,7 +24,7 @@ Based on:
 Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
 * For Mac, choose the **dmg**
 * For Windows, choose the **exe**
-* For Linux, choose either the **deb**, the **snap**, the **pacman**, or the **AppImage**
+* For Linux, choose either the **deb**, the **snap**, the **pacman**, or the **AppImage**. If you're using Arch or derivates of, it's also available in the [AUR](https://aur.archlinux.org/packages/android-messages-desktop/).
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
@@ -33,7 +33,9 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 # Features
 * System notifications when a text comes in
 * Notification badges on macOS
-* Minimize to tray on Windows
+* Run in background on Windows / Linux / macOS
+* Minimize to tray on Windows / Linux
+* Menu bar support on macOS
 * TBD...
 
 # TODOs / Roadmap (rough order of priority):

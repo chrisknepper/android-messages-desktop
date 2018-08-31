@@ -1,3 +1,47 @@
+# Changelog
+
+## [0.7.0] - 2018-07-25
+### Added
+- Toggle for tray shortcut to make app visible on Windows (single or double-click, previously there was no preference and the shortcut was double-click)
+
+### Changed
+- Under the hood: Overhaul communication between main process and webview to faciliate notification customization
+
+### Fixed
+- Clicking a notification now highlights that conversation (this was working before 0.6.0 and accidentally broken when making app visible on notification click...now clicking shows the app *and* highlights the conversation 🎉)
+
+## [0.6.0] - 2018-07-20
+### Added
+- Visual indicator (badge) to Windows tray icon when notification comes in
+- Link to package for this app on AUR (for Arch Linux users)
+
+### Changed
+- Clicking notification now makes app visible and focused
+- Under the hood: Method of displaying notification (with our bridge/ipc)
+- Update README.md
+
+### Fixed
+- Linux now respects your choice when asking to restart the app
+- Typos in README.md corrected
+
+## [0.5.0] - 2018-07-17
+### Added
+- Setting to start in tray (automatically hide app on start)
+- Setting to make tray/menu bar functionality optional
+- Preferences on Mac
+
+### Changed
+- Default to enabling tray only on Windows and Mac
+- Refine window minimizing and closing UX further:
+    - On Windows and Linux, closing window when tray icon is disabled now closes the app entirely
+    - On Windows and Linux, when the tray icon is disabled, the option to start in tray is disabled
+- Make certain UI language more platform-specific
+- KNOWN ISSUE: Toggling the tray from on to off while using Linux requires an app restart for now
+- Refactor some tray code into a new class to manage it, TrayManager
+
+### Fixed
+- Mac tray (menu bar) icon now inverts correctly when selected or Finder is in dark mode
+
 ## [0.4.0] - 2018-07-14
 ### Added
 - Right-click context menu with support for cut/copy/paste/undo/redo/save image/save video
