@@ -1,6 +1,4 @@
 import { app, BrowserWindow } from "electron";
-import { IS_MAC } from "../constants";
-import settings from "electron-settings";
 
 export const devMenuTemplate = {
   label: "Development",
