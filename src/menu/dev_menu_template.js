@@ -13,22 +13,6 @@ export const devMenuTemplate = {
       }
     },
     {
-      label: "Toggle Fullscreen",
-      accelerator: "F11",
-      click: (item, window) => {
-        const fullscreen = window.isFullScreen();
-        const autoHideMenuPref = settings.get('autoHideMenuPref', false);
-
-        // Only makes changes to menu bar settings when not on macOS
-        if (!IS_MAC) {
-          window.setMenuBarVisibility(fullscreen ? !autoHideMenuPref : false);
-          window.setAutoHideMenuBar(fullscreen ? autoHideMenuPref : true);
-        }
-
-        window.setFullScreen(!fullscreen);
-      }
-    },
-    {
       label: "Toggle DevTools",
       accelerator: "Alt+CmdOrCtrl+I",
       click: () => {
