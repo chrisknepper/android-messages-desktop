@@ -105,7 +105,8 @@ if (isSecondInstance) {
       width: 1100,
       height: 800,
       autoHideMenuBar: autoHideMenuBar,
-      show: !(startInTray) //Starts in tray if set
+      show: !(startInTray),  //Starts in tray if set
+      titleBarStyle: IS_MAC ? 'hiddenInset' : '' //Turn on hidden frame on a Mac
     };
 
     if (IS_LINUX) {
