@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.1] - 2018-11-17
+### Changed
+- Update electron from 2.0.2 to 2.0.12
+
 ## [0.7.0] - 2018-07-25
 ### Added
 - Toggle for tray shortcut to make app visible on Windows (single or double-click, previously there was no preference and the shortcut was double-click)
