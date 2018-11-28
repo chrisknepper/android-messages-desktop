@@ -92,6 +92,14 @@ npm run release
 
 Once the packaging process finished, the `dist` directory will contain your distributable file.
 
+# Publishing a release:
+1. Commit what you want to go in the release (including updates to README and CHANGELOG)
+2. Run `npm release <type>` where `<type>` is either `major`, `minor`, or `patch` depending on the extent of your changes (this command increments the version in package.json and creates a git tag for the new version)
+3. Run `git push`
+4. Run `git push --tags`
+5. Run `npm run release` (for this step to succeed, you must have a GitHub Personal Access Token with write access to this repository in your `PATH` as `GH_TOKEN`)
+6. Go to GitHub and publish the release (which should be there as a draft), taking care to make the release name match the tag name including the "v"
+
 We use [electron-builder](https://github.com/electron-userland/electron-builder) to handle the packaging process. It has a lot of [customization options](https://www.electron.build/configuration/configuration), which you can declare under `"build"` key in `package.json`.
 
 # The icons
