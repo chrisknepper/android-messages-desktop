@@ -53,8 +53,7 @@
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
     "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
     "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
-    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
-    "install-wsl": "npm install && npm uninstall electron --no-save && export npm_config_platform=win32 && npm install electron@2.0.2 --no-save && unset npm_config_platform"
+    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
   },
   "dependencies": {
     "about-window": "^1.11.1",
