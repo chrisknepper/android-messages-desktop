@@ -67,7 +67,7 @@ export const settingsMenu = {
         // Note: having the "startup apps" panel open breaks the functionality - Windows bug?
         const exeName = path.basename(process.execPath);
         app.setLoginItemSettings({
-        	openAtLogin: item.checked,
+        	openAtLogin: openAppAtLoginPref,
         	path: process.execPath,
             args: [ '--processStart', "${exeName}" ]
         });
