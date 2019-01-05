@@ -52,6 +52,16 @@ export const settingsMenu = {
         settings.set('startInTrayPref', startInTrayPref);
         item.checked = startInTrayPref;
       }
+    },
+    {
+      id: 'openAppAtLoginMenuItem',
+      label: 'Open At Login',
+      type: 'checkbox',
+      click: (item) => {
+        const openAppAtLoginPref = !settings.get('openAppAtLoginPref');
+        settings.set('openAppAtLoginPref', openAppAtLoginPref);
+        item.checked = openAppAtLoginPref;
+      }
     }
   ]
 };

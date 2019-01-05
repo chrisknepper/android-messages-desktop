@@ -73,6 +73,7 @@ if (isSecondInstance) {
     // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
+    const openAppAtLogin = settings.get('openAppAtLoginPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
 
@@ -88,14 +89,27 @@ if (isSecondInstance) {
       settingsMenu.submenu[2].enabled = trayManager.enabled;
     }
 
-    settingsMenu.submenu[2].checked = startInTray;
     settingsMenu.submenu[1].checked = trayManager.enabled;
+    settingsMenu.submenu[2].checked = startInTray;
 
-   if (IS_WINDOWS) {
-      settingsMenu.submenu[3].enabled = trayManager.enabled;
-      settingsMenu.submenu[3].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
-      settingsMenu.submenu[3].submenu[1].checked = (trayManager.clickShortcut === 'click');
-   }
+    if (IS_WINDOWS || IS_MAC) {
+      settingsMenu.submenu[3].checked = openAppAtLogin;
+    }
+
+    if (IS_WINDOWS) {
+      settingsMenu.submenu[4].enabled = trayManager.enabled;
+      settingsMenu.submenu[4].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
+      settingsMenu.submenu[4].submenu[1].checked = (trayManager.clickShortcut === 'click');
+    }
+
+    if (IS_WINDOWS || IS_MAC) {
+		const exeName = path.basename(process.execPath);
+    	app.setLoginItemSettings({
+    		openAtLogin: openAppAtLogin,
+    		path: process.execPath,
+			args: [ '--processStart', "${exeName}" ]
+		});
+    }
 
     setApplicationMenu();
 
