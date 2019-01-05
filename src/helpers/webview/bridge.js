@@ -1,7 +1,7 @@
 // This script is injected into the webview.
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
-//const popupContextMenu = require('./context_menu.js');
+const popupContextMenu = require('./context_menu.js');
 const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
 const { ipcRenderer, remote } = require('electron');
 
@@ -15,8 +15,7 @@ setTimeout(() => window.spellCheckHandler.attachToInput(), 1000);
 window.spellCheckHandler.provideHintText('This is probably the language that you want to check in');
 window.spellCheckHandler.autoUnloadDictionariesOnBlur();
 
-window.contextMenuBuilder = new ContextMenuBuilder(window.spellCheckHandler, null, true);
-window.contextMenuListener = new ContextMenuListener((info) => { window.contextMenuBuilder.showPopupMenu(info); });
+remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 //window.addEventListener('contextmenu', popupContextMenu);
