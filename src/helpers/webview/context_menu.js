@@ -53,7 +53,6 @@ const textMenuTemplate = [
 ];
 
 const standardInputMenu = Menu.buildFromTemplate(standardMenuTemplate);
-const textInputMenu = Menu.buildFromTemplate(textMenuTemplate);
 
 const popupContextMenu = async (event, params) => {
   switch (params.mediaType) {
@@ -87,23 +86,27 @@ const popupContextMenu = async (event, params) => {
       break;
     default:
       if (params.isEditable) {
+        const textMenuTemplateCopy = [ ...textMenuTemplate ];
         if (params.misspelledWord) {
           let corrections = await window.spellCheckHandler.getCorrectionsForMisspelling(params.misspelledWord);
           console.log(corrections);
           if (corrections && corrections.length) {
+            textMenuTemplateCopy.unshift({
+              type: 'separator'
+            });
             corrections.forEach(function (correction) {
-              let item = new MenuItem({
+              let item = {
                 label: correction,
                 click: function () {
                   return event.sender.replaceMisspelling(correction);
                 }
-              });
+              };
 
-              textInputMenu.append(item);
+              textMenuTemplateCopy.unshift(item);
             });
           }
         }
-
+        const textInputMenu = Menu.buildFromTemplate(textMenuTemplateCopy);
         textInputMenu.popup(remote.getCurrentWindow());
       } else { // Omit options pertaining to input fields if this isn't one
         standardInputMenu.popup(remote.getCurrentWindow());
