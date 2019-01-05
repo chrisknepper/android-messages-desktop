@@ -102,15 +102,6 @@ if (isSecondInstance) {
       settingsMenu.submenu[4].submenu[1].checked = (trayManager.clickShortcut === 'click');
     }
 
-    if (IS_WINDOWS || IS_MAC) {
-		const exeName = path.basename(process.execPath);
-    	app.setLoginItemSettings({
-    		openAtLogin: openAppAtLogin,
-    		path: process.execPath,
-			args: [ '--processStart', "${exeName}" ]
-		});
-    }
-
     setApplicationMenu();
 
     autoUpdater.checkForUpdatesAndNotify();

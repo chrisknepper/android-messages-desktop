@@ -1,4 +1,5 @@
-import { dialog } from 'electron';
+import { app, dialog } from 'electron';
+import path from 'path';
 import settings from "electron-settings";
 import { IS_LINUX, IS_MAC, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../constants';
 
@@ -61,6 +62,15 @@ export const settingsMenu = {
         const openAppAtLoginPref = !settings.get('openAppAtLoginPref');
         settings.set('openAppAtLoginPref', openAppAtLoginPref);
         item.checked = openAppAtLoginPref;
+        
+        // Allows Windows & macOS to start the app at login
+        // Note: having the "startup apps" panel open breaks the functionality - Windows bug?
+        const exeName = path.basename(process.execPath);
+        app.setLoginItemSettings({
+        	openAtLogin: item.checked,
+        	path: process.execPath,
+            args: [ '--processStart', "${exeName}" ]
+        });
       }
     }
   ]
