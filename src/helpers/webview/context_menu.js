@@ -87,9 +87,23 @@ const popupContextMenu = async (event, params) => {
     default:
       if (params.isEditable) {
         const textMenuTemplateCopy = [ ...textMenuTemplate ];
+        // TODO: Add guards here to prevent crashes/errors
+        // TODO: Possibly gate add to dictionary for non-macOS based on comments in electron-spellchecker source
+        // See: context-menu-builder.js and spell-check-handler.js
         if (params.misspelledWord) {
+          const booboo = params.selectionText;
+          textMenuTemplateCopy.unshift({
+            type: 'separator'
+          });
+          textMenuTemplateCopy.unshift({
+            label: `Add ${booboo} to Dictionary`,
+            click: function () {
+              console.log('wanna get away?', window.spellCheckHandler);
+              event.sender.replaceMisspelling(booboo);
+              window.spellCheckHandler.currentSpellchecker.add(booboo);
+            }
+          });
           let corrections = await window.spellCheckHandler.getCorrectionsForMisspelling(params.misspelledWord);
-          console.log(corrections);
           if (corrections && corrections.length) {
             textMenuTemplateCopy.unshift({
               type: 'separator'
