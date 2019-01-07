@@ -98,9 +98,11 @@ const popupContextMenu = async (event, params) => {
           textMenuTemplateCopy.unshift({
             label: `Add ${booboo} to Dictionary`,
             click: function () {
-              console.log('wanna get away?', window.spellCheckHandler);
               event.sender.replaceMisspelling(booboo);
               window.spellCheckHandler.currentSpellchecker.add(booboo);
+              // TODO: Add to a persistent data store for Windows/Linux since the dictionary doesn't natively
+              // persist user custom words on those platforms
+              // See https://github.com/electron-userland/electron-spellchecker/issues/36
             }
           });
           let corrections = await window.spellCheckHandler.getCorrectionsForMisspelling(params.misspelledWord);
