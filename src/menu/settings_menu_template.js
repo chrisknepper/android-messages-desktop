@@ -64,13 +64,26 @@ export const settingsMenu = {
         item.checked = openAppAtLoginPref;
         
         // Allows Windows & macOS to start the app at login
-        // Note: having the "startup apps" panel open breaks the functionality - Windows bug?
+        // Note: having the "startup apps" panel open on Windows 10 breaks this
         const exeName = path.basename(process.execPath);
-        app.setLoginItemSettings({
-        	openAtLogin: openAppAtLoginPref,
-        	path: process.execPath,
-            args: [ '--processStart', "${exeName}" ]
-        });
+        if (IS_WINDOWS) {
+          const appFolder = path.dirname(process.execPath)
+          const updateExe = path.resolve(appFolder, '..', 'Update.exe')
+          app.setLoginItemSettings({
+            openAtLogin: openAppAtLoginPref,
+            path: updateExe,
+            args: [
+              '--processStart', `"${exeName}"`,
+              '--process-start-args', `"--hidden"`
+            ]});
+        }
+        else {
+          app.setLoginItemSettings({
+            openAtLogin: openAppAtLoginPref,
+            path: process.execPath,
+              args: [ '--processStart', "${exeName}" ]
+          });
+        }
       }
     }
   ]
