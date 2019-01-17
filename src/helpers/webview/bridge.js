@@ -2,7 +2,7 @@
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
 const popupContextMenu = require('./context_menu.js');
-const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
+const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY } = require('../../constants');
 const { ipcRenderer, remote } = require('electron');
 
 const SpellCheckHandler = require('electron-spellchecker/lib/spell-check-handler').default;
@@ -16,6 +16,18 @@ window.spellCheckHandler.provideHintText('This is probably the language that you
 window.spellCheckHandler.autoUnloadDictionariesOnBlur();
 
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
+
+ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, (event, windowsLinuxCustomWords) => {
+    // Basically a polyfill for persistent custom words electron-spellchecker doesn't do on !mac.
+    for (let i = 0, n = windowsLinuxCustomWords.length; i < n; i++) {
+        window.spellCheckHandler.currentSpellchecker.add(windowsLinuxCustomWords[i]);
+    }
+});
+
+window.onload = () => {
+    // If this is done too soon, the bridge will not properly receive the list of custom words from the main process.
+    ipcRenderer.send(EVENT_BRIDGE_INIT);
+}
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 //window.addEventListener('contextmenu', popupContextMenu);

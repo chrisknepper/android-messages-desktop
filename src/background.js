@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -178,6 +178,34 @@ if (isSecondInstance) {
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
+      }
+    });
+
+    ipcMain.on(EVENT_BRIDGE_INIT, (event) => {
+      if (!IS_MAC) {
+        // We send an event with the array of custom words to the webview bridge which contains
+        // the instance of the spellchecker. Done this way because passing class instances
+        // between electron processes is hacky at best and impossible at worst.
+        const windowsLinuxCustomWords = settings.get('windowsLinuxCustomWords', []);
+        event.sender.send(EVENT_SPELLING_REFLECT_READY, windowsLinuxCustomWords);
+      }
+    });
+
+    ipcMain.on(EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD, (event, msg) => {
+      if (!IS_MAC) {
+        /*
+         * Add custom words to a persistent data store for Windows/Linux since the
+         * electron-spellchecker dictionary only persists on Mac :(
+         * See https://github.com/electron-userland/electron-spellchecker/issues/36
+         * and comments in electron-spellchecker source:
+         * context-menu-builder.js and spell-check-handler.js
+         */
+        const { newCustomWord } = msg;
+        const windowsLinuxCustomWords = settings.get('windowsLinuxCustomWords', []);
+        if (newCustomWord && !windowsLinuxCustomWords.includes(newCustomWord)) {
+          windowsLinuxCustomWords.push(newCustomWord);
+          settings.set('windowsLinuxCustomWords', windowsLinuxCustomWords);
+        }
       }
     });
 

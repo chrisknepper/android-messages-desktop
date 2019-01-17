@@ -1,7 +1,8 @@
 // Provide context menus (copy, paste, save image, etc...) for right-click interaction.
 // Must not contain certain newer JS syntaxes to allow use inside a webview.
 
-const remote = require('electron').remote;
+const { ipcRenderer, remote } = require('electron');
+const { IS_MAC, EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD } = require('../../constants');
 
 const Menu = remote.Menu, MenuItem = remote.MenuItem;
 
@@ -88,8 +89,6 @@ const popupContextMenu = async (event, params) => {
       if (params.isEditable) {
         const textMenuTemplateCopy = [ ...textMenuTemplate ];
         // TODO: Add guards here to prevent crashes/errors
-        // TODO: Possibly gate add to dictionary for non-macOS based on comments in electron-spellchecker source
-        // See: context-menu-builder.js and spell-check-handler.js
         if (params.misspelledWord) {
           const booboo = params.selectionText;
           textMenuTemplateCopy.unshift({
@@ -100,9 +99,12 @@ const popupContextMenu = async (event, params) => {
             click: function () {
               event.sender.replaceMisspelling(booboo);
               window.spellCheckHandler.currentSpellchecker.add(booboo);
-              // TODO: Add to a persistent data store for Windows/Linux since the dictionary doesn't natively
-              // persist user custom words on those platforms
-              // See https://github.com/electron-userland/electron-spellchecker/issues/36
+              // The main process deals with persisting the custom words in the settings for Windows/Linux
+              if (!IS_MAC) {
+                ipcRenderer.send(EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD, {
+                  newCustomWord: booboo
+                });
+              }
             }
           });
           let corrections = await window.spellCheckHandler.getCorrectionsForMisspelling(params.misspelledWord);
