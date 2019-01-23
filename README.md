@@ -22,23 +22,27 @@ Based on:
 
 # Download
 Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
+
 * For Mac, choose the **dmg**
 * For Windows, choose the **exe**
-* For Linux, choose either the **deb**, the **snap**, the **pacman**, or the **AppImage**. If you're using Arch or derivates of, it's also available in the [AUR](https://aur.archlinux.org/packages/android-messages-desktop/).
+* For Linux, choose either the **deb**, the **snap**, the **pacman**, or the **AppImage**. If you're using Arch or derivatives of Arch, it's also available in the [AUR](https://aur.archlinux.org/packages/android-messages-desktop/).
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
 **Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
 
 # Features
+
 * System notifications when a text comes in
 * Notification badges on macOS
+* Multi-language spell checking including saving custom words
 * Run in background on Windows / Linux / macOS
 * Minimize to tray on Windows / Linux
 * Menu bar support on macOS
 * TBD...
 
 # TODOs / Roadmap (rough order of priority):
+
 - [x] Make sure it actually works (definitely works as of v0.1.0, done via [8068ed2](../../commit/8068ed2))
 - [x] Release signed binaries for macOS (binaries are signed as of v0.0.2, done via [8492023](../../commit/8492023))
 - [x] Make an icon (done via [df625ba](../../commit/df625ba))
@@ -60,6 +64,37 @@ cd android-messages-desktop
 npm install
 npm start
 ```
+
+## If `npm install` fails:
+Introducing [`electron-spellchecker`](https://github.com/electron-userland/electron-spellchecker) means introducing what is known in the Node world as a "native" module, which are not distributed as binaries. In other words, some low-level code needs to be compiled on your local machine. There are a couple of "gotchas" associated with this which may break installing/running/building the app until you address them.
+
+### Windows:
+The module `node-gyp` must be able to run on your system, which you should be able to do following the [Windows instructions](https://github.com/nodejs/node-gyp#option-1) via `windows-build-tools`.
+
+### Linux:
+
+You must have the following packages installed:
+
+* libxext-dev
+* libxtst-dev
+* libxkbfile-dev
+
+These packages should be installable from your system's package manager, i.e. in Ubuntu/Ubuntu-like systems:
+`sudo apt-get install libxext-dev libxtst-dev libxkbfile-dev`
+
+### Mac:
+You probably need the Xcode Command Line Tools. I am unsure if `xcodebuild` is necessary.
+
+### All platforms:
+Node and Python 2.x are required. Mac and Linux should always have Python 2.x, and the above instructions should result in it being installed in Windows.
+
+If starting/building still doesn't work, try using `electron-rebuild` per [their instructions](https://github.com/electron/electron-rebuild#how-does-it-work):
+
+`$(npm bin)/electron-rebuild`
+
+Or if you're on Windows:
+
+`.\node_modules\.bin\electron-rebuild.cmd`
 
 ## Starting the app in development mode
 ```
