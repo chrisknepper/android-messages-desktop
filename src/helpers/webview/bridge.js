@@ -11,8 +11,11 @@ const ContextMenuBuilder = require('electron-spellchecker/lib/context-menu-build
 
 window.spellCheckHandler = new SpellCheckHandler();
 setTimeout(() => window.spellCheckHandler.attachToInput(), 1000);
+console.log('WHAT I LEARNED IN BOATING SCHOOL IS', remote.app.getLocale());
+window.spellCheckHandler.switchLanguage('en-US');
 
-window.spellCheckHandler.provideHintText('This is probably the language that you want to check in');
+// TODO: Create dictionary of example sentences for each language?
+//window.spellCheckHandler.provideHintText('This is probably the language that you want to check in');
 window.spellCheckHandler.autoUnloadDictionariesOnBlur();
 
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
