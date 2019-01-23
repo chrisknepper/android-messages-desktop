@@ -6,14 +6,9 @@ const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRID
 const { ipcRenderer, remote } = require('electron');
 
 const SpellCheckHandler = require('electron-spellchecker/lib/spell-check-handler').default;
-const ContextMenuListener = require('electron-spellchecker/lib/context-menu-listener').default;
-const ContextMenuBuilder = require('electron-spellchecker/lib/context-menu-builder').default;
 
 window.spellCheckHandler = new SpellCheckHandler();
-setTimeout(() => window.spellCheckHandler.attachToInput(), 1000);
-console.log('WHAT I LEARNED IN BOATING SCHOOL IS', remote.app.getLocale());
-window.spellCheckHandler.switchLanguage('en-US');
-
+window.spellCheckHandler.switchLanguage(remote.app.getLocale()); // See: https://electronjs.org/docs/api/locales
 // TODO: Create dictionary of example sentences for each language?
 //window.spellCheckHandler.provideHintText('This is probably the language that you want to check in');
 window.spellCheckHandler.autoUnloadDictionariesOnBlur();
@@ -21,19 +16,20 @@ window.spellCheckHandler.autoUnloadDictionariesOnBlur();
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, (event, windowsLinuxCustomWords) => {
-    // Basically a polyfill for persistent custom words electron-spellchecker doesn't do on !mac.
+    // Basically a polyfill for persistent custom words which electron-spellchecker doesn't do on !mac 🙄
     for (let i = 0, n = windowsLinuxCustomWords.length; i < n; i++) {
         window.spellCheckHandler.currentSpellchecker.add(windowsLinuxCustomWords[i]);
     }
 });
 
 window.onload = () => {
-    // If this is done too soon, the bridge will not properly receive the list of custom words from the main process.
+    window.spellCheckHandler.attachToInput();
+    // Once we are injected (and page load fires), let the main process know. Currently we only notify the main
+    // process because we need to get a list of the user's custom words on !mac. If this event is done too soon,
+    // reliability of the events between bridge/main happening goes waaaay down
     ipcRenderer.send(EVENT_BRIDGE_INIT);
-}
+};
 
-// Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-//window.addEventListener('contextmenu', popupContextMenu);
 
 const OriginalBrowserNotification = Notification;
 
