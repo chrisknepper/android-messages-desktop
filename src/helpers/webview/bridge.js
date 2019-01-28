@@ -2,11 +2,38 @@
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
 const popupContextMenu = require('./context_menu.js');
-const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
-const { ipcRenderer, remote } = require('electron')
+const { IS_DEV, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
+const { ipcRenderer, remote } = require('electron');
+import path from 'path';
+import { ENVIRONMENT } from 'hunspell-asm';
+import { SpellCheckerProvider } from 'electron-hunspell';
+import { webFrame } from 'electron';
+
+
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-window.addEventListener('contextmenu', popupContextMenu);
+remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
+
+window.onload = async () => {
+    const provider = new SpellCheckerProvider();
+    window.spellCheckHandler = provider;
+    await provider.initialize({ environment: ENVIRONMENT.NODE });
+
+    const basePath = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
+    const dictPath = path.join(basePath, 'resources', 'dictionaries');
+    //console.log('dictionary folder is ', dictPath);
+    
+
+    await provider.loadDictionary('en', path.join(dictPath, 'en_US.dic'), path.join(dictPath, 'en_US.aff'));
+    provider.switchDictionary('en');
+    // console.log('teh provider', provider);
+    // console.log('teh provider bad word', provider.spellCheckerTable.en.spellChecker.spell('derp'));
+    // console.log('teh provider good word', provider.spellCheckerTable.en.spellChecker.spell('yes'));
+    // console.log('suggestions', provider.getSuggestion('calor'));
+    // webFrame.setSpellCheckProvider('en', true, () => {
+
+    // });
+}
 
 const OriginalBrowserNotification = Notification;
 

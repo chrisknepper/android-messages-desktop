@@ -10,7 +10,12 @@ const state = {
   loaded: false
 };
 
+import fs from 'fs';
+import path from 'path';
+import { SpellCheckerProvider } from 'electron-hunspell';
+
 const app = remote.app;
+
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
   // Intercept request for notifications and accept it
@@ -41,14 +46,27 @@ androidMessagesWebview.addEventListener('did-finish-load', () => { // just befor
 
 });
 
-androidMessagesWebview.addEventListener('did-stop-loading', () => { // coincident with onLoad, can fire multiple times
+androidMessagesWebview.addEventListener('did-stop-loading', async () => { // coincident with onLoad, can fire multiple times
   console.log('done loading');
   if (!state.loaded) {
     state.loaded = true;
     loader.classList.add('hidden');
-    if (IS_DEV) {
+    //if (IS_DEV) {
       androidMessagesWebview.getWebContents().openDevTools();
-    }
+    //}
+
+    //console.log('the provider', SpellCheckProvider);
+
+    // const provider = new SpellCheckerProvider();
+    // await provider.initialize();
+    // await provider.loadDictionary('en', path.join(__dirname, '..', 'resources', 'dictionaries', 'en_US.dic'), path.join(__dirname, '..', 'resources', 'dictionaries', 'en_US.aff'));
+    // provider.switchDictionary('en');
+    // console.log('teh provider', provider);
+    // console.log('teh provider bad word', provider.spellCheckerTable.en.spellChecker.spell('derp'));
+    // console.log('teh provider good word', provider.spellCheckerTable.en.spellChecker.spell('yes'));
+    // console.log('suggestions', provider.getSuggestion('calor'));
+
+
     app.mainWindow.on('focus', () => {
       // Make sure the webview gets a focus event on its window/DOM when the app window does,
       // this makes automatic text input focus work.
