@@ -2,7 +2,7 @@
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
 const popupContextMenu = require('./context_menu.js');
-const { IS_DEV, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
+const { IS_DEV, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY } = require('../../constants');
 const { ipcRenderer, remote } = require('electron');
 import path from 'path';
 import { ENVIRONMENT } from 'hunspell-asm';
@@ -21,19 +21,23 @@ window.onload = async () => {
 
     const basePath = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
     const dictPath = path.join(basePath, 'resources', 'dictionaries');
-    //console.log('dictionary folder is ', dictPath);
-    
 
-    await provider.loadDictionary('en', path.join(dictPath, 'en_US.dic'), path.join(dictPath, 'en_US.aff'));
-    provider.switchDictionary('en');
-    // console.log('teh provider', provider);
-    // console.log('teh provider bad word', provider.spellCheckerTable.en.spellChecker.spell('derp'));
-    // console.log('teh provider good word', provider.spellCheckerTable.en.spellChecker.spell('yes'));
-    // console.log('suggestions', provider.getSuggestion('calor'));
-    // webFrame.setSpellCheckProvider('en', true, () => {
-
-    // });
+    await provider.loadDictionary('en-US', path.join(dictPath, 'en_US.dic'), path.join(dictPath, 'en_US.aff'));
+    provider.switchDictionary('en-US');
+    ipcRenderer.send(EVENT_BRIDGE_INIT);
 }
+
+ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, (event, customWords) => {
+    console.log('got the reflection', customWords, window.spellCheckHandler.selectedDictionary);
+    if (window.spellCheckHandler.selectedDictionary in customWords) {
+        console.log('we have custom words to add', customWords, customWords[window.spellCheckHandler.selectedDictionary]);
+        for (let i = 0, n = customWords[window.spellCheckHandler.selectedDictionary].length; i < n; i++) {
+            const word = customWords[window.spellCheckHandler.selectedDictionary][i];
+            console.log('adding', word, 'to dictionary');
+            window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(word);
+        }
+    }
+});
 
 const OriginalBrowserNotification = Notification;
 

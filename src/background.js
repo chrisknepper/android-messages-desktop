@@ -14,14 +14,15 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
 
 const state = {
-  unreadNotificationCount: 0
+  unreadNotificationCount: 0,
+  currentLanguage: null
 };
 
 let mainWindow = null;
@@ -68,6 +69,9 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
+    state.currentLanguage = app.getLocale();
+    console.log('the locale', state.currentLanguage);
+
     trayManager = new TrayManager();
 
     // TODO: Create a preference manager which handles all of these
@@ -178,6 +182,38 @@ if (isSecondInstance) {
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
+      }
+    });
+
+    ipcMain.on(EVENT_BRIDGE_INIT, (event) => {
+      // We send an event with the language key and array of custom words to the webview bridge which contains the
+      // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+      // between electron processes is hacky at best and impossible at worst.
+      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+      const { currentLanguage } = state;
+      let customWordsOfCurrentLanguage = {};
+      if (currentLanguage in existingCustomWords) {
+        customWordsOfCurrentLanguage = { [currentLanguage]: existingCustomWords[currentLanguage] };
+      }
+      event.sender.send(EVENT_SPELLING_REFLECT_READY, customWordsOfCurrentLanguage);
+    });
+
+    ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (event, msg) => {
+      // Add custom words picked by the user to a persistent data store because they must be added to
+      // the instance of Hunspell on each launch of the app/loading of the dictionary.
+      const { newCustomWord } = msg;
+      const { currentLanguage } = state;
+      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+      console.log('attempting to add custom words', currentLanguage, currentLanguage in existingCustomWords);
+      if (!(currentLanguage in existingCustomWords)) {
+        console.log('currentLanguage key not yet there', currentLanguage);
+        existingCustomWords[currentLanguage] = [];
+      }
+      console.log('custom word dict before adding new word', existingCustomWords);
+      if (newCustomWord && !existingCustomWords[currentLanguage].includes(newCustomWord)) {
+        existingCustomWords[currentLanguage].push(newCustomWord);
+        console.log('about to save custom word dict after adding new word', existingCustomWords);
+        settings.set(SETTING_CUSTOM_WORDS, existingCustomWords);
       }
     });
 

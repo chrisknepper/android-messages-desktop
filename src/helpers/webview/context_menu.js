@@ -2,7 +2,7 @@
 // Must not contain certain newer JS syntaxes to allow use inside a webview.
 
 const { ipcRenderer, remote } = require('electron');
-const { IS_MAC, EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD } = require('../../constants');
+const { EVENT_SPELL_ADD_CUSTOM_WORD } = require('../../constants');
 
 const Menu = remote.Menu, MenuItem = remote.MenuItem;
 
@@ -98,16 +98,13 @@ const popupContextMenu = async (event, params) => {
             label: `Add ${booboo} to Dictionary`,
             click: function () {
               event.sender.replaceMisspelling(booboo);
-              //window.spellCheckHandler.currentSpellchecker.add(booboo);
-              // The main process deals with persisting the custom words in the settings for Windows/Linux
-              if (!IS_MAC) {
-                ipcRenderer.send(EVENT_WINDOWS_LINUX_ONLY_CUSTOM_WORD, {
-                  newCustomWord: booboo
-                });
-              }
+              // The main process deals with persisting the custom words in the settings
+              ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
+                newCustomWord: booboo
+              });
             }
           });
-          console.log('ok check it out homes', window.spellCheckHandler);
+          console.log('reference to spellCheckHandler', window.spellCheckHandler);
           let corrections = window.spellCheckHandler.getSuggestion(params.misspelledWord);
           if (corrections && corrections.length) {
             textMenuTemplateCopy.unshift({
