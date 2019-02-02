@@ -1,4 +1,5 @@
 import env from 'env';
+import path from 'path';
 
 const osMap = {
     win32: 'Windows',
@@ -15,6 +16,8 @@ const IS_LINUX = (osName === 'linux');
 
 // Environment
 const IS_DEV = (env.name === 'development');
+const BASE_APP_PATH = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
+const SPELLING_DICTIONARIES_PATH = path.join(BASE_APP_PATH, 'resources', 'dictionaries');
 
 // Settings
 const SETTING_TRAY_ENABLED = 'trayEnabledPref';
@@ -35,6 +38,8 @@ export {
     IS_MAC,
     IS_LINUX,
     IS_DEV,
+    BASE_APP_PATH,
+    SPELLING_DICTIONARIES_PATH,
     SETTING_TRAY_ENABLED,
     SETTING_TRAY_CLICK_SHORTCUT,
     SETTING_CUSTOM_WORDS,
