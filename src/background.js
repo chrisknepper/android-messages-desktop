@@ -69,7 +69,7 @@ if (isSecondInstance) {
     app.setAsDefaultProtocolClient('android-messages-desktop');
   }
 
-  app.on('ready', async () => {
+  app.on('ready', () => {
     state.currentLanguage = app.getLocale();
     console.log('the locale', state.currentLanguage);
 
@@ -186,17 +186,32 @@ if (isSecondInstance) {
       }
     });
 
-    ipcMain.on(EVENT_BRIDGE_INIT, (event) => {
-      // We send an event with the language key and array of custom words to the webview bridge which contains the
-      // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
-      // between electron processes is hacky at best and impossible at worst.
-      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
-      const { currentLanguage } = state;
-      let customWordsOfCurrentLanguage = {};
-      if (currentLanguage in existingCustomWords) {
-        customWordsOfCurrentLanguage = { [currentLanguage]: existingCustomWords[currentLanguage] };
+    ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+
+      const supportedLanguages = await DictionaryManager.getSupportedLanguages();
+      const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale('en-US', supportedLanguages); // first param == app.getLocale()
+      console.log('the locale for spellcheck', dictionaryLocaleKey);
+      if (dictionaryLocaleKey) {
+        console.log('spellcheck is possible');
+        const spellCheckFiles = await DictionaryManager.getLanguagePath('en-US', dictionaryLocaleKey) // first param == app.getLocale()
+        console.log('the paths to the spellcheck files are', spellCheckFiles);
+
+        // We send an event with the language key and array of custom words to the webview bridge which contains the
+        // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+        // between electron processes is hacky at best and impossible at worst.
+        const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+        const { currentLanguage } = state;
+        let customWords = {};
+        if (currentLanguage in existingCustomWords) {
+          customWords = { [currentLanguage]: existingCustomWords[currentLanguage] };
+        }
+        event.sender.send(EVENT_SPELLING_REFLECT_READY, {
+          dictionaryLocaleKey: 'en-US', // app.getLocale() // TODO test this with mismatched locale keys
+          spellCheckFiles,
+          customWords
+        });
       }
-      event.sender.send(EVENT_SPELLING_REFLECT_READY, customWordsOfCurrentLanguage);
+
     });
 
     ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (event, msg) => {
@@ -249,14 +264,5 @@ if (isSecondInstance) {
       mainWindow.openDevTools();
     //}
 
-    console.log('just before');
-    const supportedLanguages = await DictionaryManager.getSupportedLanguages();
-    const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale('en-US', supportedLanguages);
-    console.log('the locale for spellcheck', dictionaryLocaleKey);
-    if (dictionaryLocaleKey) {
-      console.log('spellcheck is possible');
-      const spellCheckFiles = await DictionaryManager.getLanguagePath('en-US', dictionaryLocaleKey) // first param == app.getLocale()
-      console.log('the paths to the spellcheck files are', spellCheckFiles);
-    }
   });
 }

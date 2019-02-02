@@ -19,22 +19,22 @@ window.onload = async () => {
     window.spellCheckHandler = provider;
     await provider.initialize({ environment: ENVIRONMENT.NODE });
 
-    const basePath = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
-    const dictPath = path.join(basePath, 'resources', 'dictionaries');
-
-    await provider.loadDictionary('en-US', path.join(dictPath, 'en_US.dic'), path.join(dictPath, 'en_US.aff'));
-    provider.switchDictionary('en-US');
     ipcRenderer.send(EVENT_BRIDGE_INIT);
 }
 
-ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, (event, customWords) => {
-    console.log('got the reflection', customWords, window.spellCheckHandler.selectedDictionary);
-    if (window.spellCheckHandler.selectedDictionary in customWords) {
-        console.log('we have custom words to add', customWords, customWords[window.spellCheckHandler.selectedDictionary]);
-        for (let i = 0, n = customWords[window.spellCheckHandler.selectedDictionary].length; i < n; i++) {
-            const word = customWords[window.spellCheckHandler.selectedDictionary][i];
-            console.log('adding', word, 'to dictionary');
-            window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(word);
+ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
+    console.log('got the reflection', spellCheckFiles, customWords);
+    if (spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
+        await window.spellCheckHandler.loadDictionary(dictionaryLocaleKey, spellCheckFiles.userLanguageDicFile,spellCheckFiles.userLanguageAffFile);
+        window.spellCheckHandler.switchDictionary(dictionaryLocaleKey);
+        console.log('now we done loaded the dictionary', window.spellCheckHandler.selectedDictionary);
+        if (window.spellCheckHandler.selectedDictionary in customWords) {
+            console.log('we have custom words to add', customWords, customWords[window.spellCheckHandler.selectedDictionary]);
+            for (let i = 0, n = customWords[window.spellCheckHandler.selectedDictionary].length; i < n; i++) {
+                const word = customWords[window.spellCheckHandler.selectedDictionary][i];
+                console.log('adding', word, 'to dictionary');
+                window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(word);
+            }
         }
     }
 });
