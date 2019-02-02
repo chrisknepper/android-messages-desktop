@@ -15,6 +15,7 @@ import { webFrame } from 'electron';
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = async () => {
+    // TODO: Maybe only do this once we know the current language has dictionaries
     const provider = new SpellCheckerProvider();
     window.spellCheckHandler = provider;
     await provider.initialize({ environment: ENVIRONMENT.NODE });

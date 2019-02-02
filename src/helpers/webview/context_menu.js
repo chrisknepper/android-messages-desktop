@@ -88,38 +88,39 @@ const popupContextMenu = async (event, params) => {
     default:
       if (params.isEditable) {
         const textMenuTemplateCopy = [...textMenuTemplate];
-        // TODO: Add guards here to prevent crashes/errors
-        if (params.misspelledWord) {
-          const booboo = params.selectionText;
-          textMenuTemplateCopy.unshift({
-            type: 'separator'
-          });
-          textMenuTemplateCopy.unshift({
-            label: `Add ${booboo} to Dictionary`,
-            click: function () {
-              event.sender.replaceMisspelling(booboo);
-              // The main process deals with persisting the custom words in the settings
-              ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
-                newCustomWord: booboo
-              });
-            }
-          });
-          console.log('reference to spellCheckHandler', window.spellCheckHandler);
-          let corrections = window.spellCheckHandler.getSuggestion(params.misspelledWord);
-          if (corrections && corrections.length) {
+        if (window.spellCheckHandler) {
+          if (params.misspelledWord) {
+            const booboo = params.selectionText;
             textMenuTemplateCopy.unshift({
               type: 'separator'
             });
-            corrections.forEach(function (correction) {
-              let item = {
-                label: correction,
-                click: function () {
-                  return event.sender.replaceMisspelling(correction);
-                }
-              };
-
-              textMenuTemplateCopy.unshift(item);
+            textMenuTemplateCopy.unshift({
+              label: `Add ${booboo} to Dictionary`,
+              click: function () {
+                event.sender.replaceMisspelling(booboo);
+                // The main process deals with persisting the custom words in the settings
+                ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
+                  newCustomWord: booboo
+                });
+              }
             });
+            console.log('reference to spellCheckHandler', window.spellCheckHandler);
+            let corrections = window.spellCheckHandler.getSuggestion(params.misspelledWord);
+            if (corrections && corrections.length) {
+              textMenuTemplateCopy.unshift({
+                type: 'separator'
+              });
+              corrections.forEach(function (correction) {
+                let item = {
+                  label: correction,
+                  click: function () {
+                    return event.sender.replaceMisspelling(correction);
+                  }
+                };
+
+                textMenuTemplateCopy.unshift(item);
+              });
+            }
           }
         }
         const textInputMenu = Menu.buildFromTemplate(textMenuTemplateCopy);
