@@ -69,7 +69,7 @@ if (isSecondInstance) {
     app.setAsDefaultProtocolClient('android-messages-desktop');
   }
 
-  app.on('ready', () => {
+  app.on('ready', async () => {
     state.currentLanguage = app.getLocale();
     console.log('the locale', state.currentLanguage);
 
@@ -249,6 +249,14 @@ if (isSecondInstance) {
       mainWindow.openDevTools();
     //}
 
-    DictionaryManager.setupDictionaries();
+    console.log('just before');
+    const supportedLanguages = await DictionaryManager.getSupportedLanguages();
+    const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale('en-US', supportedLanguages);
+    console.log('the locale for spellcheck', dictionaryLocaleKey);
+    if (dictionaryLocaleKey) {
+      console.log('spellcheck is possible');
+      const spellCheckFiles = await DictionaryManager.getLanguagePath('en-US', dictionaryLocaleKey) // first param == app.getLocale()
+      console.log('the paths to the spellcheck files are', spellCheckFiles);
+    }
   });
 }
