@@ -15,23 +15,24 @@ import { webFrame } from 'electron';
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = async () => {
+    // Let the main process know the page is (essentially) done loading.
+    // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
     ipcRenderer.send(EVENT_BRIDGE_INIT);
 }
 
+// The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
+// and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
+// loads the spellchecker, if needed.
 ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
-    console.log('got the reflection', spellCheckFiles, customWords);
     if (dictionaryLocaleKey && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
         const provider = new SpellCheckerProvider();
         window.spellCheckHandler = provider;
         await provider.initialize({ environment: ENVIRONMENT.NODE });
         await window.spellCheckHandler.loadDictionary(dictionaryLocaleKey, spellCheckFiles.userLanguageDicFile,spellCheckFiles.userLanguageAffFile);
         window.spellCheckHandler.switchDictionary(dictionaryLocaleKey);
-        console.log('now we done loaded the dictionary', window.spellCheckHandler.selectedDictionary);
         if (window.spellCheckHandler.selectedDictionary in customWords) {
-            console.log('we have custom words to add', customWords, customWords[window.spellCheckHandler.selectedDictionary]);
             for (let i = 0, n = customWords[window.spellCheckHandler.selectedDictionary].length; i < n; i++) {
                 const word = customWords[window.spellCheckHandler.selectedDictionary][i];
-                console.log('adding', word, 'to dictionary');
                 window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(word);
             }
         }

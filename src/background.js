@@ -190,7 +190,7 @@ if (isSecondInstance) {
 
       let spellCheckFiles = null;
       let customWords = null;
-      let desiredLanguage = 'zh-CN';
+      let desiredLanguage = app.getLocale();
       const supportedLanguages = await DictionaryManager.getSupportedLanguages();
       if (supportedLanguages) {
         // TODO: Don't silently fail on promise rejections from this class
@@ -224,15 +224,11 @@ if (isSecondInstance) {
       const { newCustomWord } = msg;
       const { currentLanguage } = state;
       const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
-      console.log('attempting to add custom words', currentLanguage, currentLanguage in existingCustomWords);
       if (!(currentLanguage in existingCustomWords)) {
-        console.log('currentLanguage key not yet there', currentLanguage);
         existingCustomWords[currentLanguage] = [];
       }
-      console.log('custom word dict before adding new word', existingCustomWords);
       if (newCustomWord && !existingCustomWords[currentLanguage].includes(newCustomWord)) {
         existingCustomWords[currentLanguage].push(newCustomWord);
-        console.log('about to save custom word dict after adding new word', existingCustomWords);
         settings.set(SETTING_CUSTOM_WORDS, existingCustomWords);
       }
     });

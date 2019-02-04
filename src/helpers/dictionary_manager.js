@@ -14,7 +14,7 @@ export default class DictionaryManager {
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
                 const fileInfo = fs.statSync(SUPPORTED_LANGUAGES_PATH);
-                const fileModifiedTime = parseInt(stats.mtimeMs, 10);
+                const fileModifiedTime = parseInt(fileInfo.mtimeMs, 10);
                 const nowTime = new Date().getTime();
                 if (DICTIONARY_CACHE_TIME > Math.abs(nowTime - fileModifiedTime)) {
                     // Supported languages file has not reached max cache time yet (30 days), so use it
@@ -111,8 +111,8 @@ export default class DictionaryManager {
     static async getLanguagePath(userLanguage, localeKey) {
         return new Promise((resolve, reject) => {
             const localDictionaryFiles = {
-                userLanguageAffFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}-user.aff`),
-                userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}-user.dic`)
+                userLanguageAffFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}.aff`),
+                userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}.dic`)
             };
 
             // TODO: Similar time-based cache busting for the dictionary files themselves as we do for supported languages file
