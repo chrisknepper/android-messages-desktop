@@ -88,39 +88,40 @@ const popupContextMenu = async (event, params) => {
     default:
       if (params.isEditable) {
         const textMenuTemplateCopy = [...textMenuTemplate];
-        if (window.spellCheckHandler) {
-          if (params.misspelledWord) {
-            const booboo = params.selectionText;
+        if (window.spellCheckHandler && params.misspelledWord && typeof params.misspelledWord === 'string') {
+          const booboo = params.selectionText;
+          textMenuTemplateCopy.unshift({
+            type: 'separator'
+          });
+          textMenuTemplateCopy.unshift({
+            label: `Add ${booboo} to Dictionary`,
+            click: () => {
+              // Immediately clear red underline
+              event.sender.replaceMisspelling(booboo);
+              // Add new custom word to dictionary for the current session
+              window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(booboo);
+              // Send new custom word to main process so it will be added to the dictionary at the start of future sessions
+              ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
+                newCustomWord: booboo
+              });
+            }
+          });
+          // Hunspell always seems to return the best choices at the end of the array, so reverse it, then limit to 8 suggestions
+          const suggestions = window.spellCheckHandler.getSuggestion(params.misspelledWord).reverse().slice(0,8);
+          if (suggestions && suggestions.length) {
             textMenuTemplateCopy.unshift({
               type: 'separator'
             });
-            textMenuTemplateCopy.unshift({
-              label: `Add ${booboo} to Dictionary`,
-              click: function () {
-                event.sender.replaceMisspelling(booboo);
-                // The main process deals with persisting the custom words in the settings
-                ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
-                  newCustomWord: booboo
-                });
-              }
-            });
-            console.log('reference to spellCheckHandler', window.spellCheckHandler);
-            let corrections = window.spellCheckHandler.getSuggestion(params.misspelledWord);
-            if (corrections && corrections.length) {
-              textMenuTemplateCopy.unshift({
-                type: 'separator'
-              });
-              corrections.forEach(function (correction) {
-                let item = {
-                  label: correction,
-                  click: function () {
-                    return event.sender.replaceMisspelling(correction);
-                  }
-                };
+            suggestions.map((correction) => {
+              let item = {
+                label: correction,
+                click: () => {
+                  return event.sender.replaceMisspelling(correction);
+                }
+              };
 
-                textMenuTemplateCopy.unshift(item);
-              });
-            }
+              textMenuTemplateCopy.unshift(item);
+            });
           }
         }
         const textInputMenu = Menu.buildFromTemplate(textMenuTemplateCopy);
