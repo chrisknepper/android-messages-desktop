@@ -194,10 +194,10 @@ if (isSecondInstance) {
       const supportedLanguages = await DictionaryManager.getSupportedLanguages();
       if (supportedLanguages) {
         // TODO: Don't silently fail on promise rejections from this class
-        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(desiredLanguage, supportedLanguages); // first param == app.getLocale()
+        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(desiredLanguage, supportedLanguages);
 
         if (dictionaryLocaleKey) { // Spellchecking is supported for the current language
-          spellCheckFiles = await DictionaryManager.getLanguagePath(desiredLanguage, dictionaryLocaleKey) // first param == app.getLocale()
+          spellCheckFiles = await DictionaryManager.getLanguagePath(desiredLanguage, dictionaryLocaleKey);
 
           // We send an event with the language key and array of custom words to the webview bridge which contains the
           // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
@@ -212,7 +212,7 @@ if (isSecondInstance) {
       }
 
       event.sender.send(EVENT_SPELLING_REFLECT_READY, {
-        dictionaryLocaleKey: desiredLanguage, // app.getLocale() // TODO test this with mismatched locale keys
+        dictionaryLocaleKey: desiredLanguage,
         spellCheckFiles,
         customWords
       });
