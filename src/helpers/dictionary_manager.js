@@ -1,8 +1,7 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import { SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH } from '../constants';
-// import settings from 'electron-settings';
+import { SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
 
 export default class DictionaryManager {
 
@@ -13,39 +12,53 @@ export default class DictionaryManager {
                 fs.mkdirSync(SPELLING_DICTIONARIES_PATH);
             }
 
-            if (!fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
-                // Should check if we already have the dictionary for the current language before doing this
-                // Adapted from: https://stackoverflow.com/questions/35697058/download-and-store-files-inside-electron-app
-
-                let supportedLanguagesJsonFile = fs.createWriteStream(SUPPORTED_LANGUAGES_PATH);
-                const requestOptions = {
-                    host: 'api.github.com',
-                    port: 443,
-                    path: '/repos/wooorm/dictionaries/contents/dictionaries',
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'Android Messages Desktop App'
+            if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
+                const fileInfo = fs.statSync(SUPPORTED_LANGUAGES_PATH);
+                const fileModifiedTime = parseInt(stats.mtimeMs, 10);
+                const nowTime = new Date().getTime();
+                if (DICTIONARY_CACHE_TIME > Math.abs(nowTime - fileModifiedTime)) {
+                    // Supported languages file has not reached max cache time yet (30 days), so use it
+                    try {
+                        const supportedLanguagesJsonParsed = JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH));
+                        resolve(supportedLanguagesJsonParsed);
+                        return;
                     }
-                };
-
-                https.get(requestOptions, (response) => {
-                    if (response.statusCode === 200 || response.statusCode === 302) {
-                        response.pipe(supportedLanguagesJsonFile);
+                    catch (err) {
+                        // JSON is corrupt, delete and try to download again
+                        fs.unlinkSync(SUPPORTED_LANGUAGES_PATH);
                     }
-                });
-
-                supportedLanguagesJsonFile.on('error', (err) => {
-                    console.log('supported languages error downloading', err);
-                    reject(err);
-                });
-                supportedLanguagesJsonFile.on('finish', (finished) => {
-                    console.log('supported languages finished downloading', finished);
-                    console.log('the download file as JSON', JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH)));
-                    resolve(JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH)));
-                });
-            } else {
-                resolve(JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH)));
+                }
             }
+
+            // Adapted from: https://stackoverflow.com/questions/35697058/download-and-store-files-inside-electron-app
+
+            const requestOptions = {
+                host: 'api.github.com',
+                port: 443,
+                path: '/repos/wooorm/dictionaries/contents/dictionaries',
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Android Messages Desktop App'
+                }
+            };
+
+            https.get(requestOptions, (response) => {
+                if (response.statusCode === 200 || response.statusCode === 302) {
+                    // Only create the local file if it exists on Github
+                    let supportedLanguagesJsonFile = fs.createWriteStream(SUPPORTED_LANGUAGES_PATH);
+                    response.pipe(supportedLanguagesJsonFile);
+
+                    supportedLanguagesJsonFile.on('error', (err) => {
+                        fs.unlinkSync(SUPPORTED_LANGUAGES_PATH);
+                        reject(null);
+                    });
+                    supportedLanguagesJsonFile.on('finish', (finished) => {
+                        resolve(JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH)));
+                    });
+                } else {
+                    reject(null);
+                }
+            });
         });
     }
 
@@ -71,29 +84,25 @@ export default class DictionaryManager {
 
         let downloadDictionaryKey = null;
 
+        // Every locale code for which a dictionary exists, as an array
         const listOfSupportedLanguages = supportedLocales.map((folder) => {
             if (folder.type === 'dir') {
                 return folder.name
             }
         });
 
-        console.log('the list of languages supported by wooorm dictionaries', listOfSupportedLanguages);
-        if (listOfSupportedLanguages.includes(userLanguage)) {
+        if (listOfSupportedLanguages.includes(userLanguage)) { // language has an exact match and is supported
             downloadDictionaryKey = userLanguage;
-            console.log('your language is supported by the spellchecker!');
-        } else if (userLanguage in specialLanguageCases) {
-            console.log('your language is a supported special case', specialLanguageCases[userLanguage]);
+        } else if (userLanguage in specialLanguageCases) { // language is a special case and is supported
             downloadDictionaryKey = specialLanguageCases[userLanguage];
-        } else {
+        } else { // language may be supported, we'll try to find the closest match available (i.e. another dialect of the same language)
             const closestLanguageMatch = listOfSupportedLanguages.filter(
                 (language) => language.substr(0, 2) === userLanguage.substr(0, 2)
             );
             if (closestLanguageMatch.length) {
-                console.log('your language is not supported but there\'s a similar language,', closestLanguageMatch[0]);
                 downloadDictionaryKey = closestLanguageMatch[0];
-            } else {
-                console.log('sorry, no spell checking support for your language');
             }
+            // else, there are no dictionaries available...womp womp
         }
 
         return downloadDictionaryKey;
@@ -106,11 +115,12 @@ export default class DictionaryManager {
                 userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}-user.dic`)
             };
 
+            // TODO: Similar time-based cache busting for the dictionary files themselves as we do for supported languages file
             if (fs.existsSync(localDictionaryFiles.userLanguageAffFile) && fs.existsSync(localDictionaryFiles.userLanguageDicFile)) {
                 resolve(localDictionaryFiles);
             } else {
                 if (localeKey) {
-                    console.log('we should download the dictionary');
+                    // Try to download the dictionary files for a language
 
                     const downloadState = {
                         affFile: false,
@@ -119,36 +129,41 @@ export default class DictionaryManager {
 
                     const dictBaseUrl = `https://raw.githubusercontent.com/wooorm/dictionaries/master/dictionaries/${localeKey}/index`
 
-                    let affFile = fs.createWriteStream(localDictionaryFiles.userLanguageAffFile);
+                    
                     https.get(`${dictBaseUrl}.aff`, (response) => {
-                        response.pipe(affFile);
+                        if (response.statusCode === 200 || response.statusCode === 302) {
+                            let affFile = fs.createWriteStream(localDictionaryFiles.userLanguageAffFile);
+                            response.pipe(affFile);
+
+                            affFile.on('error', (err) => {
+                                console.log('aff error downloading', err);
+                                reject(null);
+                            });
+                            affFile.on('finish', (finished) => {
+                                console.log('aff finished downloading', finished, 'dic is', downloadState.dicFile);
+                                downloadState.affFile = true;
+
+                                (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
+                            });
+                        }
                     });
 
-                    affFile.on('error', (err) => {
-                        console.log('aff error downloading', err);
-                        reject('aff file failed');
-                    });
-                    affFile.on('finish', (finished) => {
-                        console.log('aff finished downloading', finished, 'dic is', downloadState.dicFile);
-                        downloadState.affFile = true;
-
-                        (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
-                    });
-
-                    let dicFile = fs.createWriteStream(localDictionaryFiles.userLanguageDicFile);
                     https.get(`${dictBaseUrl}.dic`, (response) => {
-                        response.pipe(dicFile);
-                    });
+                        if (response.statusCode === 200 || response.statusCode === 302) {
+                            let dicFile = fs.createWriteStream(localDictionaryFiles.userLanguageDicFile);
+                            response.pipe(dicFile);
 
-                    dicFile.on('error', (err) => {
-                        console.log('dic error downloading', err);
-                        reject('dic file failed');
-                    });
-                    dicFile.on('finish', (finished) => {
-                        console.log('dic finished downloading', finished, 'aff is', downloadState.affFile);
-                        downloadState.dicFile = true;
+                            dicFile.on('error', (err) => {
+                                console.log('dic error downloading', err);
+                                reject(null);
+                            });
+                            dicFile.on('finish', (finished) => {
+                                console.log('dic finished downloading', finished, 'aff is', downloadState.affFile);
+                                downloadState.dicFile = true;
 
-                        (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
+                                (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
+                            });
+                        }
                     });
                 }
             }

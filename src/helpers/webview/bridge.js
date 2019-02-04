@@ -15,17 +15,15 @@ import { webFrame } from 'electron';
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = async () => {
-    // TODO: Maybe only do this once we know the current language has dictionaries
-    const provider = new SpellCheckerProvider();
-    window.spellCheckHandler = provider;
-    await provider.initialize({ environment: ENVIRONMENT.NODE });
-
     ipcRenderer.send(EVENT_BRIDGE_INIT);
 }
 
 ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
     console.log('got the reflection', spellCheckFiles, customWords);
-    if (spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
+    if (dictionaryLocaleKey && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
+        const provider = new SpellCheckerProvider();
+        window.spellCheckHandler = provider;
+        await provider.initialize({ environment: ENVIRONMENT.NODE });
         await window.spellCheckHandler.loadDictionary(dictionaryLocaleKey, spellCheckFiles.userLanguageDicFile,spellCheckFiles.userLanguageAffFile);
         window.spellCheckHandler.switchDictionary(dictionaryLocaleKey);
         console.log('now we done loaded the dictionary', window.spellCheckHandler.selectedDictionary);
