@@ -13,4 +13,4 @@ Thumbs.db
 /app/**/*.map
 
 # Dictionary files are downloaded by the user's machine
-/resources/dictionaries
+/resources/dictionaries/**/*

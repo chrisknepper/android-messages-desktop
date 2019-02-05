@@ -17,7 +17,8 @@ const IS_LINUX = (osName === 'linux');
 // Environment
 const IS_DEV = (env.name === 'development');
 const BASE_APP_PATH = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
-const SPELLING_DICTIONARIES_PATH = path.join(BASE_APP_PATH, 'resources', 'dictionaries');
+const RESOURCES_PATH = path.join(BASE_APP_PATH, 'resources');
+const SPELLING_DICTIONARIES_PATH = path.join(RESOURCES_PATH, 'dictionaries');
 const SUPPORTED_LANGUAGES_PATH = path.join(SPELLING_DICTIONARIES_PATH, 'supported-languages.json');
 
 // Settings
@@ -43,6 +44,7 @@ export {
     IS_LINUX,
     IS_DEV,
     BASE_APP_PATH,
+    RESOURCES_PATH,
     SPELLING_DICTIONARIES_PATH,
     SUPPORTED_LANGUAGES_PATH,
     SETTING_TRAY_ENABLED,

@@ -1,13 +1,16 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import { SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
+import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
 
 export default class DictionaryManager {
 
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
+            if (!fs.existsSync(RESOURCES_PATH)) {
+                fs.mkdirSync(RESOURCES_PATH);
+            }
             if (!fs.existsSync(SPELLING_DICTIONARIES_PATH)) {
                 fs.mkdirSync(SPELLING_DICTIONARIES_PATH);
             }
