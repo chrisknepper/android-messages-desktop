@@ -10,12 +10,7 @@ const state = {
   loaded: false
 };
 
-import fs from 'fs';
-import path from 'path';
-import { SpellCheckerProvider } from 'electron-hunspell';
-
 const app = remote.app;
-
 
 androidMessagesWebview.addEventListener('did-start-loading', () => {
   // Intercept request for notifications and accept it

@@ -22,8 +22,7 @@ import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRA
 import env from 'env';
 
 const state = {
-  unreadNotificationCount: 0,
-  currentLanguage: null
+  unreadNotificationCount: 0
 };
 
 let mainWindow = null;
@@ -70,9 +69,6 @@ if (isSecondInstance) {
   }
 
   app.on('ready', () => {
-    state.currentLanguage = app.getLocale();
-    console.log('the locale', state.currentLanguage);
-
     trayManager = new TrayManager();
 
     // TODO: Create a preference manager which handles all of these
@@ -263,6 +259,5 @@ if (isSecondInstance) {
     if (IS_DEV) {
       mainWindow.openDevTools();
     }
-
   });
 }

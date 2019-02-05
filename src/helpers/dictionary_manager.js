@@ -139,11 +139,9 @@ export default class DictionaryManager {
                             response.pipe(affFile);
 
                             affFile.on('error', (err) => {
-                                console.log('aff error downloading', err);
                                 reject(null);
                             });
                             affFile.on('finish', (finished) => {
-                                console.log('aff finished downloading', finished, 'dic is', downloadState.dicFile);
                                 downloadState.affFile = true;
 
                                 (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
@@ -157,11 +155,9 @@ export default class DictionaryManager {
                             response.pipe(dicFile);
 
                             dicFile.on('error', (err) => {
-                                console.log('dic error downloading', err);
                                 reject(null);
                             });
                             dicFile.on('finish', (finished) => {
-                                console.log('dic finished downloading', finished, 'aff is', downloadState.affFile);
                                 downloadState.dicFile = true;
 
                                 (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
