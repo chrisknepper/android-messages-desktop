@@ -51,9 +51,9 @@ androidMessagesWebview.addEventListener('did-stop-loading', async () => { // coi
   if (!state.loaded) {
     state.loaded = true;
     loader.classList.add('hidden');
-    //if (IS_DEV) {
+    if (IS_DEV) {
       androidMessagesWebview.getWebContents().openDevTools();
-    //}
+    }
 
     app.mainWindow.on('focus', () => {
       // Make sure the webview gets a focus event on its window/DOM when the app window does,

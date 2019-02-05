@@ -260,9 +260,9 @@ if (isSecondInstance) {
       }
     });
 
-    //if (IS_DEV) {
+    if (IS_DEV) {
       mainWindow.openDevTools();
-    //}
+    }
 
   });
 }
