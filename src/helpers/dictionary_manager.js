@@ -8,11 +8,8 @@ export default class DictionaryManager {
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
-            if (!fs.existsSync(RESOURCES_PATH)) {
-                fs.mkdirSync(RESOURCES_PATH);
-            }
-            if (!fs.existsSync(SPELLING_DICTIONARIES_PATH)) {
-                fs.mkdirSync(SPELLING_DICTIONARIES_PATH);
+            if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
+                reject(null);
             }
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {

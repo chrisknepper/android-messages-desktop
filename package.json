@@ -25,6 +25,9 @@
     "directories": {
       "buildResources": "resources"
     },
+    "extraResources": [
+      "resources/dictionaries"
+    ],
     "mac": {
       "category": "public.app-category.social-networking",
       "target": [
