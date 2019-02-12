@@ -41,7 +41,7 @@ androidMessagesWebview.addEventListener('did-finish-load', () => { // just befor
 
 });
 
-androidMessagesWebview.addEventListener('did-stop-loading', async () => { // coincident with onLoad, can fire multiple times
+androidMessagesWebview.addEventListener('did-stop-loading', () => { // coincident with onLoad, can fire multiple times
   console.log('done loading');
   if (!state.loaded) {
     state.loaded = true;

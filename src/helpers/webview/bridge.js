@@ -14,7 +14,7 @@ import { webFrame } from 'electron';
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
-window.onload = async () => {
+window.onload = () => {
     // Let the main process know the page is (essentially) done loading.
     // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
     ipcRenderer.send(EVENT_BRIDGE_INIT);

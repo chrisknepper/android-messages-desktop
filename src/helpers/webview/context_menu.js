@@ -4,7 +4,7 @@
 const { ipcRenderer, remote } = require('electron');
 const { EVENT_SPELL_ADD_CUSTOM_WORD } = require('../../constants');
 
-const Menu = remote.Menu, MenuItem = remote.MenuItem;
+const Menu = remote.Menu;
 
 const standardMenuTemplate = [
   {
@@ -55,7 +55,7 @@ const textMenuTemplate = [
 
 const standardInputMenu = Menu.buildFromTemplate(standardMenuTemplate);
 
-const popupContextMenu = async (event, params) => {
+const popupContextMenu = (event, params) => {
   switch (params.mediaType) {
     case 'video':
     case 'image':
