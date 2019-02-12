@@ -28,15 +28,19 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
-**Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
+**Important note 2:** We currently have builds for Windows and macOS, and Linux. I test releases on macOS, Windows 10, and Ubuntu Linux. I would love help testing on additional distros of Linux and other versions of Windows.
 
 # Features
 * System notifications when a text comes in
 * Notification badges on macOS
+* Spellchecking in ~50 languages
 * Run in background on Windows / Linux / macOS
 * Minimize to tray on Windows / Linux
 * Menu bar support on macOS
 * TBD...
+
+# Spellchecking
+Implemented via the amazing [`electron-hunpsell`](https://github.com/kwonoj/electron-hunspell) library with dictionaries provided by the excellent [`dictionaries`](https://github.com/wooorm/dictionaries) project. Language files are downloaded when the app opens and the language used is based on the language set in your operating system. If you switch your system language and restart the app, the spellchecking should occur in the new language as long as it is in the [list of supported languages](https://github.com/wooorm/dictionaries#table-of-dictionaries).
 
 # TODOs / Roadmap (rough order of priority):
 - [x] Make sure it actually works (definitely works as of v0.1.0, done via [8068ed2](../../commit/8068ed2))

@@ -12,9 +12,10 @@ import { devMenuTemplate } from './menu/dev_menu_template';
 import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -178,6 +179,57 @@ if (isSecondInstance) {
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
+      }
+    });
+
+    ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+
+      let spellCheckFiles = null;
+      let customWords = null;
+      const currentLanguage = app.getLocale();
+      try {
+        // TODO: Possibly don't check supported-languages.json every load if local dictionary files already exist
+        const supportedLanguages = await DictionaryManager.getSupportedLanguages();
+
+        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(currentLanguage, supportedLanguages);
+
+        if (dictionaryLocaleKey) { // Spellchecking is supported for the current language
+          spellCheckFiles = await DictionaryManager.getLanguagePath(currentLanguage, dictionaryLocaleKey);
+
+          // We send an event with the language key and array of custom words to the webview bridge which contains the
+          // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+          // between electron processes is hacky at best and impossible at worst.
+          const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+
+          customWords = {};
+          if (currentLanguage in existingCustomWords) {
+            customWords = { [currentLanguage]: existingCustomWords[currentLanguage] };
+          }
+        }
+      }
+      catch (error) {
+        // TODO: Display this as an error message to the user?
+      }
+
+      event.sender.send(EVENT_SPELLING_REFLECT_READY, {
+        dictionaryLocaleKey: currentLanguage,
+        spellCheckFiles,
+        customWords
+      });
+    });
+
+    ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (event, msg) => {
+      // Add custom words picked by the user to a persistent data store because they must be added to
+      // the instance of Hunspell on each launch of the app/loading of the dictionary.
+      const { newCustomWord } = msg;
+      const currentLanguage = app.getLocale();
+      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+      if (!(currentLanguage in existingCustomWords)) {
+        existingCustomWords[currentLanguage] = [];
+      }
+      if (newCustomWord && !existingCustomWords[currentLanguage].includes(newCustomWord)) {
+        existingCustomWords[currentLanguage].push(newCustomWord);
+        settings.set(SETTING_CUSTOM_WORDS, existingCustomWords);
       }
     });
 

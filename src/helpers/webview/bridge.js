@@ -2,11 +2,42 @@
 // Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
 const popupContextMenu = require('./context_menu.js');
-const { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } = require('../../constants');
-const { ipcRenderer, remote } = require('electron')
+const { IS_DEV, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY } = require('../../constants');
+const { ipcRenderer, remote } = require('electron');
+import path from 'path';
+import { ENVIRONMENT } from 'hunspell-asm';
+import { SpellCheckerProvider } from 'electron-hunspell';
+import { webFrame } from 'electron';
+
+
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-window.addEventListener('contextmenu', popupContextMenu);
+remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
+
+window.onload = () => {
+    // Let the main process know the page is (essentially) done loading.
+    // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
+    ipcRenderer.send(EVENT_BRIDGE_INIT);
+}
+
+// The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
+// and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
+// loads the spellchecker, if needed.
+ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
+    if (dictionaryLocaleKey && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
+        const provider = new SpellCheckerProvider();
+        window.spellCheckHandler = provider;
+        await provider.initialize({ environment: ENVIRONMENT.NODE });
+        await window.spellCheckHandler.loadDictionary(dictionaryLocaleKey, spellCheckFiles.userLanguageDicFile,spellCheckFiles.userLanguageAffFile);
+        window.spellCheckHandler.switchDictionary(dictionaryLocaleKey);
+        if (window.spellCheckHandler.selectedDictionary in customWords) {
+            for (let i = 0, n = customWords[window.spellCheckHandler.selectedDictionary].length; i < n; i++) {
+                const word = customWords[window.spellCheckHandler.selectedDictionary][i];
+                window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(word);
+            }
+        }
+    }
+});
 
 const OriginalBrowserNotification = Notification;
 

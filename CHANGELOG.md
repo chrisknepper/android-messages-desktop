@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.0] - 2019-02-12
+### Added
+- Spellchecking for various languages (see notes in README)
+- Manually refreshing the webview for those times when the app gets all 🤪 (Accessible by pressing Ctrl+R or Cmd+R)
+- Full screen toggle item to View menu
+
+### Changed
+- Update electron from 2.0.12 to 3.1.3 (Electron 3 is required by electron-updater 4 which is required by electron-builder 20)
+
+### Fixed
+- Location of Check for Updates menu item on Windows (Now under Help)
+
 ## [0.7.1] - 2018-11-17
 ### Changed
 - Update electron from 2.0.2 to 2.0.12
