@@ -49,7 +49,6 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
     if (IS_DEV) {
       androidMessagesWebview.getWebContents().openDevTools();
     }
-
     app.mainWindow.on('focus', () => {
       // Make sure the webview gets a focus event on its window/DOM when the app window does,
       // this makes automatic text input focus work.
