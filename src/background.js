@@ -186,29 +186,33 @@ if (isSecondInstance) {
 
       let spellCheckFiles = null;
       let customWords = null;
-      let desiredLanguage = app.getLocale();
-      const supportedLanguages = await DictionaryManager.getSupportedLanguages();
-      if (supportedLanguages) {
-        // TODO: Don't silently fail on promise rejections from this class
-        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(desiredLanguage, supportedLanguages);
+      const currentLanguage = app.getLocale();
+      try {
+        // TODO: Possibly don't check supported-languages.json every load if local dictionary files already exist
+        const supportedLanguages = await DictionaryManager.getSupportedLanguages();
+
+        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(currentLanguage, supportedLanguages);
 
         if (dictionaryLocaleKey) { // Spellchecking is supported for the current language
-          spellCheckFiles = await DictionaryManager.getLanguagePath(desiredLanguage, dictionaryLocaleKey);
+          spellCheckFiles = await DictionaryManager.getLanguagePath(currentLanguage, dictionaryLocaleKey);
 
           // We send an event with the language key and array of custom words to the webview bridge which contains the
           // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
           // between electron processes is hacky at best and impossible at worst.
           const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
-          const { currentLanguage } = state;
+
           customWords = {};
           if (currentLanguage in existingCustomWords) {
             customWords = { [currentLanguage]: existingCustomWords[currentLanguage] };
           }
         }
       }
+      catch (error) {
+        // TODO: Display this as an error message to the user?
+      }
 
       event.sender.send(EVENT_SPELLING_REFLECT_READY, {
-        dictionaryLocaleKey: desiredLanguage,
+        dictionaryLocaleKey: currentLanguage,
         spellCheckFiles,
         customWords
       });
@@ -218,7 +222,7 @@ if (isSecondInstance) {
       // Add custom words picked by the user to a persistent data store because they must be added to
       // the instance of Hunspell on each launch of the app/loading of the dictionary.
       const { newCustomWord } = msg;
-      const { currentLanguage } = state;
+      const currentLanguage = app.getLocale();
       const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
       if (!(currentLanguage in existingCustomWords)) {
         existingCustomWords[currentLanguage] = [];

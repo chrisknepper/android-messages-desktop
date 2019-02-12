@@ -3,13 +3,16 @@ import https from 'https';
 import path from 'path';
 import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
 
+// Use a known existing commit to dictionaries in case something bad happens to master
+const DICTIONARIES_COMMIT_HASH = '2de863c';
+
 export default class DictionaryManager {
 
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
             if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
-                reject(null);
+                reject(null); // Folders where files go don't exist so bail
             }
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
@@ -35,10 +38,10 @@ export default class DictionaryManager {
             const requestOptions = {
                 host: 'api.github.com',
                 port: 443,
-                path: '/repos/wooorm/dictionaries/contents/dictionaries',
+                path: `/repos/wooorm/dictionaries/contents/dictionaries?ref=${DICTIONARIES_COMMIT_HASH}`,
                 method: 'GET',
                 headers: {
-                    'User-Agent': 'Android Messages Desktop App'
+                    'User-Agent': 'chrisknepper/android-messages-desktop'
                 }
             };
 
@@ -50,19 +53,30 @@ export default class DictionaryManager {
 
                     supportedLanguagesJsonFile.on('error', (err) => {
                         fs.unlinkSync(SUPPORTED_LANGUAGES_PATH);
-                        reject(null);
+                        reject(null); // File write error
                     });
                     supportedLanguagesJsonFile.on('finish', (finished) => {
-                        resolve(JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH)));
+                        try {
+                            const supportedLanguagesJsonParsed = JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH));
+                            resolve(supportedLanguagesJsonParsed);
+                        }
+                        catch (error) {
+                            reject(null); // The file just downloaded isn't parse-able as JSON
+                        }
                     });
                 } else {
                     reject(null);
                 }
+            }).on('error', (error) => {
+                reject(null); // Request for JSON failed (likely either Github down or API error)
             });
         });
     }
 
     static doesLanguageExistForLocale(userLanguage, supportedLocales) {
+        if (!userLanguage) {
+            return null;
+        }
         /*
          * It is possible for Electron to return a locale code for which there are multiple
          * "close match" dictionaries but no exact match. For these special cases, we
@@ -127,7 +141,7 @@ export default class DictionaryManager {
                         dicFile: false
                     };
 
-                    const dictBaseUrl = `https://raw.githubusercontent.com/wooorm/dictionaries/master/dictionaries/${localeKey}/index`
+                    const dictBaseUrl = `https://raw.githubusercontent.com/wooorm/dictionaries/${DICTIONARIES_COMMIT_HASH}/dictionaries/${localeKey}/index`
 
                     
                     https.get(`${dictBaseUrl}.aff`, (response) => {
@@ -136,7 +150,7 @@ export default class DictionaryManager {
                             response.pipe(affFile);
 
                             affFile.on('error', (err) => {
-                                reject(null);
+                                reject(null);  // File write error
                             });
                             affFile.on('finish', (finished) => {
                                 downloadState.affFile = true;
@@ -144,6 +158,8 @@ export default class DictionaryManager {
                                 (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
                             });
                         }
+                    }).on('error', (error) => {
+                        reject(null); // File download error (Github down or file doesn't exist)
                     });
 
                     https.get(`${dictBaseUrl}.dic`, (response) => {
@@ -152,7 +168,7 @@ export default class DictionaryManager {
                             response.pipe(dicFile);
 
                             dicFile.on('error', (err) => {
-                                reject(null);
+                                reject(null);  // File write error
                             });
                             dicFile.on('finish', (finished) => {
                                 downloadState.dicFile = true;
@@ -160,6 +176,8 @@ export default class DictionaryManager {
                                 (downloadState.affFile && downloadState.dicFile) && resolve(localDictionaryFiles);
                             });
                         }
+                    }).on('error', (error) => {
+                        reject(null); // File download error (Github down or file doesn't exist)
                     });
                 }
             }
