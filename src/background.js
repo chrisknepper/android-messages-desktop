@@ -30,18 +30,19 @@ let mainWindow = null;
 // Prevent multiple instances of the app which causes many problems with an app like ours
 // Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
 // Adapted from https://github.com/electron/electron/blob/v2.0.2/docs/api/app.md#appmakesingleinstancecallback
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, let's show our existing instance instead
-  if (mainWindow) {
-    if (!mainWindow.isVisible()) {
-      mainWindow.show();
-    }
-  }
-});
+const isFirstInstance = app.requestSingleInstanceLock();
 
-if (isSecondInstance) {
+if (!isFirstInstance) {
   app.quit();
 } else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (!mainWindow.isVisible()) {
+        mainWindow.show();
+      }
+    }
+  })
+
   let trayManager = null;
 
   const setApplicationMenu = () => {
