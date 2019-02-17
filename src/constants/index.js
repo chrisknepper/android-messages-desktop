@@ -35,6 +35,7 @@ const EVENT_SPELLING_REFLECT_READY = 'messages-spelling-reflect-ready';
 
 // Misc.
 const DICTIONARY_CACHE_TIME = 2592000000; // 30 days in milliseconds
+const MEDIA_DOWNLOAD_IDENTIFIER = 'isMessagesFileDownloadLink';
 
 export {
     osName,
@@ -55,5 +56,6 @@ export {
     EVENT_BRIDGE_INIT,
     EVENT_SPELL_ADD_CUSTOM_WORD,
     EVENT_SPELLING_REFLECT_READY,
-    DICTIONARY_CACHE_TIME
+    DICTIONARY_CACHE_TIME,
+    MEDIA_DOWNLOAD_IDENTIFIER
 };

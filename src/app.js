@@ -1,9 +1,6 @@
 import './stylesheets/main.css';
 
-import './helpers/external_links.js';
-
-import { remote, shell } from 'electron';
-import url from 'url';
+import { remote } from 'electron';
 import { IS_DEV } from './constants';
 
 const state = {
@@ -61,11 +58,4 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
-});
-
-androidMessagesWebview.addEventListener('new-window', (e) => {
-  const protocol = url.parse(e.url).protocol;
-  if (protocol === 'http:' || protocol === 'https:') {
-    shell.openExternal(e.url); // Open clicked links in user's default browser
-  }
 });

@@ -1,40 +1,37 @@
-// Convenient way for opening links in external browser, not in the app.
-// Useful especially if you have a lot of links to deal with.
-//
-// Usage:
-//
-// Every link with class ".js-external-link" will be opened in external browser.
-// <a class="js-external-link" href="http://google.com">google</a>
-//
-// The same behaviour for many links can be achieved by adding
-// this class to any parent tag of an anchor tag.
-// <p class="js-external-link">
-//    <a href="http://google.com">google</a>
-//    <a href="http://bing.com">bing</a>
-// </p>
+// Convenient way of opening links in external browser, not in the app.
+import { shell } from 'electron';
+import { MEDIA_DOWNLOAD_IDENTIFIER } from '../constants';
 
-import { shell } from "electron";
-
-const supportExternalLinks = event => {
+const getLinkAddressFromElementAndOpen = (element) => {
   let href;
-  let isExternal = false;
 
-  const checkDomElement = element => {
-    if (element.nodeName === "A") {
-      href = element.getAttribute("href");
+  if (element.nodeName === 'A') {
+    if ('dataset' in element && MEDIA_DOWNLOAD_IDENTIFIER in element.dataset) {
+      // Bail if this is a link created by the context_menu helper to download media. Electron takes care of showing
+      // the file save dialog and it won't show if we proceed to preventDefault/openExternal.
+      return;
     }
-    if (element.classList.contains("js-external-link")) {
-      isExternal = true;
-    }
-    if (href && isExternal) {
-      shell.openExternal(href);
-      event.preventDefault();
-    } else if (element.parentElement) {
-      checkDomElement(element.parentElement);
-    }
-  };
+    href = element.getAttribute('href');
+  }
 
-  checkDomElement(event.target);
+  if (href) {
+    event.preventDefault();
+    shell.openExternal(href);
+  } else if (element.parentElement) {
+    getLinkAddressFromElementAndOpen(element.parentElement);
+  }
 };
 
-document.addEventListener("click", supportExternalLinks, false);
+const handleExternalLinks = (event) => {
+  getLinkAddressFromElementAndOpen(event.target);
+};
+
+const setupLinksListener = (doc) => {
+  if (doc && typeof doc === 'object' && 'addEventListener' in doc) {
+    doc.addEventListener('click', handleExternalLinks, false);
+  }
+}
+
+export {
+  setupLinksListener
+};
