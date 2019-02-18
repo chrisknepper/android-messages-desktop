@@ -1,10 +1,7 @@
 import './stylesheets/main.css';
 
-import './helpers/external_links.js';
-
-import { remote, shell } from 'electron';
-import url from 'url';
-import { IS_DEV } from './constants';
+import { ipcRenderer, remote } from 'electron';
+import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from './constants';
 
 const state = {
   loaded: false
@@ -61,11 +58,18 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
+
+  // Make the title centered so that it won't get weirdly covered by the traffic light on mac
+  // 10px should make it look roughly centered
+  // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
+  if (IS_MAC) {
+    androidMessagesWebview.insertCSS('div.kegSbc{width:100%}h1.tuQbQc{text-align:center; transform: translateX(10px)}');
+  }
 });
 
-androidMessagesWebview.addEventListener('new-window', (e) => {
-  const protocol = url.parse(e.url).protocol;
-  if (protocol === 'http:' || protocol === 'https:') {
-    shell.openExternal(e.url); // Open clicked links in user's default browser
-  }
+// Forward event from main process to webview bridge
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
+  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, {
+    enterToSend
+  });
 });

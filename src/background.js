@@ -15,33 +15,35 @@ import createWindow from './helpers/window';
 import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
 
 const state = {
-  unreadNotificationCount: 0
+  unreadNotificationCount: 0,
+  notificationSoundEnabled: true
 };
 
 let mainWindow = null;
 
 // Prevent multiple instances of the app which causes many problems with an app like ours
 // Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
-// Adapted from https://github.com/electron/electron/blob/v2.0.2/docs/api/app.md#appmakesingleinstancecallback
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, let's show our existing instance instead
-  if (mainWindow) {
-    if (!mainWindow.isVisible()) {
-      mainWindow.show();
-    }
-  }
-});
+// Adapted from https://github.com/electron/electron/blob/v4.0.4/docs/api/app.md#apprequestsingleinstancelock
+const isFirstInstance = app.requestSingleInstanceLock();
 
-if (isSecondInstance) {
+if (!isFirstInstance) {
   app.quit();
 } else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (!mainWindow.isVisible()) {
+        mainWindow.show();
+      }
+    }
+  })
+
   let trayManager = null;
 
   const setApplicationMenu = () => {
@@ -74,8 +76,21 @@ if (isSecondInstance) {
     // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
+    const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
+    const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
+    settings.watch('notificationSoundEnabledPref', (newValue) => {
+      state.notificationSoundEnabled = newValue;
+    });
+    settings.watch('pressEnterToSendPref', (newValue) => {
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: newValue
+      });
+    });
+
+    setApplicationMenu();
+    const menuInstance = Menu.getApplicationMenu();
 
     if (IS_MAC) {
       app.on('activate', () => {
@@ -83,22 +98,33 @@ if (isSecondInstance) {
       });
     }
 
+    const trayMenuItem = menuInstance.getMenuItemById('startInTrayMenuItem');
+    const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
+    const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
+    const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
+
     if (!IS_MAC) {
       // Sets checked status based on user prefs
-      settingsMenu.submenu[0].checked = autoHideMenuBar;
-      settingsMenu.submenu[2].enabled = trayManager.enabled;
+      menuInstance.getMenuItemById('autoHideMenuBarMenuItem').checked = autoHideMenuBar;
+      trayMenuItem.enabled = trayManager.enabled;
     }
 
-    settingsMenu.submenu[2].checked = startInTray;
-    settingsMenu.submenu[1].checked = trayManager.enabled;
+    trayMenuItem.checked = startInTray;
+    enableTrayIconMenuItem.checked = trayManager.enabled;
 
    if (IS_WINDOWS) {
-      settingsMenu.submenu[3].enabled = trayManager.enabled;
-      settingsMenu.submenu[3].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
-      settingsMenu.submenu[3].submenu[1].checked = (trayManager.clickShortcut === 'click');
+      const trayClickShortcutMenuItem = menuInstance.getMenuItemById('trayClickShortcutMenuItem');
+      trayClickShortcutMenuItem.enabled = trayManager.enabled;
+      // As of Electron 3 or 4, setting checked property (even to false) of multiple items in radio group results in
+      // the first one always being checked, so we have to set it just on the one where checked should == true
+      const checkedItemIndex = (trayManager.clickShortcut === 'double-click') ? 0 : 1;
+      trayClickShortcutMenuItem.submenu.items[checkedItemIndex].checked = true;
    }
 
-    setApplicationMenu();
+   notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
+   pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+
+   state.notificationSoundEnabled = notificationSoundEnabled;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -107,7 +133,7 @@ if (isSecondInstance) {
       height: 800,
       autoHideMenuBar: autoHideMenuBar,
       show: !(startInTray),  //Starts in tray if set
-      titleBarStyle: IS_MAC ? 'hiddenInset' : '' //Turn on hidden frame on a Mac
+      titleBarStyle: IS_MAC ? 'hiddenInset' : 'default' //Turn on hidden frame on a Mac
     };
 
     if (IS_LINUX) {
@@ -158,7 +184,7 @@ if (isSecondInstance) {
            */
           icon: msg.options.icon,
           body: msg.options.body,
-          silent: false
+          silent: !(state.notificationSoundEnabled)
         });
 
         if (IS_MAC) {
@@ -184,6 +210,13 @@ if (isSecondInstance) {
     });
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+
+      // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
+      // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
+      // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: pressEnterToSendEnabled
+      });
 
       let spellCheckFiles = null;
       let customWords = null;

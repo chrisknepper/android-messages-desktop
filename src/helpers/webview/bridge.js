@@ -1,20 +1,18 @@
 // This script is injected into the webview.
-// Newer ES6 features (import/export syntax etc...) are not allowed here nor in any JS which this imports.
 
-const popupContextMenu = require('./context_menu.js');
-const { IS_DEV, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY } = require('../../constants');
-const { ipcRenderer, remote } = require('electron');
-import path from 'path';
+import { popupContextMenu } from './context_menu';
+import { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from '../../constants';
+import { ipcRenderer, remote } from 'electron';
+import InputManager from './input_manager';
 import { ENVIRONMENT } from 'hunspell-asm';
 import { SpellCheckerProvider } from 'electron-hunspell';
-import { webFrame } from 'electron';
-
 
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = () => {
+    InputManager.setupLinksListener();
     // Let the main process know the page is (essentially) done loading.
     // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
     ipcRenderer.send(EVENT_BRIDGE_INIT);
@@ -37,6 +35,10 @@ ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleK
             }
         }
     }
+});
+
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
+    InputManager.handleEnterPrefToggle(enterToSend);
 });
 
 const OriginalBrowserNotification = Notification;

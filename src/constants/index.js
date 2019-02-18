@@ -32,9 +32,11 @@ const EVENT_NOTIFICATION_REFLECT_READY = 'messages-webview-reflect-ready';
 const EVENT_BRIDGE_INIT = 'messages-bridge-init';
 const EVENT_SPELL_ADD_CUSTOM_WORD = 'messages-spelling-add-custom-word';
 const EVENT_SPELLING_REFLECT_READY = 'messages-spelling-reflect-ready';
+const EVENT_UPDATE_USER_SETTING = 'messages-update-user-setting';
 
 // Misc.
 const DICTIONARY_CACHE_TIME = 2592000000; // 30 days in milliseconds
+const MEDIA_DOWNLOAD_IDENTIFIER = 'isMessagesFileDownloadLink';
 
 export {
     osName,
@@ -55,5 +57,7 @@ export {
     EVENT_BRIDGE_INIT,
     EVENT_SPELL_ADD_CUSTOM_WORD,
     EVENT_SPELLING_REFLECT_READY,
-    DICTIONARY_CACHE_TIME
+    EVENT_UPDATE_USER_SETTING,
+    DICTIONARY_CACHE_TIME,
+    MEDIA_DOWNLOAD_IDENTIFIER
 };

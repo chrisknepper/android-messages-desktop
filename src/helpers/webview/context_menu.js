@@ -1,10 +1,9 @@
 // Provide context menus (copy, paste, save image, etc...) for right-click interaction.
-// Must not contain certain newer JS syntaxes to allow use inside a webview.
 
-const { ipcRenderer, remote } = require('electron');
-const { EVENT_SPELL_ADD_CUSTOM_WORD } = require('../../constants');
+import { ipcRenderer, remote } from 'electron';
+import { EVENT_SPELL_ADD_CUSTOM_WORD, MEDIA_DOWNLOAD_IDENTIFIER } from '../../constants';
 
-const Menu = remote.Menu;
+const { Menu } = remote;
 
 const standardMenuTemplate = [
   {
@@ -53,9 +52,13 @@ const textMenuTemplate = [
   }
 ];
 
-const standardInputMenu = Menu.buildFromTemplate(standardMenuTemplate);
-
 const popupContextMenu = (event, params) => {
+  // As of Electron 4, Menu.popup no longer accepts being called with the signature popup(remote.getCurrentWindow())
+  // It must be passed as an object with the window key. Is this change silly? Yes. Will we know why it was done? No.
+  const menuPopupArgs = {
+    window: remote.getCurrentWindow()
+  };
+
   switch (params.mediaType) {
     case 'video':
     case 'image':
@@ -72,6 +75,9 @@ const popupContextMenu = (event, params) => {
             // The resulting filename from this also appears to be consistent with
             // saving the image via dragging or the Chrome context menu...winning!
             link.download = params.srcURL.replace('blob:https://messages.android.com/', '');
+            // InputManager.handleExternalLinks handles all link clicks...and this is technically a link.
+            // So we mark the link with a data attribute so handleExternalLinks can know to leave it alone.
+            link.dataset[MEDIA_DOWNLOAD_IDENTIFIER] = true;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -107,7 +113,7 @@ const popupContextMenu = (event, params) => {
             }
           });
           // Hunspell always seems to return the best choices at the end of the array, so reverse it, then limit to 8 suggestions
-          const suggestions = window.spellCheckHandler.getSuggestion(params.misspelledWord).reverse().slice(0,8);
+          const suggestions = window.spellCheckHandler.getSuggestion(params.misspelledWord).reverse().slice(0, 8);
           if (suggestions && suggestions.length) {
             textMenuTemplateCopy.unshift({
               type: 'separator'
@@ -125,11 +131,14 @@ const popupContextMenu = (event, params) => {
           }
         }
         const textInputMenu = Menu.buildFromTemplate(textMenuTemplateCopy);
-        textInputMenu.popup(remote.getCurrentWindow());
+        textInputMenu.popup(menuPopupArgs);
       } else { // Omit options pertaining to input fields if this isn't one
-        standardInputMenu.popup(remote.getCurrentWindow());
+        const standardInputMenu = Menu.buildFromTemplate(standardMenuTemplate);
+        standardInputMenu.popup(menuPopupArgs);
       }
   }
 };
 
-module.exports = popupContextMenu;
+export {
+  popupContextMenu
+};

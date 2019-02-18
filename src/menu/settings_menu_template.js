@@ -1,5 +1,6 @@
 import { dialog } from 'electron';
 import settings from "electron-settings";
+import { separator } from './items/separator';
 import { IS_LINUX, IS_MAC, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../constants';
 
 export const settingsMenu = {
@@ -9,6 +10,7 @@ export const settingsMenu = {
       // This option doesn't apply to Mac, so this hides it but keeps the order of menu items
       // to make updating based on array indices easier.
       visible: (!IS_MAC),
+      id: 'autoHideMenuBarMenuItem',
       label: 'Auto Hide Menu Bar',
       type: 'checkbox',
       click: (item, window) => {
@@ -19,6 +21,7 @@ export const settingsMenu = {
       }
     },
     {
+      id: 'enableTrayIconMenuItem',
       label: IS_MAC ? 'Enable Menu Bar Icon' : 'Enable Tray Icon',
       type: 'checkbox',
       click: (item) => {
@@ -84,3 +87,26 @@ if (IS_WINDOWS) {
     }
   );
 }
+
+settingsMenu.submenu.push(
+  separator,
+  {
+    id: 'notificationSoundEnabledMenuItem',
+    label: 'Play Notification Sound',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('notificationSoundEnabledPref', item.checked);
+    }
+  },
+  separator,
+  {
+    id: 'pressEnterToSendMenuItem',
+    label: 'Press Enter to Send Message',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('pressEnterToSendPref', item.checked);
+    }
+  }
+);
+
+
