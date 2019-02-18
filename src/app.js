@@ -1,7 +1,7 @@
 import './stylesheets/main.css';
 
 import { ipcRenderer, remote } from 'electron';
-import { EVENT_UPDATE_USER_SETTING, IS_DEV } from './constants';
+import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from './constants';
 
 const state = {
   loaded: false
@@ -58,6 +58,12 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
+
+  // Make the title centered so that it won't get weirdly covered by the traffic light on mac
+  // 10px should make it look roughly-centered
+  if (IS_MAC) {
+    androidMessagesWebview.insertCSS('div.kegSbc{width:100%}h1.tuQbQc{text-align:center; transform: translateX(10px)}');
+  }
 });
 
 // Forward event from main process to webview bridge
