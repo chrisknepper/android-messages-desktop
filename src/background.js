@@ -30,7 +30,7 @@ let mainWindow = null;
 
 // Prevent multiple instances of the app which causes many problems with an app like ours
 // Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
-// Adapted from https://github.com/electron/electron/blob/v2.0.2/docs/api/app.md#appmakesingleinstancecallback
+// Adapted from https://github.com/electron/electron/blob/v4.0.4/docs/api/app.md#apprequestsingleinstancelock
 const isFirstInstance = app.requestSingleInstanceLock();
 
 if (!isFirstInstance) {

@@ -60,7 +60,8 @@ androidMessagesWebview.addEventListener('dom-ready', () => {
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
 
   // Make the title centered so that it won't get weirdly covered by the traffic light on mac
-  // 10px should make it look roughly-centered
+  // 10px should make it look roughly centered
+  // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
   if (IS_MAC) {
     androidMessagesWebview.insertCSS('div.kegSbc{width:100%}h1.tuQbQc{text-align:center; transform: translateX(10px)}');
   }
