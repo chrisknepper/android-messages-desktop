@@ -55,24 +55,6 @@ export const settingsMenu = {
         settings.set('startInTrayPref', startInTrayPref);
         item.checked = startInTrayPref;
       }
-    },
-    separator,
-    {
-      id: 'notificationSoundEnabledMenuItem',
-      label: 'Play Notification Sound',
-      type: 'checkbox',
-      click: (item) => {
-        settings.set('notificationSoundEnabledPref', item.checked);
-      }
-    },
-    separator,
-    {
-      id: 'pressEnterToSendMenuItem',
-      label: 'Press Enter to Send Message',
-      type: 'checkbox',
-      click: (item) => {
-        settings.set('pressEnterToSendPref', item.checked);
-      }
     }
   ]
 };
@@ -105,3 +87,26 @@ if (IS_WINDOWS) {
     }
   );
 }
+
+settingsMenu.submenu.push(
+  separator,
+  {
+    id: 'notificationSoundEnabledMenuItem',
+    label: 'Play Notification Sound',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('notificationSoundEnabledPref', item.checked);
+    }
+  },
+  separator,
+  {
+    id: 'pressEnterToSendMenuItem',
+    label: 'Press Enter to Send Message',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('pressEnterToSendPref', item.checked);
+    }
+  }
+);
+
+

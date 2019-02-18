@@ -100,7 +100,6 @@ if (!isFirstInstance) {
 
     const trayMenuItem = menuInstance.getMenuItemById('startInTrayMenuItem');
     const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
-    const trayClickShortcutMenuItem = menuInstance.getMenuItemById('trayClickShortcutMenuItem');
     const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
     const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
 
@@ -114,9 +113,12 @@ if (!isFirstInstance) {
     enableTrayIconMenuItem.checked = trayManager.enabled;
 
    if (IS_WINDOWS) {
+      const trayClickShortcutMenuItem = menuInstance.getMenuItemById('trayClickShortcutMenuItem');
       trayClickShortcutMenuItem.enabled = trayManager.enabled;
-      trayClickShortcutMenuItem.submenu[0].checked = (trayManager.clickShortcut === 'double-click');
-      trayClickShortcutMenuItem.submenu[1].checked = (trayManager.clickShortcut === 'click');
+      // As of Electron 3 or 4, setting checked property (even to false) of multiple items in radio group results in
+      // the first one always being checked, so we have to set it just on the one where checked should == true
+      const checkedItemIndex = (trayManager.clickShortcut === 'double-click') ? 0 : 1;
+      trayClickShortcutMenuItem.submenu.items[checkedItemIndex].checked = true;
    }
 
    notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
