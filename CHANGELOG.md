@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.0] - 2019-02-18
+### Added
+- Setting to disable notification sound
+- Setting to disable sending message when pressing enter
+
+### Changed
+- Use inline window buttons on Mac (looks more similar to iMessage)
+- Update electron from 3.1.3 to 4.0.4 (see note under Fixed)
+- Update README.md
+- Under the hood: Method to communicate user settings changes to webview
+- Under the hood: Revamp link opening method
+- Under the hood: Electron 4-related API changes
+- Under the hood: Code cleanup
+
+### Fixed
+- Localization of Messages page (buttons and text provided by Google) (this appeared to be broken in Electron 3)
+- The link to a support page shown when the app can't detect the phone should now open in system web browser like other links
+
 ## [0.8.0] - 2019-02-12
 ### Added
 - Spellchecking for various languages (see notes in README)
