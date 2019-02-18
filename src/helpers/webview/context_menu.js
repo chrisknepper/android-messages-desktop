@@ -75,8 +75,8 @@ const popupContextMenu = (event, params) => {
             // The resulting filename from this also appears to be consistent with
             // saving the image via dragging or the Chrome context menu...winning!
             link.download = params.srcURL.replace('blob:https://messages.android.com/', '');
-            // The external_links helper handles all link clicks...and this is technically a link.
-            // So we mark the link with a data attribute so external_links can know to leave it alone.
+            // InputManager.handleExternalLinks handles all link clicks...and this is technically a link.
+            // So we mark the link with a data attribute so handleExternalLinks can know to leave it alone.
             link.dataset[MEDIA_DOWNLOAD_IDENTIFIER] = true;
             document.body.appendChild(link);
             link.click();

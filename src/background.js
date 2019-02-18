@@ -15,14 +15,15 @@ import createWindow from './helpers/window';
 import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
 
 const state = {
-  unreadNotificationCount: 0
+  unreadNotificationCount: 0,
+  notificationSoundEnabled: true
 };
 
 let mainWindow = null;
@@ -75,8 +76,21 @@ if (!isFirstInstance) {
     // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
+    const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
+    const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
+    settings.watch('notificationSoundEnabledPref', (newValue) => {
+      state.notificationSoundEnabled = newValue;
+    });
+    settings.watch('pressEnterToSendPref', (newValue) => {
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: newValue
+      });
+    });
+
+    setApplicationMenu();
+    const menuInstance = Menu.getApplicationMenu();
 
     if (IS_MAC) {
       app.on('activate', () => {
@@ -84,22 +98,31 @@ if (!isFirstInstance) {
       });
     }
 
+    const trayMenuItem = menuInstance.getMenuItemById('startInTrayMenuItem');
+    const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
+    const trayClickShortcutMenuItem = menuInstance.getMenuItemById('trayClickShortcutMenuItem');
+    const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
+    const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
+
     if (!IS_MAC) {
       // Sets checked status based on user prefs
-      settingsMenu.submenu[0].checked = autoHideMenuBar;
-      settingsMenu.submenu[2].enabled = trayManager.enabled;
+      menuInstance.getMenuItemById('autoHideMenuBarMenuItem').checked = autoHideMenuBar;
+      trayMenuItem.enabled = trayManager.enabled;
     }
 
-    settingsMenu.submenu[2].checked = startInTray;
-    settingsMenu.submenu[1].checked = trayManager.enabled;
+    trayMenuItem.checked = startInTray;
+    enableTrayIconMenuItem.checked = trayManager.enabled;
 
    if (IS_WINDOWS) {
-      settingsMenu.submenu[3].enabled = trayManager.enabled;
-      settingsMenu.submenu[3].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
-      settingsMenu.submenu[3].submenu[1].checked = (trayManager.clickShortcut === 'click');
+      trayClickShortcutMenuItem.enabled = trayManager.enabled;
+      trayClickShortcutMenuItem.submenu[0].checked = (trayManager.clickShortcut === 'double-click');
+      trayClickShortcutMenuItem.submenu[1].checked = (trayManager.clickShortcut === 'click');
    }
 
-    setApplicationMenu();
+   notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
+   pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+
+   state.notificationSoundEnabled = notificationSoundEnabled;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -158,7 +181,7 @@ if (!isFirstInstance) {
            */
           icon: msg.options.icon,
           body: msg.options.body,
-          silent: false
+          silent: !(state.notificationSoundEnabled)
         });
 
         if (IS_MAC) {
@@ -184,6 +207,13 @@ if (!isFirstInstance) {
     });
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+
+      // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
+      // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
+      // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: pressEnterToSendEnabled
+      });
 
       let spellCheckFiles = null;
       let customWords = null;

@@ -1,7 +1,7 @@
 import './stylesheets/main.css';
 
-import { remote } from 'electron';
-import { IS_DEV } from './constants';
+import { ipcRenderer, remote } from 'electron';
+import { EVENT_UPDATE_USER_SETTING, IS_DEV } from './constants';
 
 const state = {
   loaded: false
@@ -58,4 +58,11 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
+});
+
+// Forward event from main process to webview bridge
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
+  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, {
+    enterToSend
+  });
 });
