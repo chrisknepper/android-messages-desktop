@@ -2,7 +2,7 @@
 
 ## [0.9.1] - 2019-03-03
 ### Fixed
-- Spell check not working due to new HTTP security header
+- Spell check now works again (abruptly stopped working after the release of 0.9.0 due to new HTTP security header)
 
 ## [0.9.0] - 2019-02-18
 ### Added
