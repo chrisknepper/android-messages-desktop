@@ -31,6 +31,38 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
       return callback(false); // Deny
     }
   });
+
+  androidMessagesWebview.getWebContents().session.webRequest.onHeadersReceived({
+    // Only run this code on requests for which the URL is in the following array.
+    // The SRC of the webview is the same context as the preload script.
+    urls: ['https://messages.android.com/'] }, (details, callback) => {
+      /*
+       * Google sends several directives in the content-security-policy header which restrict what kind of JS can run and where it can originate.
+       * This will break our spell checking (because it instantiates a WebAssembly module) unless we include unsafe-eval for the root page.
+       * We must do this before any stricter rules are specified since they can only "further restrict capabilities" as they are defined.
+       * We therefore must modify the rule Google sends by detecting and prepending the next-least-strict rule sent, "unsafe-inline."
+       * We must use double quotes since content-security-policy directive rules need single quotes as part of the string.
+       *
+       * Doing it this way allows us to keep the rest of Google's security rules to maximize security while still allowing WebAssembly to work.
+       *
+       * If this ever stops working, we can force WebAssembly to work by completely nixing the content-security-policy header, done via:
+       * delete modifiedHeaders['content-security-policy'];
+       *
+       * See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#Multiple_content_security_policies
+       */
+      const modifiedHeaders = {
+        ...details.responseHeaders
+      };
+      const firstCSP = modifiedHeaders['content-security-policy'][0];
+
+      if (firstCSP.includes("'unsafe-inline'")) {
+        modifiedHeaders['content-security-policy'][0] = firstCSP.replace("'unsafe-inline'", "'unsafe-eval' 'unsafe-inline'");
+      }
+
+      callback({
+        responseHeaders: modifiedHeaders
+      });
+  });
 });
 
 androidMessagesWebview.addEventListener('did-finish-load', () => { // just before onLoad
