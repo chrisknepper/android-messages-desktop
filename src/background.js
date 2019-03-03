@@ -133,7 +133,11 @@ if (!isFirstInstance) {
       height: 800,
       autoHideMenuBar: autoHideMenuBar,
       show: !(startInTray),  //Starts in tray if set
-      titleBarStyle: IS_MAC ? 'hiddenInset' : 'default' //Turn on hidden frame on a Mac
+      titleBarStyle: IS_MAC ? 'hiddenInset' : 'default', //Turn on hidden frame on a Mac
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true
+      }
     };
 
     if (IS_LINUX) {
