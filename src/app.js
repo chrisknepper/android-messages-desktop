@@ -27,7 +27,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
       return callback(false); // Prevent the webview's notification from coming through (we roll our own)
     }
 
-    if (!url.startsWith('https://messages.android.com')) {
+    if (!url.startsWith('https://messages.google.com/web')) {
       return callback(false); // Deny
     }
   });
@@ -35,7 +35,7 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
   androidMessagesWebview.getWebContents().session.webRequest.onHeadersReceived({
     // Only run this code on requests for which the URL is in the following array.
     // The SRC of the webview is the same context as the preload script.
-    urls: ['https://messages.android.com/'] }, (details, callback) => {
+    urls: ['https://messages.google.com/web'] }, (details, callback) => {
       /*
        * Google sends several directives in the content-security-policy header which restrict what kind of JS can run and where it can originate.
        * This will break our spell checking (because it instantiates a WebAssembly module) unless we include unsafe-eval for the root page.
