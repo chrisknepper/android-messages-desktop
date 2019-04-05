@@ -35,10 +35,11 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
   androidMessagesWebview.getWebContents().session.webRequest.onHeadersReceived({
     // Only run this code on requests for which the URL is in the following array.
     // The SRC of the webview is the same context as the preload script.
-    urls: ['https://messages.google.com/web'] }, (details, callback) => {
+    urls: ['https://messages.google.com/web/'] }, (details, callback) => {
       /*
-       * Google sends several directives in the content-security-policy header which restrict what kind of JS can run and where it can originate.
-       * This will break our spell checking (because it instantiates a WebAssembly module) unless we include unsafe-eval for the root page.
+       * Google, prior to changing the URL of the app from messages.android.com to messages.google.com/web sends several directives in the
+       * content-security-policy header which restrict what kind of JS can run and where it can originate. This can break our spell
+       * checking (because the spellchecker instantiates a WebAssembly module) unless we include unsafe-eval for the root page headers.
        * We must do this before any stricter rules are specified since they can only "further restrict capabilities" as they are defined.
        * We therefore must modify the rule Google sends by detecting and prepending the next-least-strict rule sent, "unsafe-inline."
        * We must use double quotes since content-security-policy directive rules need single quotes as part of the string.
@@ -53,10 +54,15 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
       const modifiedHeaders = {
         ...details.responseHeaders
       };
-      const firstCSP = modifiedHeaders['content-security-policy'][0];
 
-      if (firstCSP.includes("'unsafe-inline'")) {
-        modifiedHeaders['content-security-policy'][0] = firstCSP.replace("'unsafe-inline'", "'unsafe-eval' 'unsafe-inline'");
+      // Since the URL change, this header no longer seems to be sent, so this should allow spellchecking to work,
+      // even if Google starts sending the header again.
+      if (typeof modifiedHeaders === 'object' && 'content-security-policy' in modifiedHeaders) {
+        const firstCSP = modifiedHeaders['content-security-policy'][0];
+
+        if (firstCSP.includes("'unsafe-inline'")) {
+          modifiedHeaders['content-security-policy'][0] = firstCSP.replace("'unsafe-inline'", "'unsafe-eval' 'unsafe-inline'");
+        }
       }
 
       callback({
@@ -95,7 +101,7 @@ androidMessagesWebview.addEventListener('dom-ready', () => {
   // 10px should make it look roughly centered
   // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
   if (IS_MAC) {
-    androidMessagesWebview.insertCSS('div.kegSbc{width:100%}h1.tuQbQc{text-align:center; transform: translateX(10px)}');
+    androidMessagesWebview.insertCSS('.main-nav-header .logo {text-align:center; transform: translateX(10px)}');
   }
 });
 

@@ -71,10 +71,15 @@ const popupContextMenu = (event, params) => {
             // document.execCommand('SaveAs', true, params.srcURL);
             const link = document.createElement('a');
             link.href = params.srcURL;
-            // Leaving the URL root results in the file extension being truncated.
-            // The resulting filename from this also appears to be consistent with
-            // saving the image via dragging or the Chrome context menu...winning!
-            link.download = params.srcURL.replace('blob:https://messages.google.com/web', '');
+            /*
+             * Leaving the URL root results in the file extension being truncated.
+             * The resulting filename from this also appears to be consistent with
+             * saving the image via dragging or the Chrome context menu...winning!
+             *
+             * Since the URL change from messages.android.com, the URL root of the files
+             * is messages.google.com (note the lack of /web/ in the path)
+             */
+            link.download = params.srcURL.replace('blob:https://messages.google.com/', '');
             // InputManager.handleExternalLinks handles all link clicks...and this is technically a link.
             // So we mark the link with a data attribute so handleExternalLinks can know to leave it alone.
             link.dataset[MEDIA_DOWNLOAD_IDENTIFIER] = true;
