@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.0] - 2019-04-05
+### Changed
+- *BREAKING CHANGE* Migrate to new URL provided by Google (messages.android.com -> messages.google.com, requires signing in again)
+- Under the hood: Associated changes and fixes relating to URL change
+
 ## [0.9.1] - 2019-03-03
 ### Fixed
 - Spell check now works again (abruptly stopped working after the release of 0.9.0 due to new HTTP security header)
