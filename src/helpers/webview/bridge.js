@@ -12,7 +12,6 @@ import { SpellCheckerProvider } from 'electron-hunspell';
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = () => {
-    InputManager.setupLinksListener();
     // Let the main process know the page is (essentially) done loading.
     // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
     ipcRenderer.send(EVENT_BRIDGE_INIT);
