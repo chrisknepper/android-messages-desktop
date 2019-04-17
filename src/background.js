@@ -5,7 +5,7 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu, ipcMain, Notification } from 'electron';
+import { app, Menu, ipcMain, Notification, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
@@ -301,5 +301,18 @@ if (!isFirstInstance) {
     if (IS_DEV) {
       mainWindow.openDevTools();
     }
+
+    app.on('web-contents-created', (e, contents) => {
+
+      // Check for a webview
+      if (contents.getType() == 'webview') {
+
+        // Listen for any new window events
+        contents.on('new-window', (e, url) => {
+          e.preventDefault()
+          shell.openExternal(url)
+        })
+      }
+    });
   });
 }

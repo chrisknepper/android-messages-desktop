@@ -1,7 +1,7 @@
 // Provide context menus (copy, paste, save image, etc...) for right-click interaction.
 
 import { ipcRenderer, remote } from 'electron';
-import { EVENT_SPELL_ADD_CUSTOM_WORD, MEDIA_DOWNLOAD_IDENTIFIER } from '../../constants';
+import { EVENT_SPELL_ADD_CUSTOM_WORD } from '../../constants';
 
 const { Menu } = remote;
 
@@ -80,9 +80,7 @@ const popupContextMenu = (event, params) => {
              * is messages.google.com (note the lack of /web/ in the path)
              */
             link.download = params.srcURL.replace('blob:https://messages.google.com/', '');
-            // InputManager.handleExternalLinks handles all link clicks...and this is technically a link.
-            // So we mark the link with a data attribute so handleExternalLinks can know to leave it alone.
-            link.dataset[MEDIA_DOWNLOAD_IDENTIFIER] = true;
+            // Trigger save dialog by clicking the "link"
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

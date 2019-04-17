@@ -36,7 +36,6 @@ const EVENT_UPDATE_USER_SETTING = 'messages-update-user-setting';
 
 // Misc.
 const DICTIONARY_CACHE_TIME = 2592000000; // 30 days in milliseconds
-const MEDIA_DOWNLOAD_IDENTIFIER = 'isMessagesFileDownloadLink';
 
 export {
     osName,
@@ -58,6 +57,5 @@ export {
     EVENT_SPELL_ADD_CUSTOM_WORD,
     EVENT_SPELLING_REFLECT_READY,
     EVENT_UPDATE_USER_SETTING,
-    DICTIONARY_CACHE_TIME,
-    MEDIA_DOWNLOAD_IDENTIFIER
+    DICTIONARY_CACHE_TIME
 };

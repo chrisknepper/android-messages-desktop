@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - 2019-04-16
+### Fixed
+- Clicking links in text messages now opens them in your browser again instead of doing nothing (big oof)
+
 ## [1.0.0] - 2019-04-05
 ### Changed
 - *BREAKING CHANGE* Migrate to new URL provided by Google (messages.android.com -> messages.google.com, requires signing in again)
