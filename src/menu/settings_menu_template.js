@@ -109,7 +109,7 @@ settingsMenu.submenu.push(
   },
   separator,
   {
-    id: 'pressEnterToSendMenuItem',
+    id: 'hideNotificationContentMenuItem',
     label: 'Hide Sender in Notification',
     type: 'checkbox',
     click: (item) => {

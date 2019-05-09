@@ -107,6 +107,7 @@ if (!isFirstInstance) {
     const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
     const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
     const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
+    const hideNotificationContentMenuItem = menuInstance.getMenuItemById('hideNotificationContentMenuItem');
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
@@ -128,6 +129,7 @@ if (!isFirstInstance) {
 
     notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
     pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+    hideNotificationContentMenuItem.checked = hideNotificationContent;
 
     state.notificationSoundEnabled = notificationSoundEnabled;
     state.notificationContentHidden = hideNotificationContent;
