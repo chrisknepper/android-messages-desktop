@@ -23,7 +23,8 @@ import env from 'env';
 
 const state = {
   unreadNotificationCount: 0,
-  notificationSoundEnabled: true
+  notificationSoundEnabled: true,
+  notificationContentHidden: false
 };
 
 let mainWindow = null;
@@ -78,6 +79,7 @@ if (!isFirstInstance) {
     const startInTray = settings.get('startInTrayPref', false);
     const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
     const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
+    const hideNotificationContent = settings.get('hideNotificationContentPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
     settings.watch('notificationSoundEnabledPref', (newValue) => {
@@ -87,6 +89,9 @@ if (!isFirstInstance) {
       mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
         enterToSend: newValue
       });
+    });
+    settings.watch('hideNotificationContentPref', (newValue) => {
+      state.notificationContentHidden = newValue;
     });
 
     setApplicationMenu();
@@ -121,10 +126,11 @@ if (!isFirstInstance) {
       trayClickShortcutMenuItem.submenu.items[checkedItemIndex].checked = true;
    }
 
-   notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
-   pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+    notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
+    pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
 
-   state.notificationSoundEnabled = notificationSoundEnabled;
+    state.notificationSoundEnabled = notificationSoundEnabled;
+    state.notificationContentHidden = hideNotificationContent;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -173,23 +179,27 @@ if (!isFirstInstance) {
 
     ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
       if (msg.options) {
-        const customNotification = new Notification({
-          title: msg.title,
-          /*
-           * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
-           * the sender's picture/avatar here.
-           *
-           * We may be able to just do it live by:
-           * 1. Traversing the DOM for the conversation which matches the sender
-           * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
-           * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
-           * This would likely also require copying computed style properties into the element to ensure it looks right.
-           * There also appears to be a library: http://html2canvas.hertzen.com
-           */
-          icon: msg.options.icon,
-          body: msg.options.body,
-          silent: !(state.notificationSoundEnabled)
-        });
+        const notificationOpts = state.notificationContentHidden ? {
+          title: 'Android Messages Desktop',
+          body: msg.options.body
+        } : {
+            title: msg.title,
+            /*
+            * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
+            * the sender's picture/avatar here.
+            *
+            * We may be able to just do it live by:
+            * 1. Traversing the DOM for the conversation which matches the sender
+            * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+            * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
+            * This would likely also require copying computed style properties into the element to ensure it looks right.
+            * There also appears to be a library: http://html2canvas.hertzen.com
+            */
+            icon: msg.options.icon,
+            body: msg.options.body,
+        };
+        notificationOpts.silent = !(state.notificationSoundEnabled);
+        const customNotification = new Notification(notificationOpts);
 
         if (IS_MAC) {
           if (!mainWindow.isFocused()) {

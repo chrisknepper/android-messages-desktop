@@ -35,6 +35,27 @@
         "dmg"
       ]
     },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "${productName} Portable ${version}.${ext}"
+    },
     "linux": {
       "category": "Chat",
       "target": [
@@ -76,7 +97,7 @@
     "chai": "^4.1.0",
     "css-loader": "^0.28.7",
     "electron": "4.0.4",
-    "electron-builder": "^20.15.1",
+    "electron-builder": "20.39.0",
     "electron-mocha": "^6.0.4",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
