@@ -47,3 +47,14 @@ a {
   opacity: 0;
   pointer-events: none;
 }
+
+#titlebar {
+  -webkit-app-region: drag;
+  position: fixed; 
+  width: 100%; 
+  height: 64px; 
+  top: 0; 
+  left: 0; 
+  background: none;
+  pointer-events: none;
+}

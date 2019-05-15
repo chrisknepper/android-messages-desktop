@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.0.1] - 2019-04-16
+### Fixed
+- Clicking links in text messages now opens them in your browser again instead of doing nothing (big oof)
+
+## [1.0.0] - 2019-04-05
+### Changed
+- *BREAKING CHANGE* Migrate to new URL provided by Google (messages.android.com -> messages.google.com, requires signing in again)
+- Under the hood: Associated changes and fixes relating to URL change
+
+## [0.9.1] - 2019-03-03
+### Fixed
+- Spell check now works again (abruptly stopped working after the release of 0.9.0 due to new HTTP security header)
+
+## [0.9.0] - 2019-02-18
+### Added
+- Setting to disable notification sound
+- Setting to disable sending message when pressing enter
+
+### Changed
+- Use inline window buttons on Mac (looks more similar to iMessage)
+- Update electron from 3.1.3 to 4.0.4 (see note under Fixed)
+- Update README.md
+- Under the hood: Method to communicate user settings changes to webview
+- Under the hood: Revamp link opening method
+- Under the hood: Electron 4-related API changes
+- Under the hood: Code cleanup
+
+### Fixed
+- Localization of Messages page (buttons and text provided by Google) (this appeared to be broken in Electron 3)
+- The link to a support page shown when the app can't detect the phone should now open in system web browser like other links
+
+## [0.8.0] - 2019-02-12
+### Added
+- Spellchecking for various languages (see notes in README)
+- Manually refreshing the webview for those times when the app gets all 🤪 (Accessible by pressing Ctrl+R or Cmd+R)
+- Full screen toggle item to View menu
+
+### Changed
+- Update electron from 2.0.12 to 3.1.3 (Electron 3 is required by electron-updater 4 which is required by electron-builder 20)
+
+### Fixed
+- Location of Check for Updates menu item on Windows (Now under Help)
+
 ## [0.7.1] - 2018-11-17
 ### Changed
 - Update electron from 2.0.2 to 2.0.12

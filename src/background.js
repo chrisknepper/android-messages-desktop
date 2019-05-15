@@ -5,42 +5,45 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu, ipcMain, Notification } from 'electron';
+import { app, Menu, ipcMain, Notification, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { settingsMenu } from './menu/settings_menu_template';
 import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
+import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
 import settings from 'electron-settings';
-import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY } from './constants';
+import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from 'env';
 
 const state = {
-  unreadNotificationCount: 0
+  unreadNotificationCount: 0,
+  notificationSoundEnabled: true
 };
 
 let mainWindow = null;
 
 // Prevent multiple instances of the app which causes many problems with an app like ours
 // Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
-// Adapted from https://github.com/electron/electron/blob/v2.0.2/docs/api/app.md#appmakesingleinstancecallback
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, let's show our existing instance instead
-  if (mainWindow) {
-    if (!mainWindow.isVisible()) {
-      mainWindow.show();
-    }
-  }
-});
+// Adapted from https://github.com/electron/electron/blob/v4.0.4/docs/api/app.md#apprequestsingleinstancelock
+const isFirstInstance = app.requestSingleInstanceLock();
 
-if (isSecondInstance) {
+if (!isFirstInstance) {
   app.quit();
 } else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (!mainWindow.isVisible()) {
+        mainWindow.show();
+      }
+    }
+  })
+
   let trayManager = null;
 
   const setApplicationMenu = () => {
@@ -73,36 +76,57 @@ if (isSecondInstance) {
     // TODO: Create a preference manager which handles all of these
     const autoHideMenuBar = settings.get('autoHideMenuPref', false);
     const startInTray = settings.get('startInTrayPref', false);
+    const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
+    const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
     const openAppAtLogin = settings.get('openAppAtLoginPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
+    settings.watch('notificationSoundEnabledPref', (newValue) => {
+      state.notificationSoundEnabled = newValue;
+    });
+    settings.watch('pressEnterToSendPref', (newValue) => {
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: newValue
+      });
+    });
+
+    setApplicationMenu();
+    const menuInstance = Menu.getApplicationMenu();
 
     if (IS_MAC) {
       app.on('activate', () => {
         mainWindow.show();
       });
-    }
-
-    if (!IS_MAC) {
-      // Sets checked status based on user prefs
-      settingsMenu.submenu[0].checked = autoHideMenuBar;
-      settingsMenu.submenu[2].enabled = trayManager.enabled;
-    }
-
-    settingsMenu.submenu[1].checked = trayManager.enabled;
-    settingsMenu.submenu[2].checked = startInTray;
-
-    if (IS_WINDOWS || IS_MAC) {
       settingsMenu.submenu[3].checked = openAppAtLogin;
     }
 
-    if (IS_WINDOWS) {
-      settingsMenu.submenu[4].enabled = trayManager.enabled;
-      settingsMenu.submenu[4].submenu[0].checked = (trayManager.clickShortcut === 'double-click');
-      settingsMenu.submenu[4].submenu[1].checked = (trayManager.clickShortcut === 'click');
-    }
+    const trayMenuItem = menuInstance.getMenuItemById('startInTrayMenuItem');
+    const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
+    const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
+    const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
 
-    setApplicationMenu();
+    if (!IS_MAC) {
+      // Sets checked status based on user prefs
+      menuInstance.getMenuItemById('autoHideMenuBarMenuItem').checked = autoHideMenuBar;
+      trayMenuItem.enabled = trayManager.enabled;
+    }
+    trayMenuItem.checked = startInTray;
+    enableTrayIconMenuItem.checked = trayManager.enabled;
+
+   if (IS_WINDOWS) {
+      const trayClickShortcutMenuItem = menuInstance.getMenuItemById('trayClickShortcutMenuItem');
+      trayClickShortcutMenuItem.enabled = trayManager.enabled;
+      // As of Electron 3 or 4, setting checked property (even to false) of multiple items in radio group results in
+      // the first one always being checked, so we have to set it just on the one where checked should == true
+      const checkedItemIndex = (trayManager.clickShortcut === 'double-click') ? 0 : 1;
+      trayClickShortcutMenuItem.submenu.items[checkedItemIndex].checked = true;
+      settingsMenu.submenu[3].checked = openAppAtLogin;
+   }
+
+   notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
+   pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+
+   state.notificationSoundEnabled = notificationSoundEnabled;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -110,7 +134,12 @@ if (isSecondInstance) {
       width: 1100,
       height: 800,
       autoHideMenuBar: autoHideMenuBar,
-      show: !(startInTray) //Starts in tray if set
+      show: !(startInTray),  //Starts in tray if set
+      titleBarStyle: IS_MAC ? 'hiddenInset' : 'default', //Turn on hidden frame on a Mac
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true
+      }
     };
 
     if (IS_LINUX) {
@@ -161,7 +190,7 @@ if (isSecondInstance) {
            */
           icon: msg.options.icon,
           body: msg.options.body,
-          silent: false
+          silent: !(state.notificationSoundEnabled)
         });
 
         if (IS_MAC) {
@@ -183,6 +212,64 @@ if (isSecondInstance) {
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
+      }
+    });
+
+    ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+
+      // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
+      // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
+      // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
+      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+        enterToSend: pressEnterToSendEnabled
+      });
+
+      let spellCheckFiles = null;
+      let customWords = null;
+      const currentLanguage = app.getLocale();
+      try {
+        // TODO: Possibly don't check supported-languages.json every load if local dictionary files already exist
+        const supportedLanguages = await DictionaryManager.getSupportedLanguages();
+
+        const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(currentLanguage, supportedLanguages);
+
+        if (dictionaryLocaleKey) { // Spellchecking is supported for the current language
+          spellCheckFiles = await DictionaryManager.getLanguagePath(currentLanguage, dictionaryLocaleKey);
+
+          // We send an event with the language key and array of custom words to the webview bridge which contains the
+          // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+          // between electron processes is hacky at best and impossible at worst.
+          const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+
+          customWords = {};
+          if (currentLanguage in existingCustomWords) {
+            customWords = { [currentLanguage]: existingCustomWords[currentLanguage] };
+          }
+        }
+      }
+      catch (error) {
+        // TODO: Display this as an error message to the user?
+      }
+
+      event.sender.send(EVENT_SPELLING_REFLECT_READY, {
+        dictionaryLocaleKey: currentLanguage,
+        spellCheckFiles,
+        customWords
+      });
+    });
+
+    ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (event, msg) => {
+      // Add custom words picked by the user to a persistent data store because they must be added to
+      // the instance of Hunspell on each launch of the app/loading of the dictionary.
+      const { newCustomWord } = msg;
+      const currentLanguage = app.getLocale();
+      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+      if (!(currentLanguage in existingCustomWords)) {
+        existingCustomWords[currentLanguage] = [];
+      }
+      if (newCustomWord && !existingCustomWords[currentLanguage].includes(newCustomWord)) {
+        existingCustomWords[currentLanguage].push(newCustomWord);
+        settings.set(SETTING_CUSTOM_WORDS, existingCustomWords);
       }
     });
 
@@ -216,5 +303,18 @@ if (isSecondInstance) {
     if (IS_DEV) {
       mainWindow.openDevTools();
     }
+
+    app.on('web-contents-created', (e, contents) => {
+
+      // Check for a webview
+      if (contents.getType() == 'webview') {
+
+        // Listen for any new window events
+        contents.on('new-window', (e, url) => {
+          e.preventDefault()
+          shell.openExternal(url)
+        })
+      }
+    });
   });
 }

@@ -1,10 +1,7 @@
 import './stylesheets/main.css';
 
-import './helpers/external_links.js';
-
-import { remote, shell } from 'electron';
-import url from 'url';
-import { IS_DEV } from './constants';
+import { ipcRenderer, remote } from 'electron';
+import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from './constants';
 
 const state = {
   loaded: false
@@ -30,9 +27,47 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
       return callback(false); // Prevent the webview's notification from coming through (we roll our own)
     }
 
-    if (!url.startsWith('https://messages.android.com')) {
+    if (!url.startsWith('https://messages.google.com/web')) {
       return callback(false); // Deny
     }
+  });
+
+  androidMessagesWebview.getWebContents().session.webRequest.onHeadersReceived({
+    // Only run this code on requests for which the URL is in the following array.
+    // The SRC of the webview is the same context as the preload script.
+    urls: ['https://messages.google.com/web/'] }, (details, callback) => {
+      /*
+       * Google, prior to changing the URL of the app from messages.android.com to messages.google.com/web sends several directives in the
+       * content-security-policy header which restrict what kind of JS can run and where it can originate. This can break our spell
+       * checking (because the spellchecker instantiates a WebAssembly module) unless we include unsafe-eval for the root page headers.
+       * We must do this before any stricter rules are specified since they can only "further restrict capabilities" as they are defined.
+       * We therefore must modify the rule Google sends by detecting and prepending the next-least-strict rule sent, "unsafe-inline."
+       * We must use double quotes since content-security-policy directive rules need single quotes as part of the string.
+       *
+       * Doing it this way allows us to keep the rest of Google's security rules to maximize security while still allowing WebAssembly to work.
+       *
+       * If this ever stops working, we can force WebAssembly to work by completely nixing the content-security-policy header, done via:
+       * delete modifiedHeaders['content-security-policy'];
+       *
+       * See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#Multiple_content_security_policies
+       */
+      const modifiedHeaders = {
+        ...details.responseHeaders
+      };
+
+      // Since the URL change, this header no longer seems to be sent, so this should allow spellchecking to work,
+      // even if Google starts sending the header again.
+      if (typeof modifiedHeaders === 'object' && 'content-security-policy' in modifiedHeaders) {
+        const firstCSP = modifiedHeaders['content-security-policy'][0];
+
+        if (firstCSP.includes("'unsafe-inline'")) {
+          modifiedHeaders['content-security-policy'][0] = firstCSP.replace("'unsafe-inline'", "'unsafe-eval' 'unsafe-inline'");
+        }
+      }
+
+      callback({
+        responseHeaders: modifiedHeaders
+      });
   });
 });
 
@@ -61,11 +96,18 @@ androidMessagesWebview.addEventListener('did-stop-loading', () => { // coinciden
 androidMessagesWebview.addEventListener('dom-ready', () => {
   console.log('dom ready');
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
+
+  // Make the title centered so that it won't get weirdly covered by the traffic light on mac
+  // 10px should make it look roughly centered
+  // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
+  if (IS_MAC) {
+    androidMessagesWebview.insertCSS('.main-nav-header .logo {text-align:center; transform: translateX(10px)}');
+  }
 });
 
-androidMessagesWebview.addEventListener('new-window', (e) => {
-  const protocol = url.parse(e.url).protocol;
-  if (protocol === 'http:' || protocol === 'https:') {
-    shell.openExternal(e.url); // Open clicked links in user's default browser
-  }
+// Forward event from main process to webview bridge
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
+  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, {
+    enterToSend
+  });
 });

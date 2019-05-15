@@ -1,0 +1,10 @@
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+
+# This, along with the extraFiles electron-builder directive in package.json ensures that
+# resources/dictionaries folder is included as an empty folder in production/user-facing builds.
+# It must be done this way because some OSes install the app to a location from which the user does not
+# have the permission to create a subdirectory unless they run the app as root. Namely, Ubuntu, via the .deb,
+# installs the app to /opt/ and calling node mkdir only works as root from there.

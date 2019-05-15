@@ -28,15 +28,19 @@ Head over to the [latest releases](https://github.com/chrisknepper/android-messa
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
-**Important note 2:** We currently have builds for Windows and macOS, and Linux. I've only tested on macOS and Windows 10, and would love help testing on Linux and older versions of Windows.
+**Important note 2:** We currently have builds for Windows and macOS, and Linux. I test releases on macOS, Windows 10, and Ubuntu Linux. I would love help testing on additional distros of Linux and other versions of Windows.
 
 # Features
 * System notifications when a text comes in
 * Notification badges on macOS
+* Spellchecking in ~50 languages
 * Run in background on Windows / Linux / macOS
 * Minimize to tray on Windows / Linux
 * Menu bar support on macOS
 * TBD...
+
+# Spellchecking
+Implemented via the amazing [`electron-hunspell`](https://github.com/kwonoj/electron-hunspell) library with dictionaries provided by the excellent [`dictionaries`](https://github.com/wooorm/dictionaries) project. Language files are downloaded when the app opens and the language used is based on the language set in your operating system. If you switch your system language and restart the app, the spellchecking should occur in the new language as long as it is in the [list of supported languages](https://github.com/wooorm/dictionaries#table-of-dictionaries).
 
 # TODOs / Roadmap (rough order of priority):
 - [x] Make sure it actually works (definitely works as of v0.1.0, done via [8068ed2](../../commit/8068ed2))
@@ -84,11 +88,13 @@ npm run e2e
 ```
 Using [Mocha](https://mochajs.org/) and [Spectron](http://electron.atom.io/spectron/). This task will run all files in `e2e` directory with `.e2e.js` extension.
 
-# Making a release
-To package your app into an installer use command:
-```
-npm run release
-```
+# Publishing a release:
+1. Commit what you want to go in the release (including updates to README and CHANGELOG)
+2. Run `npm version <type>` where `<type>` is either `major`, `minor`, or `patch` depending on the extent of your changes (this command increments the version in package.json and creates a git tag for the new version)
+3. Run `git push`
+4. Run `git push --tags`
+5. Run `npm run release` (for this step to succeed, you must have a GitHub Personal Access Token with write access to this repository in your `PATH` as `GH_TOKEN`)
+6. Go to GitHub and publish the release (which should be there as a draft), taking care to make the release name match the tag name including the "v"
 
 Once the packaging process finished, the `dist` directory will contain your distributable file.
 

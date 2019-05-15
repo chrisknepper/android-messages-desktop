@@ -11,3 +11,6 @@ Thumbs.db
 /app/background.js
 /app/bridge.js
 /app/**/*.map
+
+# Dictionary files are downloaded by the user's machine
+/resources/dictionaries/**/*
