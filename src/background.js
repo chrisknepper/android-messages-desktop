@@ -183,7 +183,7 @@ if (!isFirstInstance) {
       if (msg.options) {
         const notificationOpts = state.notificationContentHidden ? {
           title: 'Android Messages Desktop',
-          body: msg.options.body
+          body: 'New Message'
         } : {
             title: msg.title,
             /*

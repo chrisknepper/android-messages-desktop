@@ -110,7 +110,7 @@ settingsMenu.submenu.push(
   separator,
   {
     id: 'hideNotificationContentMenuItem',
-    label: 'Hide Sender in Notification',
+    label: 'Hide Notification Content',
     type: 'checkbox',
     click: (item) => {
       settings.set('hideNotificationContentPref', item.checked);
