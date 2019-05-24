@@ -1,8 +1,9 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
-import { maybeGetValidJson, isObject } from './utilities';
+import sudo from 'sudo-prompt';
+import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME, IS_LINUX } from '../constants';
+import { maybeGetValidJson, isObject, isDictionariesFolderOwnedByUser, currentUserAndGroupId } from './utilities';
 
 // Use a known existing commit to dictionaries in case something bad happens to master
 const DICTIONARIES_COMMIT_HASH = '2de863c';
@@ -12,6 +13,24 @@ export default class DictionaryManager {
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
+
+            if (IS_LINUX) {
+                if (!isDictionariesFolderOwnedByUser()) {
+                    const user = currentUserAndGroupId();
+                    if (user === null) {
+                        reject(null); // Couldn't get user and group ID
+                    }
+                    sudo.exec(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`,
+                        function(error, stdout, stderr) {
+                            if (error) {
+                                reject(null);
+                            }
+                            console.log('stdout: ' + stdout);
+                        }
+                    );
+                }
+            }
+
             if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
                 reject(null); // Folders where files go don't exist so bail
             }
