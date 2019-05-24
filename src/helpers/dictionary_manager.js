@@ -1,9 +1,8 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import sudo from 'sudo-prompt';
-import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME, IS_LINUX } from '../constants';
-import { maybeGetValidJson, isObject, isDictionariesFolderOwnedByUser, currentUserAndGroupId } from './utilities';
+import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
+import { maybeGetValidJson, isObject } from './utilities';
 
 // Use a known existing commit to dictionaries in case something bad happens to master
 const DICTIONARIES_COMMIT_HASH = '2de863c';
@@ -147,7 +146,7 @@ export default class DictionaryManager {
 
                     const dictBaseUrl = `https://raw.githubusercontent.com/wooorm/dictionaries/${DICTIONARIES_COMMIT_HASH}/dictionaries/${localeKey}/index`
 
-                    
+
                     https.get(`${dictBaseUrl}.aff`, (response) => {
                         if (response.statusCode === 200 || response.statusCode === 302) {
                             let affFile = fs.createWriteStream(localDictionaryFiles.userLanguageAffFile);

@@ -1,6 +1,6 @@
 import { statSync } from 'fs';
 import { userInfo } from 'os';
-import { IS_LINUX, SPELLING_DICTIONARIES_PATH } from 'constants';
+import { IS_LINUX, SPELLING_DICTIONARIES_PATH } from '../constants';
 
 function maybeGetValidJson(jsonText) {
     if (jsonText === null || jsonText === false || jsonText === '') {
@@ -36,7 +36,7 @@ function currentUserAndGroupId() {
     return null;
 }
 
-function runSudoCommandPromise(command) {
+function runSudoCommandPromise(command, options) {
     return new Promise((resolve, reject) => {
         sudo.exec(command, options,
             function (error, stdout, stderr) {
@@ -65,7 +65,7 @@ function promptLinuxUserAndChangePermissions() {
             name: 'Electron'
         };
         try {
-            const sudoExecResult = await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`);
+            await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`, options);
             resolve(true);
         }
         catch (error) {
