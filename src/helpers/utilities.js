@@ -1,6 +1,6 @@
-import { statSync } from fs;
-import { userInfo } from os;
-import { SPELLING_DICTIONARIES_PATH } from 'constants';
+import { statSync } from 'fs';
+import { userInfo } from 'os';
+import { IS_LINUX, SPELLING_DICTIONARIES_PATH } from 'constants';
 
 function maybeGetValidJson(jsonText) {
     if (jsonText === null || jsonText === false || jsonText === '') {
@@ -36,9 +36,49 @@ function currentUserAndGroupId() {
     return null;
 }
 
+function runSudoCommandPromise(command) {
+    return new Promise((resolve, reject) => {
+        sudo.exec(command, options,
+            function (error, stdout, stderr) {
+                if (error) {
+                    reject(error);
+                }
+                resolve(stdout);
+            }
+        );
+    });
+}
+
+function promptLinuxUserAndChangePermissions() {
+    return new Promise(async (resolve, reject) => {
+        if (!IS_LINUX) {
+            reject(null);
+        }
+        if (isDictionariesFolderOwnedByUser()) {
+            resolve(true);
+        }
+        const user = currentUserAndGroupId();
+        if (user === null) {
+            reject(null); // Couldn't get user and group ID
+        }
+        const options = {
+            name: 'Electron'
+        };
+        try {
+            const sudoExecResult = await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`);
+            resolve(true);
+        }
+        catch (error) {
+            reject(error);
+        }
+    })
+
+}
+
 export {
     maybeGetValidJson,
     isObject,
     isDictionariesFolderOwnedByUser,
-    currentUserAndGroupId
+    currentUserAndGroupId,
+    promptLinuxUserAndChangePermissions
 }

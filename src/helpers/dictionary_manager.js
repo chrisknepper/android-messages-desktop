@@ -13,24 +13,6 @@ export default class DictionaryManager {
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
-
-            if (IS_LINUX) {
-                if (!isDictionariesFolderOwnedByUser()) {
-                    const user = currentUserAndGroupId();
-                    if (user === null) {
-                        reject(null); // Couldn't get user and group ID
-                    }
-                    sudo.exec(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`,
-                        function(error, stdout, stderr) {
-                            if (error) {
-                                reject(null);
-                            }
-                            console.log('stdout: ' + stdout);
-                        }
-                    );
-                }
-            }
-
             if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
                 reject(null); // Folders where files go don't exist so bail
             }
