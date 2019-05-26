@@ -54,19 +54,23 @@ function promptLinuxUserAndChangePermissions() {
     return new Promise(async (resolve, reject) => {
         if (!IS_LINUX) {
             reject(null);
+            return;
         }
         if (isDictionariesFolderOwnedByUser()) {
             resolve(true);
+            return;
         }
         const user = currentUserAndGroupId();
         if (user === null) {
             reject(null); // Couldn't get user and group ID
+            return;
         }
         const options = {
             name: 'Electron'
         };
         try {
-            await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} ${SPELLING_DICTIONARIES_PATH}`, options);
+            // Must quote path, otherwise this would fail with paths that would require escaping (such as with spaces)
+            await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} "${SPELLING_DICTIONARIES_PATH}"`, options);
             resolve(true);
         }
         catch (error) {

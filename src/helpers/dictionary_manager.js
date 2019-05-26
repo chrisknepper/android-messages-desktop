@@ -14,6 +14,7 @@ export default class DictionaryManager {
         return new Promise((resolve, reject) => {
             if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
                 reject(null); // Folders where files go don't exist so bail
+                return;
             }
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
@@ -27,6 +28,7 @@ export default class DictionaryManager {
                     const supportedLanguagesJsonParsed = maybeGetValidJson(jsonStringFromFile);
                     if (isObject(supportedLanguagesJsonParsed) && Array.isArray(supportedLanguagesJsonParsed)) {
                         resolve(supportedLanguagesJsonParsed);
+                        return;
                     }
                 }
 
@@ -59,6 +61,7 @@ export default class DictionaryManager {
                             fs.writeFileSync(SUPPORTED_LANGUAGES_PATH, '');
                         }
                         reject(null); // File write error
+                        return;
                     });
                     supportedLanguagesJsonFile.on('finish', (finished) => {
                         const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH);
@@ -69,6 +72,7 @@ export default class DictionaryManager {
                     });
                 } else {
                     reject(null);
+                    return;
                 }
             }).on('error', (error) => {
                 reject(null); // Request for JSON failed (likely either Github down or API error)
