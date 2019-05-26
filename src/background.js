@@ -25,7 +25,8 @@ import env from 'env';
 const state = {
   unreadNotificationCount: 0,
   notificationSoundEnabled: true,
-  notificationContentHidden: false
+  notificationContentHidden: false,
+  bridgeInitDone: false
 };
 
 let mainWindow = null;
@@ -227,7 +228,11 @@ if (!isFirstInstance) {
     });
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+      if (state.bridgeInitDone) {
+        return;
+      }
 
+      state.bridgeInitDone = true;
       // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
       // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
       // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
@@ -327,7 +332,19 @@ if (!isFirstInstance) {
         contents.on('new-window', (e, url) => {
           e.preventDefault()
           shell.openExternal(url)
-        })
+        });
+
+        contents.on('destroyed', (e) => {
+          // we will need to re-init on reload
+          state.bridgeInitDone = false;
+        });
+
+        contents.on('will-navigate', (e, url) => {
+          if (url === 'https://messages.google.com/web/authentication') {
+            // we were logged out, let's display a notification to the user about this in the future
+            state.bridgeInitDone = false;
+          }
+        });
       }
     });
   });

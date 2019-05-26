@@ -1,5 +1,6 @@
 import { statSync } from 'fs';
 import { userInfo } from 'os';
+import sudo from 'sudo-prompt';
 import { IS_LINUX, SPELLING_DICTIONARIES_PATH } from '../constants';
 
 function maybeGetValidJson(jsonText) {

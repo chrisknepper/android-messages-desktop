@@ -12,9 +12,22 @@ import { SpellCheckerProvider } from 'electron-hunspell';
 remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
 
 window.onload = () => {
-    // Let the main process know the page is (essentially) done loading.
+    // Conditionally let the main process know the page is (essentially) done loading.
     // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
-    ipcRenderer.send(EVENT_BRIDGE_INIT);
+
+    // Without observing the DOM, we don't have a reliable way to let the main process know once
+    // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
+    // when we need to init the spellchecker and prompt Linux users for sudo
+    const onMutation = function (mutationsList, observer) {
+        if (document.querySelector('mw-main-nav')) { // we're definitely logged-in if this is in the DOM
+            ipcRenderer.send(EVENT_BRIDGE_INIT);
+            observer.disconnect();
+        }
+        // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
+    };
+
+    const observer = new MutationObserver(onMutation);
+    observer.observe(document.querySelector('body'), { childList: true, attributes: true });
 }
 
 // The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
