@@ -66,7 +66,7 @@ function promptLinuxUserAndChangePermissions() {
             return;
         }
         const options = {
-            name: 'Electron'
+            name: 'Android Messages Desktop'
         };
         try {
             // Must quote path, otherwise this would fail with paths that would require escaping (such as with spaces)
