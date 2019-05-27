@@ -14,6 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
+import { promptLinuxUserAndChangePermissions } from './helpers/utilities';
 import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
@@ -23,7 +24,9 @@ import env from 'env';
 
 const state = {
   unreadNotificationCount: 0,
-  notificationSoundEnabled: true
+  notificationSoundEnabled: true,
+  notificationContentHidden: false,
+  bridgeInitDone: false
 };
 
 let mainWindow = null;
@@ -78,6 +81,7 @@ if (!isFirstInstance) {
     const startInTray = settings.get('startInTrayPref', false);
     const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
     const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
+    const hideNotificationContent = settings.get('hideNotificationContentPref', false);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
     settings.watch('notificationSoundEnabledPref', (newValue) => {
@@ -87,6 +91,9 @@ if (!isFirstInstance) {
       mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
         enterToSend: newValue
       });
+    });
+    settings.watch('hideNotificationContentPref', (newValue) => {
+      state.notificationContentHidden = newValue;
     });
 
     setApplicationMenu();
@@ -102,6 +109,7 @@ if (!isFirstInstance) {
     const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
     const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
     const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
+    const hideNotificationContentMenuItem = menuInstance.getMenuItemById('hideNotificationContentMenuItem');
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
@@ -121,10 +129,12 @@ if (!isFirstInstance) {
       trayClickShortcutMenuItem.submenu.items[checkedItemIndex].checked = true;
    }
 
-   notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
-   pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+    notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
+    pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
+    hideNotificationContentMenuItem.checked = hideNotificationContent;
 
-   state.notificationSoundEnabled = notificationSoundEnabled;
+    state.notificationSoundEnabled = notificationSoundEnabled;
+    state.notificationContentHidden = hideNotificationContent;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -173,23 +183,27 @@ if (!isFirstInstance) {
 
     ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
       if (msg.options) {
-        const customNotification = new Notification({
-          title: msg.title,
-          /*
-           * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
-           * the sender's picture/avatar here.
-           *
-           * We may be able to just do it live by:
-           * 1. Traversing the DOM for the conversation which matches the sender
-           * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
-           * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
-           * This would likely also require copying computed style properties into the element to ensure it looks right.
-           * There also appears to be a library: http://html2canvas.hertzen.com
-           */
-          icon: msg.options.icon,
-          body: msg.options.body,
-          silent: !(state.notificationSoundEnabled)
-        });
+        const notificationOpts = state.notificationContentHidden ? {
+          title: 'Android Messages Desktop',
+          body: 'New Message'
+        } : {
+            title: msg.title,
+            /*
+            * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
+            * the sender's picture/avatar here.
+            *
+            * We may be able to just do it live by:
+            * 1. Traversing the DOM for the conversation which matches the sender
+            * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+            * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
+            * This would likely also require copying computed style properties into the element to ensure it looks right.
+            * There also appears to be a library: http://html2canvas.hertzen.com
+            */
+            icon: msg.options.icon,
+            body: msg.options.body,
+        };
+        notificationOpts.silent = !(state.notificationSoundEnabled);
+        const customNotification = new Notification(notificationOpts);
 
         if (IS_MAC) {
           if (!mainWindow.isFocused()) {
@@ -214,7 +228,11 @@ if (!isFirstInstance) {
     });
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+      if (state.bridgeInitDone) {
+        return;
+      }
 
+      state.bridgeInitDone = true;
       // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
       // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
       // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
@@ -227,6 +245,9 @@ if (!isFirstInstance) {
       const currentLanguage = app.getLocale();
       try {
         // TODO: Possibly don't check supported-languages.json every load if local dictionary files already exist
+        if (IS_LINUX) {
+          await promptLinuxUserAndChangePermissions();
+        }
         const supportedLanguages = await DictionaryManager.getSupportedLanguages();
 
         const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(currentLanguage, supportedLanguages);
@@ -311,7 +332,19 @@ if (!isFirstInstance) {
         contents.on('new-window', (e, url) => {
           e.preventDefault()
           shell.openExternal(url)
-        })
+        });
+
+        contents.on('destroyed', (e) => {
+          // we will need to re-init on reload
+          state.bridgeInitDone = false;
+        });
+
+        contents.on('will-navigate', (e, url) => {
+          if (url === 'https://messages.google.com/web/authentication') {
+            // we were logged out, let's display a notification to the user about this in the future
+            state.bridgeInitDone = false;
+          }
+        });
       }
     });
   });

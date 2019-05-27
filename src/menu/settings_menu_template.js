@@ -106,6 +106,15 @@ settingsMenu.submenu.push(
     click: (item) => {
       settings.set('pressEnterToSendPref', item.checked);
     }
+  },
+  separator,
+  {
+    id: 'hideNotificationContentMenuItem',
+    label: 'Hide Notification Content',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('hideNotificationContentPref', item.checked);
+    }
   }
 );
 

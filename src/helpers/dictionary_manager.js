@@ -2,6 +2,7 @@ import fs from 'fs';
 import https from 'https';
 import path from 'path';
 import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
+import { maybeGetValidJson, isObject } from './utilities';
 
 // Use a known existing commit to dictionaries in case something bad happens to master
 const DICTIONARIES_COMMIT_HASH = '2de863c';
@@ -13,24 +14,26 @@ export default class DictionaryManager {
         return new Promise((resolve, reject) => {
             if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
                 reject(null); // Folders where files go don't exist so bail
+                return;
             }
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
+
                 const fileInfo = fs.statSync(SUPPORTED_LANGUAGES_PATH);
                 const fileModifiedTime = parseInt(fileInfo.mtimeMs, 10);
                 const nowTime = new Date().getTime();
                 if (DICTIONARY_CACHE_TIME > Math.abs(nowTime - fileModifiedTime)) {
-                    // Supported languages file has not reached max cache time yet (30 days), so use it
-                    try {
-                        const supportedLanguagesJsonParsed = JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH));
+                    // Supported languages file has not reached max cache time yet (30 days), so try to use it
+                    const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH);
+                    const supportedLanguagesJsonParsed = maybeGetValidJson(jsonStringFromFile);
+                    if (isObject(supportedLanguagesJsonParsed) && Array.isArray(supportedLanguagesJsonParsed)) {
                         resolve(supportedLanguagesJsonParsed);
                         return;
                     }
-                    catch (err) {
-                        // JSON is corrupt, delete and try to download again
-                        fs.unlinkSync(SUPPORTED_LANGUAGES_PATH);
-                    }
                 }
+
+                // If this point is reached, the file exists but isn't valid JSON, so this function will continue
+                // (and try to download it again)
             }
 
             // Adapted from: https://stackoverflow.com/questions/35697058/download-and-store-files-inside-electron-app
@@ -52,20 +55,24 @@ export default class DictionaryManager {
                     response.pipe(supportedLanguagesJsonFile);
 
                     supportedLanguagesJsonFile.on('error', (err) => {
-                        fs.unlinkSync(SUPPORTED_LANGUAGES_PATH);
+                        // something went wrong with the download and we may or may not have part of the file
+                        // let's set it to empty since calling unlink is hit or miss for non-root Linux users
+                        if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
+                            fs.writeFileSync(SUPPORTED_LANGUAGES_PATH, '');
+                        }
                         reject(null); // File write error
+                        return;
                     });
                     supportedLanguagesJsonFile.on('finish', (finished) => {
-                        try {
-                            const supportedLanguagesJsonParsed = JSON.parse(fs.readFileSync(SUPPORTED_LANGUAGES_PATH));
+                        const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH);
+                        const supportedLanguagesJsonParsed = maybeGetValidJson(jsonStringFromFile);
+                        if (isObject(supportedLanguagesJsonParsed) && Array.isArray(supportedLanguagesJsonParsed)) {
                             resolve(supportedLanguagesJsonParsed);
-                        }
-                        catch (error) {
-                            reject(null); // The file just downloaded isn't parse-able as JSON
                         }
                     });
                 } else {
                     reject(null);
+                    return;
                 }
             }).on('error', (error) => {
                 reject(null); // Request for JSON failed (likely either Github down or API error)
@@ -74,7 +81,7 @@ export default class DictionaryManager {
     }
 
     static doesLanguageExistForLocale(userLanguage, supportedLocales) {
-        if (!userLanguage) {
+        if ((!userLanguage) || (!Array.isArray(supportedLocales))) {
             return null;
         }
         /*
@@ -143,7 +150,7 @@ export default class DictionaryManager {
 
                     const dictBaseUrl = `https://raw.githubusercontent.com/wooorm/dictionaries/${DICTIONARIES_COMMIT_HASH}/dictionaries/${localeKey}/index`
 
-                    
+
                     https.get(`${dictBaseUrl}.aff`, (response) => {
                         if (response.statusCode === 200 || response.statusCode === 302) {
                             let affFile = fs.createWriteStream(localDictionaryFiles.userLanguageAffFile);

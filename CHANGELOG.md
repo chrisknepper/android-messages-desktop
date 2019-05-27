@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0] - 2019-05-26
+### Added
+- 32-bit (x86) builds for Windows
+- Portable builds for Windows
+- KNOWN ISSUE: Portable builds for Windows cannot display system notifications
+- Setting to hide sender name and message preview in notifications
+- Under the hood: Method for detecting when user logs in or out (auth vs. de-auth)
+- Under the hood: System to execute commands as root user (see item under Fixed below)
+
+### Changed
+- Update icon to match current style of official icon
+- Update icon to have a bit more space around the outside (padding)
+- Under the hood: Refactor spellchecking dictionary manager logic and error handling
+
+### Fixed
+- Javascript error on launch for Linux users (resulting from dist dictionaries folder being owned by root--Linux users are now prompted to allow changing ownership of the dictionaries folder to the current user)
+
 ## [1.0.1] - 2019-04-16
 ### Fixed
 - Clicking links in text messages now opens them in your browser again instead of doing nothing (big oof)
