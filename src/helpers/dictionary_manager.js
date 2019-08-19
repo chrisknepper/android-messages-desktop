@@ -1,7 +1,7 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
+import { SPELLING_DICTIONARIES_PATH, SUPPORTED_LANGUAGES_PATH, DICTIONARY_CACHE_TIME } from '../constants';
 import { maybeGetValidJson, isObject } from './utilities';
 
 // Use a known existing commit to dictionaries in case something bad happens to master
@@ -9,22 +9,26 @@ const DICTIONARIES_COMMIT_HASH = '2de863c';
 
 export default class DictionaryManager {
 
+    static isFileExpired(filePath) {
+        const fileInfo = fs.statSync(filePath);
+        const fileModifiedTime = parseInt(fileInfo.mtimeMs, 10);
+        const nowTime = new Date().getTime();
+        const millisecondsSinceFileUpdated = Math.abs(nowTime - fileModifiedTime);
+        return millisecondsSinceFileUpdated >= DICTIONARY_CACHE_TIME;
+    }
+
     static async getSupportedLanguages() {
 
         return new Promise((resolve, reject) => {
-            if ((!fs.existsSync(RESOURCES_PATH)) || (!fs.existsSync(SPELLING_DICTIONARIES_PATH))) {
+            if (!fs.existsSync(SPELLING_DICTIONARIES_PATH())) {
                 reject(null); // Folders where files go don't exist so bail
                 return;
             }
 
-            if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
-
-                const fileInfo = fs.statSync(SUPPORTED_LANGUAGES_PATH);
-                const fileModifiedTime = parseInt(fileInfo.mtimeMs, 10);
-                const nowTime = new Date().getTime();
-                if (DICTIONARY_CACHE_TIME > Math.abs(nowTime - fileModifiedTime)) {
+            if (fs.existsSync(SUPPORTED_LANGUAGES_PATH())) {
+                if (!DictionaryManager.isFileExpired(SUPPORTED_LANGUAGES_PATH())) {
                     // Supported languages file has not reached max cache time yet (30 days), so try to use it
-                    const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH);
+                    const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH());
                     const supportedLanguagesJsonParsed = maybeGetValidJson(jsonStringFromFile);
                     if (isObject(supportedLanguagesJsonParsed) && Array.isArray(supportedLanguagesJsonParsed)) {
                         resolve(supportedLanguagesJsonParsed);
@@ -51,20 +55,20 @@ export default class DictionaryManager {
             https.get(requestOptions, (response) => {
                 if (response.statusCode === 200 || response.statusCode === 302) {
                     // Only create the local file if it exists on Github
-                    let supportedLanguagesJsonFile = fs.createWriteStream(SUPPORTED_LANGUAGES_PATH);
+                    let supportedLanguagesJsonFile = fs.createWriteStream(SUPPORTED_LANGUAGES_PATH());
                     response.pipe(supportedLanguagesJsonFile);
 
                     supportedLanguagesJsonFile.on('error', (err) => {
                         // something went wrong with the download and we may or may not have part of the file
                         // let's set it to empty since calling unlink is hit or miss for non-root Linux users
-                        if (fs.existsSync(SUPPORTED_LANGUAGES_PATH)) {
-                            fs.writeFileSync(SUPPORTED_LANGUAGES_PATH, '');
+                        if (fs.existsSync((SUPPORTED_LANGUAGES_PATH()))) {
+                            fs.writeFileSync((SUPPORTED_LANGUAGES_PATH()), '');
                         }
                         reject(null); // File write error
                         return;
                     });
                     supportedLanguagesJsonFile.on('finish', (finished) => {
-                        const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH);
+                        const jsonStringFromFile = fs.readFileSync(SUPPORTED_LANGUAGES_PATH());
                         const supportedLanguagesJsonParsed = maybeGetValidJson(jsonStringFromFile);
                         if (isObject(supportedLanguagesJsonParsed) && Array.isArray(supportedLanguagesJsonParsed)) {
                             resolve(supportedLanguagesJsonParsed);
@@ -132,12 +136,13 @@ export default class DictionaryManager {
     static async getLanguagePath(userLanguage, localeKey) {
         return new Promise((resolve, reject) => {
             const localDictionaryFiles = {
-                userLanguageAffFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}.aff`),
-                userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH, `${userLanguage}.dic`)
+                userLanguageAffFile: path.join(SPELLING_DICTIONARIES_PATH(), `${userLanguage}.aff`),
+                userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH(), `${userLanguage}.dic`)
             };
 
-            // TODO: Similar time-based cache busting for the dictionary files themselves as we do for supported languages file
-            if (fs.existsSync(localDictionaryFiles.userLanguageAffFile) && fs.existsSync(localDictionaryFiles.userLanguageDicFile)) {
+            const languageDictFilesExist = fs.existsSync(localDictionaryFiles.userLanguageAffFile) && fs.existsSync(localDictionaryFiles.userLanguageDicFile);
+            const languageDictFilesTooOld = DictionaryManager.isFileExpired(localDictionaryFiles.userLanguageAffFile); // Only need to check one of the two
+            if (languageDictFilesExist && !languageDictFilesTooOld) {
                 resolve(localDictionaryFiles);
             } else {
                 if (localeKey) {

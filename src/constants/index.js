@@ -1,5 +1,6 @@
 import env from 'env';
 import path from 'path';
+import { app } from 'electron';
 
 const osMap = {
     win32: 'Windows',
@@ -14,12 +15,13 @@ const IS_WINDOWS = (osName === 'win32');
 const IS_MAC = (osName === 'darwin');
 const IS_LINUX = (osName === 'linux');
 
-// Environment
+// Environment and paths
 const IS_DEV = (env.name === 'development');
 const BASE_APP_PATH = IS_DEV ? path.join(__dirname, '..') : process.resourcesPath;
 const RESOURCES_PATH = path.join(BASE_APP_PATH, 'resources');
-const SPELLING_DICTIONARIES_PATH = path.join(RESOURCES_PATH, 'dictionaries');
-const SUPPORTED_LANGUAGES_PATH = path.join(SPELLING_DICTIONARIES_PATH, 'supported-languages.json');
+const USER_DATA_PATH = () => app.getPath('userData'); // This has to be a function call because app.ready callback must be fired before this path can be used
+const SPELLING_DICTIONARIES_PATH = () => path.join(USER_DATA_PATH(), 'dictionaries');
+const SUPPORTED_LANGUAGES_PATH = () => path.join(SPELLING_DICTIONARIES_PATH(), 'supported-languages.json');
 
 // Settings
 const SETTING_TRAY_ENABLED = 'trayEnabledPref';

@@ -20,7 +20,7 @@ function isObject(maybeObj) {
 }
 
 function isDictionariesFolderOwnedByUser() {
-    const stat = statSync(SPELLING_DICTIONARIES_PATH);
+    const stat = statSync(SPELLING_DICTIONARIES_PATH());
     const mUserInfo = userInfo();
     return isObject(stat) && isObject(mUserInfo) && 'uid' in stat && 'uid' in mUserInfo && stat.uid === mUserInfo.uid;
 }
@@ -70,7 +70,7 @@ function promptLinuxUserAndChangePermissions() {
         };
         try {
             // Must quote path, otherwise this would fail with paths that would require escaping (such as with spaces)
-            await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} "${SPELLING_DICTIONARIES_PATH}"`, options);
+            await runSudoCommandPromise(`chown -R ${user.uid}:${user.gid} "${SPELLING_DICTIONARIES_PATH()}"`, options);
             resolve(true);
         }
         catch (error) {
