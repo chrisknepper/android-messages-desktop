@@ -87,8 +87,7 @@
     "electron-settings": "^3.2.0",
     "electron-updater": "4.0.6",
     "fs-jetpack": "^1.0.0",
-    "hunspell-asm": "^1.1.2",
-    "sudo-prompt": "^8.2.5"
+    "hunspell-asm": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.5",

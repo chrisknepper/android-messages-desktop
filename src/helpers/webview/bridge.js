@@ -17,7 +17,7 @@ window.onload = () => {
 
     // Without observing the DOM, we don't have a reliable way to let the main process know once
     // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
-    // when we need to init the spellchecker and prompt Linux users for sudo
+    // when we need to init the spellchecker
     const onMutation = function (mutationsList, observer) {
         if (document.querySelector('mw-main-nav')) { // we're definitely logged-in if this is in the DOM
             ipcRenderer.send(EVENT_BRIDGE_INIT);
