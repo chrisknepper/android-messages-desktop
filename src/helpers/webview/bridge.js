@@ -34,7 +34,7 @@ window.onload = () => {
 // and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
 // loads the spellchecker, if needed.
 ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
-    if (dictionaryLocaleKey && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
+    if (dictionaryLocaleKey && spellCheckFiles && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
         const provider = new SpellCheckerProvider();
         window.spellCheckHandler = provider;
         await provider.initialize({ environment: ENVIRONMENT.NODE });

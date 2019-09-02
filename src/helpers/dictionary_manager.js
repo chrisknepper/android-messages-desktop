@@ -139,9 +139,8 @@ export default class DictionaryManager {
                 userLanguageAffFile: path.join(SPELLING_DICTIONARIES_PATH(), `${userLanguage}.aff`),
                 userLanguageDicFile: path.join(SPELLING_DICTIONARIES_PATH(), `${userLanguage}.dic`)
             };
-
             const languageDictFilesExist = fs.existsSync(localDictionaryFiles.userLanguageAffFile) && fs.existsSync(localDictionaryFiles.userLanguageDicFile);
-            const languageDictFilesTooOld = DictionaryManager.isFileExpired(localDictionaryFiles.userLanguageAffFile); // Only need to check one of the two
+            const languageDictFilesTooOld = languageDictFilesExist && DictionaryManager.isFileExpired(localDictionaryFiles.userLanguageAffFile); // Only need to check one of the two
             if (languageDictFilesExist && !languageDictFilesTooOld) {
                 resolve(localDictionaryFiles);
             } else {
