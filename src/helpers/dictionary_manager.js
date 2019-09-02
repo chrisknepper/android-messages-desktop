@@ -21,8 +21,7 @@ export default class DictionaryManager {
 
         return new Promise((resolve, reject) => {
             if (!fs.existsSync(SPELLING_DICTIONARIES_PATH())) {
-                reject(null); // Folders where files go don't exist so bail
-                return;
+                fs.mkdirSync(SPELLING_DICTIONARIES_PATH());
             }
 
             if (fs.existsSync(SUPPORTED_LANGUAGES_PATH())) {
