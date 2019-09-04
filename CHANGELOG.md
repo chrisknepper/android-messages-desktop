@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.0] - 2019-09-04
+### Changed
+- No longer prompt Linux users for sudo
+- Under the hood: Update electron from 4.0.4 to 6.0.7
+- Under the hood: Update spellchecker and related electron dependencies
+
+### Fixed
+- Change location of dictionary files to the correct directory as specified by Electron, which manifested as a request for sudo on Linux, a JavaScript error on startup, and/or the spellchecker not working
+
 ## [2.0.0] - 2019-05-26
 ### Added
 - 32-bit (x86) builds for Windows

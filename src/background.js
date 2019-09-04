@@ -14,7 +14,6 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
-import { promptLinuxUserAndChangePermissions } from './helpers/utilities';
 import settings from 'electron-settings';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
@@ -145,6 +144,7 @@ if (!isFirstInstance) {
       show: !(startInTray),  //Starts in tray if set
       titleBarStyle: IS_MAC ? 'hiddenInset' : 'default', //Turn on hidden frame on a Mac
       webPreferences: {
+        contextIsolation: false,
         nodeIntegration: true,
         webviewTag: true
       }
@@ -244,10 +244,6 @@ if (!isFirstInstance) {
       let customWords = null;
       const currentLanguage = app.getLocale();
       try {
-        // TODO: Possibly don't check supported-languages.json every load if local dictionary files already exist
-        if (IS_LINUX) {
-          await promptLinuxUserAndChangePermissions();
-        }
         const supportedLanguages = await DictionaryManager.getSupportedLanguages();
 
         const dictionaryLocaleKey = DictionaryManager.doesLanguageExistForLocale(currentLanguage, supportedLanguages);
