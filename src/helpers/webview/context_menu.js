@@ -52,7 +52,7 @@ const textMenuTemplate = [
   }
 ];
 
-const popupContextMenu = (event, params) => {
+const popupContextMenu = async (event, params) => {
   // As of Electron 4, Menu.popup no longer accepts being called with the signature popup(remote.getCurrentWindow())
   // It must be passed as an object with the window key. Is this change silly? Yes. Will we know why it was done? No.
   const menuPopupArgs = {
@@ -104,24 +104,27 @@ const popupContextMenu = (event, params) => {
           });
           textMenuTemplateCopy.unshift({
             label: `Add ${booboo} to Dictionary`,
-            click: () => {
+            click: async () => {
               // Immediately clear red underline
               event.sender.replaceMisspelling(booboo);
               // Add new custom word to dictionary for the current session
-              window.spellCheckHandler.spellCheckerTable[window.spellCheckHandler.selectedDictionary].spellChecker.addWord(booboo);
+              const localeKey = await window.spellCheckHandler.getSelectedDictionaryLanguage();
+              window.spellCheckHandler.spellCheckerTable[localeKey].spellChecker.addWord(booboo);
               // Send new custom word to main process so it will be added to the dictionary at the start of future sessions
               ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
                 newCustomWord: booboo
               });
             }
           });
-          // Hunspell always seems to return the best choices at the end of the array, so reverse it, then limit to 8 suggestions
-          const suggestions = window.spellCheckHandler.getSuggestion(params.misspelledWord).reverse().slice(0, 8);
+
+          const suggestions = await window.spellCheckHandler.getSuggestion(params.misspelledWord);
           if (suggestions && suggestions.length) {
             textMenuTemplateCopy.unshift({
               type: 'separator'
             });
-            suggestions.map((correction) => {
+
+            // Hunspell always seems to return the best choices at the end of the array, so reverse it, then limit to 8 suggestions
+            suggestions.reverse().slice(0, 8).map((correction) => {
               let item = {
                 label: correction,
                 click: () => {

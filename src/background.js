@@ -144,6 +144,7 @@ if (!isFirstInstance) {
       show: !(startInTray),  //Starts in tray if set
       titleBarStyle: IS_MAC ? 'hiddenInset' : 'default', //Turn on hidden frame on a Mac
       webPreferences: {
+        contextIsolation: false,
         nodeIntegration: true,
         webviewTag: true
       }
