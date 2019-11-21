@@ -6,6 +6,24 @@ export const viewMenuTemplate = {
     },
     {
       role: "reload"
-    }
+    },
+    { 
+      type: 'separator'
+    },
+    {
+      role: "resetZoom"
+    },
+    {
+      role: "zoomIn"
+    },
+    {
+      role: 'zoomin',
+      accelerator: 'CommandOrControl+=',
+      visible: false,
+      enabled: true,
+    },
+    {
+      role: "zoomOut"
+    },
   ]
 };
