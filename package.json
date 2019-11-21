@@ -2,7 +2,7 @@
   "name": "android-messages-desktop",
   "productName": "Android Messages",
   "description": "Messages for web, as a desktop app",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "author": "Chris Knepper <chris82thekid@gmail.com>",
   "copyright": "© 2018-2019 Chris Knepper",
   "homepage": "https://github.com/chrisknepper/android-messages-desktop",
@@ -28,12 +28,15 @@
     "extraResources": [
       "resources/dictionaries"
     ],
+    "afterSign": "config/packaging/notarize.js",
     "mac": {
       "category": "public.app-category.social-networking",
       "target": [
         "zip",
         "dmg"
-      ]
+      ],
+      "entitlements": "config/packaging/macosEntitlements.plist",
+      "entitlementsInherit": "config/packaging/macosEntitlements.plist"
     },
     "win": {
       "target": [
@@ -96,6 +99,7 @@
     "electron": "7.0.1",
     "electron-builder": "22.1.0",
     "electron-mocha": "^6.0.4",
+    "electron-notarize": "^0.2.0",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^5.2.0",

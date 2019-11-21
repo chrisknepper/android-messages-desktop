@@ -140,6 +140,7 @@ export default class DictionaryManager {
             };
             const languageDictFilesExist = fs.existsSync(localDictionaryFiles.userLanguageAffFile) && fs.existsSync(localDictionaryFiles.userLanguageDicFile);
             const languageDictFilesTooOld = languageDictFilesExist && DictionaryManager.isFileExpired(localDictionaryFiles.userLanguageAffFile); // Only need to check one of the two
+            console.log('dictionary files too old, redownloading');
             if (languageDictFilesExist && !languageDictFilesTooOld) {
                 resolve(localDictionaryFiles);
             } else {
