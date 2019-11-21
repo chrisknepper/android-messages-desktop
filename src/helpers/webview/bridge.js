@@ -2,6 +2,7 @@
 
 import { popupContextMenu } from './context_menu';
 import { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from '../../constants';
+import { isObject } from '../../helpers/utilities';
 import { ipcRenderer, remote } from 'electron';
 import InputManager from './input_manager';
 import fs from 'fs';
@@ -57,8 +58,21 @@ ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleK
     }
 });
 
-ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
-    InputManager.handleEnterPrefToggle(enterToSend);
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
+    if (isObject(settingsList)) {
+        if ('useDarkMode' in settingsList && settingsList.useDarkMode !== null) {
+            if (settingsList.useDarkMode) {
+                // Props to Google for making the web app use dark mode entirely based on this class
+                // and for making the class name semantic!
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        if ('enterToSend' in settingsList) {
+            InputManager.handleEnterPrefToggle(enterToSend);
+        }
+    }
 });
 
 const OriginalBrowserNotification = Notification;

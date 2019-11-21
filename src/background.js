@@ -5,7 +5,7 @@
 
 import path from 'path';
 import url from 'url';
-import { app, Menu, ipcMain, Notification, shell } from 'electron';
+import { app, Menu, ipcMain, Notification, shell, nativeTheme } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { baseMenuTemplate } from './menu/base_menu_template';
 import { devMenuTemplate } from './menu/dev_menu_template';
@@ -25,7 +25,8 @@ const state = {
   unreadNotificationCount: 0,
   notificationSoundEnabled: true,
   notificationContentHidden: false,
-  bridgeInitDone: false
+  bridgeInitDone: false,
+  useSystemDarkMode: true
 };
 
 let mainWindow = null;
@@ -81,6 +82,7 @@ if (!isFirstInstance) {
     const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
     const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
     const hideNotificationContent = settings.get('hideNotificationContentPref', false);
+    const useSystemDarkMode = settings.get('useSystemDarkModePref', true);
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
     settings.watch('notificationSoundEnabledPref', (newValue) => {
@@ -94,6 +96,9 @@ if (!isFirstInstance) {
     settings.watch('hideNotificationContentPref', (newValue) => {
       state.notificationContentHidden = newValue;
     });
+    settings.watch('useSystemDarkModePref', (newValue) => {
+      state.useSystemDarkMode = newValue;
+    });
 
     setApplicationMenu();
     const menuInstance = Menu.getApplicationMenu();
@@ -104,11 +109,20 @@ if (!isFirstInstance) {
       });
     }
 
+    nativeTheme.on('updated', () => {
+      if (state.useSystemDarkMode) {
+        mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
+          useDarkMode: nativeTheme.shouldUseDarkColors
+        });
+      }
+    });
+
     const trayMenuItem = menuInstance.getMenuItemById('startInTrayMenuItem');
     const enableTrayIconMenuItem = menuInstance.getMenuItemById('enableTrayIconMenuItem');
     const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById('notificationSoundEnabledMenuItem');
     const pressEnterToSendMenuItem = menuInstance.getMenuItemById('pressEnterToSendMenuItem');
     const hideNotificationContentMenuItem = menuInstance.getMenuItemById('hideNotificationContentMenuItem');
+    const useSystemDarkModeMenuItem = menuInstance.getMenuItemById('useSystemDarkModeMenuItem');
 
     if (!IS_MAC) {
       // Sets checked status based on user prefs
@@ -131,9 +145,11 @@ if (!isFirstInstance) {
     notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
     pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
     hideNotificationContentMenuItem.checked = hideNotificationContent;
+    useSystemDarkModeMenuItem.checked = useSystemDarkMode;
 
     state.notificationSoundEnabled = notificationSoundEnabled;
     state.notificationContentHidden = hideNotificationContent;
+    state.useSystemDarkMode = useSystemDarkMode;
 
     autoUpdater.checkForUpdatesAndNotify();
 
@@ -237,7 +253,8 @@ if (!isFirstInstance) {
       // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
       // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
       mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
-        enterToSend: pressEnterToSendEnabled
+        enterToSend: pressEnterToSendEnabled,
+        useDarkMode: useSystemDarkMode ? nativeTheme.shouldUseDarkColors : null
       });
 
       let spellCheckFiles = null;
