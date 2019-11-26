@@ -106,8 +106,6 @@ androidMessagesWebview.addEventListener('dom-ready', () => {
 });
 
 // Forward event from main process to webview bridge
-ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, { enterToSend }) => {
-  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, {
-    enterToSend
-  });
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
+  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, settingsList);
 });

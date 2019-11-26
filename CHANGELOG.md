@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.1.0] - 2019-11-26
+### Added
+- Setting to follow (sync) system dark mode setting, changing from dark to light and vice versa as the operating system does -- This overrides the Google-provided setting within the 3-dot menu
+- Setting and keyboard shortcut (Command or Control +/-) to zoom the application in or out a la a web browser allows a page
+
+### Changed
+- Under the hood: Notarize the macOS build of the app per Apple requirements
+- Under the hood: Update electron from 6.0.7 to 7.0.1
+
 ## [3.0.0] - 2019-09-04
 ### Changed
 - No longer prompt Linux users for sudo

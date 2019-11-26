@@ -28,12 +28,15 @@
     "extraResources": [
       "resources/dictionaries"
     ],
+    "afterSign": "config/packaging/notarize.js",
     "mac": {
       "category": "public.app-category.social-networking",
       "target": [
         "zip",
         "dmg"
-      ]
+      ],
+      "entitlements": "config/packaging/macosEntitlements.plist",
+      "entitlementsInherit": "config/packaging/macosEntitlements.plist"
     },
     "win": {
       "target": [
@@ -74,7 +77,7 @@
     "e2e": "mocha temp/e2e.js --require source-map-support/register",
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
-    "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
+    "release": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
     "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
     "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
     "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
@@ -83,7 +86,7 @@
     "about-window": "1.13.0",
     "electron-hunspell": "1.0.0-beta.12",
     "electron-settings": "3.2.0",
-    "electron-updater": "4.1.2",
+    "electron-updater": "4.2.0",
     "fs-jetpack": "^1.0.0"
   },
   "devDependencies": {
@@ -93,9 +96,10 @@
     "babel-plugin-transform-object-rest-spread": "^7.0.0-beta.3",
     "chai": "^4.1.0",
     "css-loader": "^0.28.7",
-    "electron": "6.0.7",
+    "electron": "7.0.1",
     "electron-builder": "21.2.0",
     "electron-mocha": "^6.0.4",
+    "electron-notarize": "^0.2.0",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^5.2.0",

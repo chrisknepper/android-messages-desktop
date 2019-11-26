@@ -115,7 +115,14 @@ settingsMenu.submenu.push(
     click: (item) => {
       settings.set('hideNotificationContentPref', item.checked);
     }
+  },
+  separator,
+  {
+    id: 'useSystemDarkModeMenuItem',
+    label: 'Use System Dark Mode Setting',
+    type: 'checkbox',
+    click: (item) => {
+      settings.set('useSystemDarkModePref', item.checked);
+    }
   }
 );
-
-
