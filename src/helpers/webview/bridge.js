@@ -70,7 +70,7 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
             }
         }
         if ('enterToSend' in settingsList) {
-            InputManager.handleEnterPrefToggle(enterToSend);
+          InputManager.handleEnterPrefToggle(settingsList.enterToSend);
         }
     }
 });
