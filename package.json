@@ -83,7 +83,7 @@
     "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
   },
   "dependencies": {
-    "about-window": "1.13.0",
+    "about-window": "1.13.4",
     "electron-hunspell": "1.0.0-beta.12",
     "electron-settings": "3.2.0",
     "electron-updater": "4.2.0",
