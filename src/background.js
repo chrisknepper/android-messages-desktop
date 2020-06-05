@@ -185,7 +185,7 @@ if (!isFirstInstance) {
     trayManager.startIfEnabled();
 
     app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
-    
+
     mainWindow.on('focus', () => {
       if (IS_MAC) {
         state.unreadNotificationCount = 0;
@@ -215,7 +215,12 @@ if (!isFirstInstance) {
             * This would likely also require copying computed style properties into the element to ensure it looks right.
             * There also appears to be a library: http://html2canvas.hertzen.com
             */
-            icon: msg.options.icon,
+            /*
+            * Google's image for notifications was not working for some reason. I do not
+            * know what broke it (and I do not really care) but I am going to assume a security header.
+            * I am going to use one of the icons in the resources folder because it is convienet.
+            */
+            icon: path.resolve(__dirname, "..", "resources", "icons", "64x64.png"),
             body: msg.options.body,
         };
         notificationOpts.silent = !(state.notificationSoundEnabled);
