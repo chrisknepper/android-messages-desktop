@@ -1,8 +1,7 @@
 import { IS_DEV } from "../../constants";
 import openAboutWindow from "about-window";
-import { app } from "electron";
-import { description } from "../../../package.json";
-import path from "path";
+import { app, MenuItemConstructorOptions } from "electron";
+import * as path from "path";
 
 const productName = "Android Messages Desktop";
 const localeStyle =
@@ -17,10 +16,10 @@ let descriptionWithLocale = "";
 app.on("ready", () => {
   languageCode = app.getLocale();
   // about-window does not have a field for arbitrary HTML, so we add the HTML we need to an existing field
-  descriptionWithLocale = `${description}<span style="${localeStyle}">${languageCode}</span>`;
+  descriptionWithLocale = `Messages for web, as a desktop app<span style="${localeStyle}">${languageCode}</span>`;
 });
 
-export const aboutMenuItem = {
+export const aboutMenuItem: MenuItemConstructorOptions = {
   label: `About ${productName}`,
   click: () => {
     openAboutWindow({

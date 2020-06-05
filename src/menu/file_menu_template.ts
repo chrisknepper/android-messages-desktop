@@ -1,12 +1,12 @@
-import { app } from "electron";
+import { app, MenuItemConstructorOptions } from "electron";
 import { IS_WINDOWS } from "../constants";
 import { checkForUpdatesMenuItem } from "./items/check_for_updates";
 import { separator } from "./items/separator";
 
-const submenu = [
+const submenu: MenuItemConstructorOptions[] = [
   {
     label: "Quit Android Messages",
-    click: () => app.quit(),
+    click: (): void => app.quit(),
   },
 ];
 
@@ -15,7 +15,7 @@ if (!IS_WINDOWS) {
   submenu.unshift(checkForUpdatesMenuItem);
 }
 
-export const fileMenuTemplate = {
+export const fileMenuTemplate: MenuItemConstructorOptions = {
   label: "File",
   submenu,
 };

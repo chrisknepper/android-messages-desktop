@@ -1,21 +1,21 @@
-import { shell } from "electron";
+import { shell, MenuItemConstructorOptions } from "electron";
 import { IS_MAC, IS_WINDOWS } from "../constants";
 import { aboutMenuItem } from "./items/about";
 import { checkForUpdatesMenuItem } from "./items/check_for_updates";
 import { separator } from "./items/separator";
 
-const submenu = [
+const submenu: MenuItemConstructorOptions[] = [
   {
     label: "Learn More",
-    click: () =>
-      shell.openExternal(
+    click: async (): Promise<void> =>
+      await shell.openExternal(
         "https://github.com/chrisknepper/android-messages-desktop/"
       ),
   },
   {
     label: "Changelog",
-    click: () =>
-      shell.openExternal(
+    click: async (): Promise<void> =>
+      await shell.openExternal(
         "https://github.com/chrisknepper/android-messages-desktop/blob/master/CHANGELOG.md"
       ),
   },
@@ -31,7 +31,7 @@ if (!IS_MAC) {
   submenu.push(aboutMenuItem);
 }
 
-export const helpMenuTemplate = {
+export const helpMenuTemplate: MenuItemConstructorOptions = {
   label: "Help",
   submenu,
 };

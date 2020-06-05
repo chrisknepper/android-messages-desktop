@@ -1,8 +1,10 @@
-export const viewMenuTemplate = {
+import { MenuItemConstructorOptions } from "electron";
+
+export const viewMenuTemplate: MenuItemConstructorOptions = {
   label: "View",
   submenu: [
     {
-      role: "toggleFullScreen",
+      role: "togglefullscreen",
     },
     {
       role: "reload",
@@ -20,7 +22,7 @@ export const viewMenuTemplate = {
       role: "zoomIn",
     },
     {
-      role: "zoomin",
+      role: "zoomIn",
       accelerator: "CommandOrControl+=",
       visible: false,
       enabled: true,

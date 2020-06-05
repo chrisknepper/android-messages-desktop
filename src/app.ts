@@ -3,11 +3,13 @@ import "./stylesheets/main.css";
 import { ipcRenderer, remote } from "electron";
 import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from "./constants";
 
+type TOFIX = any;
+
 const app = remote.app;
 
 const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
-);
+) as TOFIX;
 
 androidMessagesWebview.addEventListener("did-finish-load", () => {
   // just before onLoad
@@ -25,7 +27,7 @@ androidMessagesWebview.addEventListener("dom-ready", () => {
   if (IS_DEV) {
     androidMessagesWebview.getWebContents().openDevTools();
   }
-  app.mainWindow.on("focus", () => {
+  (app as TOFIX).mainWindow.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs
     androidMessagesWebview.dispatchEvent(new Event("focus"));
   });

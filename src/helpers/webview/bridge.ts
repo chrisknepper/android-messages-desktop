@@ -8,14 +8,15 @@ import {
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
 } from "../../constants";
-import { isObject } from "../../helpers/utilities";
 import { ipcRenderer, remote } from "electron";
-import InputManager from "./input_manager";
+import { handleEnterPrefToggle } from "./input_manager";
 import fs from "fs";
 import {
   SpellCheckerProvider,
   attachSpellCheckProvider,
 } from "electron-hunspell";
+
+type TOFIX = any;
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -27,7 +28,7 @@ window.onload = () => {
   // Without observing the DOM, we don't have a reliable way to let the main process know once
   // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
   // when we need to init the spellchecker
-  const onMutation = function (mutationsList, observer) {
+  const onMutation = (mutationsList: TOFIX, observer: MutationObserver) => {
     if (document.querySelector("mw-main-nav")) {
       // we're definitely logged-in if this is in the DOM
       ipcRenderer.send(EVENT_BRIDGE_INIT);
@@ -37,7 +38,8 @@ window.onload = () => {
   };
 
   const observer = new MutationObserver(onMutation);
-  observer.observe(document.querySelector("body"), {
+  // There is always a body so TS is being dumb
+  observer.observe((document.querySelector("body") as unknown) as HTMLElement, {
     childList: true,
     attributes: true,
   });
@@ -56,7 +58,7 @@ ipcRenderer.once(
       spellCheckFiles.userLanguageDicFile
     ) {
       const provider = new SpellCheckerProvider();
-      window.spellCheckHandler = provider;
+      (window as TOFIX).spellCheckHandler = provider;
       await provider.initialize({}); // Empty brace correct, see: https://github.com/kwonoj/electron-hunspell/blob/master/example/browserWindow.ts
 
       await provider.loadDictionary(
@@ -68,7 +70,7 @@ ipcRenderer.once(
       const attached = await attachSpellCheckProvider(provider);
       attached.switchLanguage(dictionaryLocaleKey);
 
-      let table = window.spellCheckHandler.spellCheckerTable;
+      const table = (window as TOFIX).spellCheckHandler.spellCheckerTable;
       if (
         dictionaryLocaleKey in customWords &&
         table &&
@@ -88,19 +90,17 @@ ipcRenderer.once(
 );
 
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
-  if (isObject(settingsList)) {
-    if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
-      if (settingsList.useDarkMode) {
-        // Props to Google for making the web app use dark mode entirely based on this class
-        // and for making the class name semantic!
-        document.body.classList.add("dark-mode");
-      } else {
-        document.body.classList.remove("dark-mode");
-      }
+  if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
+    if (settingsList.useDarkMode) {
+      // Props to Google for making the web app use dark mode entirely based on this class
+      // and for making the class name semantic!
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
     }
-    if ("enterToSend" in settingsList) {
-      InputManager.handleEnterPrefToggle(settingsList.enterToSend);
-    }
+  }
+  if ("enterToSend" in settingsList) {
+    handleEnterPrefToggle(settingsList.enterToSend);
   }
 });
 
@@ -117,8 +117,11 @@ const OriginalBrowserNotification = Notification;
  * https://stackoverflow.com/questions/31231622/event-listener-for-web-notification
  * https://stackoverflow.com/questions/1421257/intercept-javascript-event
  */
-Notification = function (title, options) {
-  let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
+// It hurts but this is so antipattern I am telling the ts compiler to screw itself
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+Notification = function (title: string, options?: NotificationOptions) {
+  const notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
   /*
    * Google's own notifications have a click event listener which takes care of highlighting
@@ -135,10 +138,15 @@ Notification = function (title, options) {
    * time we can reliably get a reference to the Electron notification and attach Google's click
    * event listener.
    */
-  let originalClickListener = null;
+  let originalClickListener: (() => void) | null = null;
 
   const originalAddEventListener = notificationToSend.addEventListener;
-  notificationToSend.addEventListener = function (type, listener, options) {
+  // Seems silly to have these be correct as there is no way to mess it up
+  notificationToSend.addEventListener = (
+    type: TOFIX,
+    listener: TOFIX,
+    options: TOFIX
+  ) => {
     if (type === "click") {
       originalClickListener = listener;
     } else {
@@ -153,8 +161,8 @@ Notification = function (title, options) {
     }
   };
 
-  ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, (event, arg) => {
-    let theHookedUpNotification = remote.getGlobal("currentNotification");
+  ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, () => {
+    const theHookedUpNotification = remote.getGlobal("currentNotification");
     if (
       typeof theHookedUpNotification === "object" &&
       typeof originalClickListener === "function"
@@ -171,5 +179,8 @@ Notification = function (title, options) {
   return notificationToSend;
 };
 Notification.prototype = OriginalBrowserNotification.prototype;
+// It hurts but this is so antipattern I am telling the ts compiler to screw itself
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 Notification.permission = OriginalBrowserNotification.permission;
 Notification.requestPermission = OriginalBrowserNotification.requestPermission;

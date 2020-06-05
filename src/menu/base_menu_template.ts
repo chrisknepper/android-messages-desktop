@@ -5,8 +5,9 @@ import { settingsMenu } from "./settings_menu_template";
 import { viewMenuTemplate } from "./view_menu_template";
 import { windowMenuTemplate } from "./window_menu_template";
 import { IS_MAC } from "../constants";
+import { MenuItemConstructorOptions } from "electron";
 
-const baseMenuTemplate = [
+const baseMenuTemplate: MenuItemConstructorOptions[] = [
   editMenuTemplate,
   viewMenuTemplate,
   windowMenuTemplate,

@@ -1,29 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
-
-const translateEnvToMode = (env) => {
-  if (env === "production") {
-    return "production";
-  }
-  return "development";
-};
 
 module.exports = (env) => {
   return {
     target: "electron-renderer",
-    mode: translateEnvToMode(env),
     node: {
       __dirname: false,
       __filename: false,
     },
     externals: [nodeExternals()],
-    resolve: {
-      alias: {
-        env: path.resolve(__dirname, `../config/env_${env}.json`),
-      },
-    },
     devtool: "source-map",
     module: {
       rules: [
@@ -33,7 +19,7 @@ module.exports = (env) => {
           use: ["babel-loader"],
         },
         {
-          test: /\.js$/,
+          test: /\.ts$/,
           exclude: /node_modules/,
           use: ["babel-loader", "ts-loader"],
         },
@@ -47,7 +33,7 @@ module.exports = (env) => {
             {
               loader: "file-loader",
               options: {
-                useRelativePath: process.env.NODE_ENV !== "production",
+                useRelativePath: process.env.NODE_ENV === "development",
                 emitFile: false,
                 name: "[name].[ext]",
               },
@@ -57,7 +43,9 @@ module.exports = (env) => {
       ],
     },
     plugins: [
-      new FriendlyErrorsWebpackPlugin({ clearConsole: env === "development" }),
+      new FriendlyErrorsWebpackPlugin({
+        clearConsole: process.env.NODE_ENV === "development",
+      }),
     ],
   };
 };

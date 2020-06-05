@@ -1,11 +1,18 @@
 // Provide context menus (copy, paste, save image, etc...) for right-click interaction.
 
-import { ipcRenderer, remote } from "electron";
+import {
+  ipcRenderer,
+  MenuItemConstructorOptions,
+  remote,
+  ContextMenuParams,
+} from "electron";
 import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../../constants";
+
+type TOFIX = any;
 
 const { Menu } = remote;
 
-const standardMenuTemplate = [
+const standardMenuTemplate: MenuItemConstructorOptions[] = [
   {
     label: "Copy",
     role: "copy",
@@ -15,11 +22,11 @@ const standardMenuTemplate = [
   },
   {
     label: "Select All",
-    role: "selectall",
+    role: "selectAll",
   },
 ];
 
-const textMenuTemplate = [
+const textMenuTemplate: MenuItemConstructorOptions[] = [
   {
     label: "Undo",
     role: "undo",
@@ -48,11 +55,14 @@ const textMenuTemplate = [
   },
   {
     label: "Select All",
-    role: "selectall",
+    role: "selectAll",
   },
 ];
 
-const popupContextMenu = async (event, params) => {
+export const popupContextMenu = async (
+  event: Electron.Event,
+  params: ContextMenuParams
+): Promise<void> => {
   // As of Electron 4, Menu.popup no longer accepts being called with the signature popup(remote.getCurrentWindow())
   // It must be passed as an object with the window key. Is this change silly? Yes. Will we know why it was done? No.
   const menuPopupArgs = {
@@ -63,7 +73,7 @@ const popupContextMenu = async (event, params) => {
     case "video":
     case "image":
       if (params.srcURL && params.srcURL.length) {
-        let mediaType =
+        const mediaType =
           params.mediaType[0].toUpperCase() + params.mediaType.slice(1);
         const mediaInputMenu = Menu.buildFromTemplate([
           {
@@ -95,7 +105,7 @@ const popupContextMenu = async (event, params) => {
         mediaInputMenu.popup({
           window: remote.getCurrentWindow(),
           callback: () => {
-            mediaInputMenu = null; // Unsure if memory would leak without this (Clean up, clean up, everybody do your share)
+            (mediaInputMenu as unknown) = null; // Unsure if memory would leak without this (Clean up, clean up, everybody do your share)
           },
         });
       }
@@ -104,7 +114,7 @@ const popupContextMenu = async (event, params) => {
       if (params.isEditable) {
         const textMenuTemplateCopy = [...textMenuTemplate];
         if (
-          window.spellCheckHandler &&
+          (window as TOFIX).spellCheckHandler &&
           params.misspelledWord &&
           typeof params.misspelledWord === "string"
         ) {
@@ -116,10 +126,10 @@ const popupContextMenu = async (event, params) => {
             label: `Add ${booboo} to Dictionary`,
             click: async () => {
               // Immediately clear red underline
-              event.sender.replaceMisspelling(booboo);
+              (event as TOFIX).sender.replaceMisspelling(booboo);
               // Add new custom word to dictionary for the current session
-              const localeKey = await window.spellCheckHandler.getSelectedDictionaryLanguage();
-              window.spellCheckHandler.spellCheckerTable[
+              const localeKey = await (window as TOFIX).spellCheckHandler.getSelectedDictionaryLanguage();
+              (window as TOFIX).spellCheckHandler.spellCheckerTable[
                 localeKey
               ].spellChecker.addWord(booboo);
               // Send new custom word to main process so it will be added to the dictionary at the start of future sessions
@@ -129,9 +139,9 @@ const popupContextMenu = async (event, params) => {
             },
           });
 
-          const suggestions = await window.spellCheckHandler.getSuggestion(
+          const suggestions = (await (window as TOFIX).spellCheckHandler.getSuggestion(
             params.misspelledWord
-          );
+          )) as string[];
           if (suggestions && suggestions.length) {
             textMenuTemplateCopy.unshift({
               type: "separator",
@@ -142,10 +152,12 @@ const popupContextMenu = async (event, params) => {
               .reverse()
               .slice(0, 8)
               .map((correction) => {
-                let item = {
+                const item = {
                   label: correction,
                   click: () => {
-                    return event.sender.replaceMisspelling(correction);
+                    return (event as TOFIX).sender.replaceMisspelling(
+                      correction
+                    );
                   },
                 };
 
@@ -162,5 +174,3 @@ const popupContextMenu = async (event, params) => {
       }
   }
 };
-
-export { popupContextMenu };
