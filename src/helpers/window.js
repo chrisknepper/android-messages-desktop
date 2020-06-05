@@ -11,7 +11,7 @@ export default (name, options) => {
   const stateStoreFile = `window-state-${name}.json`;
   const defaultSize = {
     width: options.width,
-    height: options.height
+    height: options.height,
   };
   let state = {};
   let win;
@@ -34,7 +34,7 @@ export default (name, options) => {
       x: position[0],
       y: position[1],
       width: size[0],
-      height: size[1]
+      height: size[1],
     };
   };
 
@@ -51,12 +51,12 @@ export default (name, options) => {
     const bounds = screen.getPrimaryDisplay().bounds;
     return Object.assign({}, defaultSize, {
       x: (bounds.width - defaultSize.width) / 2,
-      y: (bounds.height - defaultSize.height) / 2
+      y: (bounds.height - defaultSize.height) / 2,
     });
   };
 
-  const ensureVisibleOnSomeDisplay = windowState => {
-    const visible = screen.getAllDisplays().some(display => {
+  const ensureVisibleOnSomeDisplay = (windowState) => {
+    const visible = screen.getAllDisplays().some((display) => {
       return windowWithinBounds(windowState, display.bounds);
     });
     if (!visible) {

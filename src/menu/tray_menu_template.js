@@ -1,9 +1,9 @@
-import { app } from 'electron';
-import { IS_MAC } from '../constants';
+import { app } from "electron";
+import { IS_MAC } from "../constants";
 
 export const trayMenuTemplate = [
   {
-    label: 'Show/Hide Android Messages',
+    label: "Show/Hide Android Messages",
     click: () => {
       if (app.mainWindow) {
         if (app.mainWindow.isVisible()) {
@@ -16,15 +16,15 @@ export const trayMenuTemplate = [
           app.mainWindow.show();
         }
       }
-    }
+    },
   },
   {
-    type: 'separator'
+    type: "separator",
   },
   {
-    label: 'Quit Android Messages',
+    label: "Quit Android Messages",
     click: () => {
-        app.quit();
-    }
-  }
+      app.quit();
+    },
+  },
 ];

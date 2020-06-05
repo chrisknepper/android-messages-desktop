@@ -1,4 +1,4 @@
 export const windowMenuTemplate = {
-  label: 'Window',
-  role: 'windowMenu'
+  label: "Window",
+  role: "windowMenu",
 };

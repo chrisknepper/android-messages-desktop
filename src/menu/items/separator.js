@@ -1,1 +1,1 @@
-export const separator = { type: 'separator' };
+export const separator = { type: "separator" };

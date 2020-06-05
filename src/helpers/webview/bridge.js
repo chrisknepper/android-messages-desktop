@@ -1,78 +1,107 @@
 // This script is injected into the webview.
 
-import { popupContextMenu } from './context_menu';
-import { EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from '../../constants';
-import { isObject } from '../../helpers/utilities';
-import { ipcRenderer, remote } from 'electron';
-import InputManager from './input_manager';
-import fs from 'fs';
-import { SpellCheckerProvider, attachSpellCheckProvider } from 'electron-hunspell';
+import { popupContextMenu } from "./context_menu";
+import {
+  EVENT_WEBVIEW_NOTIFICATION,
+  EVENT_NOTIFICATION_REFLECT_READY,
+  EVENT_BRIDGE_INIT,
+  EVENT_SPELLING_REFLECT_READY,
+  EVENT_UPDATE_USER_SETTING,
+} from "../../constants";
+import { isObject } from "../../helpers/utilities";
+import { ipcRenderer, remote } from "electron";
+import InputManager from "./input_manager";
+import fs from "fs";
+import {
+  SpellCheckerProvider,
+  attachSpellCheckProvider,
+} from "electron-hunspell";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-remote.getCurrentWebContents().addListener('context-menu', popupContextMenu);
+remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
 window.onload = () => {
-    // Conditionally let the main process know the page is (essentially) done loading.
-    // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
+  // Conditionally let the main process know the page is (essentially) done loading.
+  // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
 
-    // Without observing the DOM, we don't have a reliable way to let the main process know once
-    // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
-    // when we need to init the spellchecker
-    const onMutation = function (mutationsList, observer) {
-        if (document.querySelector('mw-main-nav')) { // we're definitely logged-in if this is in the DOM
-            ipcRenderer.send(EVENT_BRIDGE_INIT);
-            observer.disconnect();
-        }
-        // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
-    };
+  // Without observing the DOM, we don't have a reliable way to let the main process know once
+  // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
+  // when we need to init the spellchecker
+  const onMutation = function (mutationsList, observer) {
+    if (document.querySelector("mw-main-nav")) {
+      // we're definitely logged-in if this is in the DOM
+      ipcRenderer.send(EVENT_BRIDGE_INIT);
+      observer.disconnect();
+    }
+    // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
+  };
 
-    const observer = new MutationObserver(onMutation);
-    observer.observe(document.querySelector('body'), { childList: true, attributes: true });
-}
+  const observer = new MutationObserver(onMutation);
+  observer.observe(document.querySelector("body"), {
+    childList: true,
+    attributes: true,
+  });
+};
 
 // The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
 // and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
 // loads the spellchecker, if needed.
-ipcRenderer.once(EVENT_SPELLING_REFLECT_READY, async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
-    if (dictionaryLocaleKey && spellCheckFiles && spellCheckFiles.userLanguageAffFile && spellCheckFiles.userLanguageDicFile) {
-        const provider = new SpellCheckerProvider();
-        window.spellCheckHandler = provider;
-        await provider.initialize({}); // Empty brace correct, see: https://github.com/kwonoj/electron-hunspell/blob/master/example/browserWindow.ts
+ipcRenderer.once(
+  EVENT_SPELLING_REFLECT_READY,
+  async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
+    if (
+      dictionaryLocaleKey &&
+      spellCheckFiles &&
+      spellCheckFiles.userLanguageAffFile &&
+      spellCheckFiles.userLanguageDicFile
+    ) {
+      const provider = new SpellCheckerProvider();
+      window.spellCheckHandler = provider;
+      await provider.initialize({}); // Empty brace correct, see: https://github.com/kwonoj/electron-hunspell/blob/master/example/browserWindow.ts
 
-        await provider.loadDictionary(
-            dictionaryLocaleKey,
-            fs.readFileSync(spellCheckFiles.userLanguageDicFile),
-            fs.readFileSync(spellCheckFiles.userLanguageAffFile)
-        );
+      await provider.loadDictionary(
+        dictionaryLocaleKey,
+        fs.readFileSync(spellCheckFiles.userLanguageDicFile),
+        fs.readFileSync(spellCheckFiles.userLanguageAffFile)
+      );
 
-        const attached = await attachSpellCheckProvider(provider);
-        attached.switchLanguage(dictionaryLocaleKey);
+      const attached = await attachSpellCheckProvider(provider);
+      attached.switchLanguage(dictionaryLocaleKey);
 
-        let table = window.spellCheckHandler.spellCheckerTable;
-        if (dictionaryLocaleKey in customWords && table && dictionaryLocaleKey in table) {
-            for (let i = 0, n = customWords[dictionaryLocaleKey].length; i < n; i++) {
-                const word = customWords[dictionaryLocaleKey][i];
-                table[dictionaryLocaleKey].spellChecker.addWord(word);
-            }
+      let table = window.spellCheckHandler.spellCheckerTable;
+      if (
+        dictionaryLocaleKey in customWords &&
+        table &&
+        dictionaryLocaleKey in table
+      ) {
+        for (
+          let i = 0, n = customWords[dictionaryLocaleKey].length;
+          i < n;
+          i++
+        ) {
+          const word = customWords[dictionaryLocaleKey][i];
+          table[dictionaryLocaleKey].spellChecker.addWord(word);
         }
+      }
     }
-});
+  }
+);
 
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
-    if (isObject(settingsList)) {
-        if ('useDarkMode' in settingsList && settingsList.useDarkMode !== null) {
-            if (settingsList.useDarkMode) {
-                // Props to Google for making the web app use dark mode entirely based on this class
-                // and for making the class name semantic!
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-        }
-        if ('enterToSend' in settingsList) {
-          InputManager.handleEnterPrefToggle(settingsList.enterToSend);
-        }
+  if (isObject(settingsList)) {
+    if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
+      if (settingsList.useDarkMode) {
+        // Props to Google for making the web app use dark mode entirely based on this class
+        // and for making the class name semantic!
+        document.body.classList.add("dark-mode");
+      } else {
+        document.body.classList.remove("dark-mode");
+      }
     }
+    if ("enterToSend" in settingsList) {
+      InputManager.handleEnterPrefToggle(settingsList.enterToSend);
+    }
+  }
 });
 
 const OriginalBrowserNotification = Notification;
@@ -89,49 +118,57 @@ const OriginalBrowserNotification = Notification;
  * https://stackoverflow.com/questions/1421257/intercept-javascript-event
  */
 Notification = function (title, options) {
-    let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
+  let notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
-    /*
-     * Google's own notifications have a click event listener which takes care of highlighting
-     * the conversation a notification belongs to, but this click listener does not carry over
-     * when we block Google's and create our own Electron notification.
-     *
-     * What I would like to do here is just pass the listener function over IPC and call it in
-     * the main process.
-     *
-     * However, Electron does not support sending functions or otherwise non-JSON data across IPC.
-     * To solve this and be able to have both our click event listener (so we can show the app
-     * window) and Google's (so the converstaion gets selected/highlighted), when the main process
-     * asyncronously receives the notification data, it asyncronously sends a message back at which
-     * time we can reliably get a reference to the Electron notification and attach Google's click
-     * event listener.
-     */
-    let originalClickListener = null;
+  /*
+   * Google's own notifications have a click event listener which takes care of highlighting
+   * the conversation a notification belongs to, but this click listener does not carry over
+   * when we block Google's and create our own Electron notification.
+   *
+   * What I would like to do here is just pass the listener function over IPC and call it in
+   * the main process.
+   *
+   * However, Electron does not support sending functions or otherwise non-JSON data across IPC.
+   * To solve this and be able to have both our click event listener (so we can show the app
+   * window) and Google's (so the converstaion gets selected/highlighted), when the main process
+   * asyncronously receives the notification data, it asyncronously sends a message back at which
+   * time we can reliably get a reference to the Electron notification and attach Google's click
+   * event listener.
+   */
+  let originalClickListener = null;
 
-    const originalAddEventListener = notificationToSend.addEventListener;
-    notificationToSend.addEventListener = function (type, listener, options) {
-        if (type === 'click') {
-            originalClickListener = listener;
-        } else {
-            // Let all other event listeners be called, though they shouldn't have any effect
-            // because the original notification is blocked in the renderer process.
-            originalAddEventListener.call(notificationToSend, type, listener, options);
-        }
-    }
-
-    ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, (event, arg) => {
-        let theHookedUpNotification = remote.getGlobal('currentNotification');
-        if (typeof theHookedUpNotification === 'object' && typeof originalClickListener === 'function') {
-            theHookedUpNotification.once('click', originalClickListener);
-        }
-    });
-
-    ipcRenderer.send(EVENT_WEBVIEW_NOTIFICATION, {
-        title,
+  const originalAddEventListener = notificationToSend.addEventListener;
+  notificationToSend.addEventListener = function (type, listener, options) {
+    if (type === "click") {
+      originalClickListener = listener;
+    } else {
+      // Let all other event listeners be called, though they shouldn't have any effect
+      // because the original notification is blocked in the renderer process.
+      originalAddEventListener.call(
+        notificationToSend,
+        type,
+        listener,
         options
-    });
+      );
+    }
+  };
 
-    return notificationToSend;
+  ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, (event, arg) => {
+    let theHookedUpNotification = remote.getGlobal("currentNotification");
+    if (
+      typeof theHookedUpNotification === "object" &&
+      typeof originalClickListener === "function"
+    ) {
+      theHookedUpNotification.once("click", originalClickListener);
+    }
+  });
+
+  ipcRenderer.send(EVENT_WEBVIEW_NOTIFICATION, {
+    title,
+    options,
+  });
+
+  return notificationToSend;
 };
 Notification.prototype = OriginalBrowserNotification.prototype;
 Notification.permission = OriginalBrowserNotification.permission;

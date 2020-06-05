@@ -1,8 +1,14 @@
-import path from 'path';
-import { app, Tray, Menu } from 'electron';
-import { trayMenuTemplate } from '../../menu/tray_menu_template';
-import { IS_MAC, IS_LINUX, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../../constants';
-import settings from 'electron-settings';
+import path from "path";
+import { app, Tray, Menu } from "electron";
+import { trayMenuTemplate } from "../../menu/tray_menu_template";
+import {
+  IS_MAC,
+  IS_LINUX,
+  IS_WINDOWS,
+  SETTING_TRAY_ENABLED,
+  SETTING_TRAY_CLICK_SHORTCUT,
+} from "../../constants";
+import settings from "electron-settings";
 
 // TODO: Make this static
 export default class TrayManager {
@@ -10,14 +16,19 @@ export default class TrayManager {
     // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen!
     this._tray = null;
     // Enable tray/menu bar icon by default except on Linux -- the system having a tray is less of a guarantee on Linux.
-    this._enabled = settings.get(SETTING_TRAY_ENABLED, (!IS_LINUX));
+    this._enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX);
     this._iconPath = this.setTrayIconPath();
     this._overlayIconPath = this.setOverlayIconPath();
     this._overlayVisible = false;
-    this._clickShortcut = settings.get(SETTING_TRAY_CLICK_SHORTCUT, 'double-click');
+    this._clickShortcut = settings.get(
+      SETTING_TRAY_CLICK_SHORTCUT,
+      "double-click"
+    );
 
     this.handleTrayEnabledToggle = this.handleTrayEnabledToggle.bind(this);
-    this.handleTrayClickShortcutToggle = this.handleTrayClickShortcutToggle.bind(this);
+    this.handleTrayClickShortcutToggle = this.handleTrayClickShortcutToggle.bind(
+      this
+    );
   }
 
   get tray() {
@@ -62,20 +73,26 @@ export default class TrayManager {
 
   setTrayIconPath() {
     if (IS_WINDOWS) {
-        // Re-use regular app .ico for the tray icon on Windows.
-        return path.join(__dirname, '..', 'resources', 'icon.ico');
+      // Re-use regular app .ico for the tray icon on Windows.
+      return path.join(__dirname, "..", "resources", "icon.ico");
     } else {
-        // Mac tray icon filename MUST end in 'Template' and contain only black and transparent pixels.
-        // Otherwise, automatic inversion and dark mode appearance won't work.
-        // See: https://stackoverflow.com/questions/41664208/electron-tray-icon-change
-        const trayIconFileName = IS_MAC ? 'icon_macTemplate.png' : 'icon.png';
-        return path.join(__dirname, '..', 'resources', 'tray', trayIconFileName);
+      // Mac tray icon filename MUST end in 'Template' and contain only black and transparent pixels.
+      // Otherwise, automatic inversion and dark mode appearance won't work.
+      // See: https://stackoverflow.com/questions/41664208/electron-tray-icon-change
+      const trayIconFileName = IS_MAC ? "icon_macTemplate.png" : "icon.png";
+      return path.join(__dirname, "..", "resources", "tray", trayIconFileName);
     }
   }
 
   setOverlayIconPath() {
     if (IS_WINDOWS) {
-      return path.join(__dirname, '..', 'resources', 'tray', 'tray_with_badge.ico');
+      return path.join(
+        __dirname,
+        "..",
+        "resources",
+        "tray",
+        "tray_with_badge.ico"
+      );
     }
     return null;
   }
@@ -97,13 +114,13 @@ export default class TrayManager {
     // This actually has no effect. Electron docs say that click event is ignored on Linux for
     // AppIndicator tray, but I can't find a way to not use AppIndicator for Linux tray.
     if (IS_LINUX) {
-      this.tray.on('click', this.handleTrayClick);
+      this.tray.on("click", this.handleTrayClick);
     }
   }
 
   destroyEventListeners() {
-    this.tray.removeListener('click', this.handleTrayClick);
-    this.tray.removeListener('double-click', this.handleTrayClick);
+    this.tray.removeListener("click", this.handleTrayClick);
+    this.tray.removeListener("double-click", this.handleTrayClick);
   }
 
   handleTrayClick(event) {
@@ -120,21 +137,29 @@ export default class TrayManager {
 
   showMinimizeToTrayWarning() {
     if (IS_WINDOWS && this.enabled) {
-      const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
+      const seenMinimizeToTrayWarning = settings.get(
+        "seenMinimizeToTrayWarningPref",
+        false
+      );
       if (!seenMinimizeToTrayWarning) {
         this.tray.displayBalloon({
-          title: 'Android Messages',
-          content: 'Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.'
+          title: "Android Messages",
+          content:
+            "Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.",
         });
-        settings.set('seenMinimizeToTrayWarningPref', true);
+        settings.set("seenMinimizeToTrayWarningPref", true);
       }
     }
   }
 
   handleTrayEnabledToggle(newValue, oldValue) {
     this.enabled = newValue;
-    let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById('startInTrayMenuItem');
-    let livetrayClickShortcutMenuItemRef = Menu.getApplicationMenu().getMenuItemById('trayClickShortcutMenuItem');
+    let liveStartInTrayMenuItemRef = Menu.getApplicationMenu().getMenuItemById(
+      "startInTrayMenuItem"
+    );
+    let livetrayClickShortcutMenuItemRef = Menu.getApplicationMenu().getMenuItemById(
+      "trayClickShortcutMenuItem"
+    );
 
     if (newValue) {
       if (!IS_MAC) {
@@ -151,7 +176,7 @@ export default class TrayManager {
     if (!newValue) {
       if (this.tray) {
         this.destroy();
-        if ((!IS_MAC) && app.mainWindow) {
+        if (!IS_MAC && app.mainWindow) {
           if (!app.mainWindow.isVisible()) {
             app.mainWindow.show();
           }
@@ -160,7 +185,7 @@ export default class TrayManager {
       if (!IS_MAC) {
         // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
         // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
-        settings.set('startInTrayPref', false);
+        settings.set("startInTrayPref", false);
         liveStartInTrayMenuItemRef.enabled = false;
         liveStartInTrayMenuItemRef.checked = false;
       }
@@ -192,5 +217,4 @@ export default class TrayManager {
       this.overlayVisible = toggle;
     }
   }
-
 }
