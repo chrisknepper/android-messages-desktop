@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const merge = require("webpack-merge");
 const jetpack = require("fs-jetpack");
 const base = require("./webpack.base.config");
@@ -18,12 +19,12 @@ const entryFileContent = e2eDir
 
 jetpack.write(entryFilePath, entryFileContent);
 
-module.exports = env => {
+module.exports = (env) => {
   return merge(base(env), {
     entry: entryFilePath,
     output: {
       filename: "e2e.js",
-      path: tempDir.path()
-    }
+      path: tempDir.path(),
+    },
   });
 };

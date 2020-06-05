@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
@@ -9,19 +10,19 @@ const translateEnvToMode = (env) => {
   return "development";
 };
 
-module.exports = env => {
+module.exports = (env) => {
   return {
     target: "electron-renderer",
     mode: translateEnvToMode(env),
     node: {
       __dirname: false,
-      __filename: false
+      __filename: false,
     },
     externals: [nodeExternals()],
     resolve: {
       alias: {
-        env: path.resolve(__dirname, `../config/env_${env}.json`)
-      }
+        env: path.resolve(__dirname, `../config/env_${env}.json`),
+      },
     },
     devtool: "source-map",
     module: {
@@ -29,34 +30,34 @@ module.exports = env => {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          use: ["babel-loader"]
+          use: ["babel-loader"],
         },
         {
           test: /\.css$/,
-          use: ["style-loader", "css-loader"]
+          use: ["style-loader", "css-loader"],
         },
         {
           test: /\.(png|jpg|gif)$/,
           use: [
             {
-              loader: 'file-loader',
+              loader: "file-loader",
               options: {
                 useRelativePath: process.env.NODE_ENV !== "production",
                 emitFile: false,
-                name (file) {
+                name(file) {
                   if (process.env.NODE_ENV !== "production") {
-                    return '[name].[ext]'
+                    return "[name].[ext]";
                   }
-                  return '[name].[ext]'
-                }
-              }
-            }
-          ]
-        }
-      ]
+                  return "[name].[ext]";
+                },
+              },
+            },
+          ],
+        },
+      ],
     },
     plugins: [
-      new FriendlyErrorsWebpackPlugin({ clearConsole: env === "development" })
-    ]
+      new FriendlyErrorsWebpackPlugin({ clearConsole: env === "development" }),
+    ],
   };
 };

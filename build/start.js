@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const childProcess = require("child_process");
 const electron = require("electron");
 const webpack = require("webpack");
