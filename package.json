@@ -99,7 +99,7 @@
     "electron": "9.0.2",
     "electron-builder": "21.2.0",
     "electron-mocha": "^6.0.4",
-    "electron-notarize": "^0.2.0",
+    "electron-notarize": "^0.3.0",
     "file-loader": "^6.0.0",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^7.2.0",
