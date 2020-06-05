@@ -33,6 +33,11 @@ module.exports = (env) => {
           use: ["babel-loader"],
         },
         {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: ["babel-loader", "ts-loader"],
+        },
+        {
           test: /\.css$/,
           use: ["style-loader", "css-loader"],
         },
@@ -44,12 +49,7 @@ module.exports = (env) => {
               options: {
                 useRelativePath: process.env.NODE_ENV !== "production",
                 emitFile: false,
-                name(file) {
-                  if (process.env.NODE_ENV !== "production") {
-                    return "[name].[ext]";
-                  }
-                  return "[name].[ext]";
-                },
+                name: "[name].[ext]",
               },
             },
           ],
