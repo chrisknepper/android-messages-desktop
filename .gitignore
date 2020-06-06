@@ -5,9 +5,6 @@ Thumbs.db
 
 /dist
 
-# ignore everything in 'app' folder what had been generated from 'src' folder
-/app/**/*.js
-/app/**/*.map
 
 # Dictionary files are downloaded by the user's machine
 /resources/dictionaries/**/*

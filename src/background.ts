@@ -222,7 +222,7 @@ if (!isFirstInstance) {
 
     mainWindow = new CustomBrowserWindow("main", mainWindowOptions);
 
-    mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "app.html"));
+    mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "index.html"));
 
     trayManager.startIfEnabled();
 

@@ -1,6 +1,7 @@
 import { Configuration } from "webpack";
 import nodeExternals from "webpack-node-externals";
 import FriendlyErrors from "friendly-errors-webpack-plugin";
+import HTMLWebpackPlguin from "html-webpack-plugin";
 import * as process from "process";
 import * as path from "path";
 import merge from "webpack-merge";
@@ -35,7 +36,13 @@ const base: Configuration = {
   resolve: {
     extensions: [".ts", ".js", ".css"],
   },
-  plugins: [new FriendlyErrors()],
+  plugins: [
+    new FriendlyErrors(),
+    new HTMLWebpackPlguin({
+      template: "./src/index.html",
+      inject: false,
+    }),
+  ],
 };
 
 const app = merge(base, {
