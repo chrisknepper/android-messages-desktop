@@ -9,9 +9,9 @@ const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
 ) as WebviewTag;
 
-window.getUserImg = async (): Promise<Array<string | undefined> | undefined> =>
+window.getUserImg = async (name: string): Promise<string | undefined> =>
   await androidMessagesWebview.executeJavaScript(
-    `[document.querySelector("h3.name").textContent, document.querySelector("img").src]`
+    `Array.from(document.querySelectorAll("h3.name")).filter(e => "${name}" === e.textContent)[0].parentElement.parentElement.querySelector("img").src`
   );
 
 androidMessagesWebview.addEventListener("dom-ready", () => {

@@ -239,58 +239,59 @@ if (!isFirstInstance) {
       }
     });
 
-    ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, async (event, msg) => {
-      if (msg.options) {
-        const userImgData = (await mainWindow.webContents.executeJavaScript(
-          `window.getUserImg()`
-        )) as Array<string | undefined> | undefined;
+    ipcMain.on(
+      EVENT_WEBVIEW_NOTIFICATION,
+      async (event, msg: { title: string; options?: NotificationOptions }) => {
+        if (msg.options) {
+          const userImgData = (await mainWindow.webContents.executeJavaScript(
+            `window.getUserImg("${msg.title}")`
+          )) as string | undefined;
 
-        const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
-          ? {
-              title: "Android Messages Desktop",
-              body: "New Message",
+          const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
+            ? {
+                title: "Android Messages Desktop",
+                body: "New Message",
+              }
+            : {
+                title: msg.title,
+                /*
+                 * This is what we call absolute shenanigans. Above we call a function in the render process
+                 * That function calls another function in the webView retrieving the name of the message at the top and the respective image
+                 * It could technically be done without polluting the window but it would have been ugly as hell (as if this is not)
+                 * Bellow it makes sure everything is defined and checks if the author matches the title of the notification
+                 * If something is undefined it falls back to a generic icon in the resources folder.
+                 */
+                icon:
+                  userImgData != null
+                    ? nativeImage.createFromDataURL(userImgData)
+                    : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
+                body: msg.options.body || "",
+              };
+          notificationOpts.silent = !state.notificationSoundEnabled;
+          const customNotification = new Notification(notificationOpts);
+
+          if (IS_MAC) {
+            if (!mainWindow.isFocused()) {
+              state.unreadNotificationCount += 1;
+              app.dock.setBadge("" + state.unreadNotificationCount);
             }
-          : {
-              title: msg.title,
-              /*
-               * This is what we call absolute shenanigans. Above we call a function in the render process
-               * That function calls another function in the webView retrieving the name of the message at the top and the respective image
-               * It could technically be done without polluting the window but it would have been ugly as hell (as if this is not)
-               * Bellow it makes sure everything is defined and checks if the author matches the title of the notification
-               * If something is undefined it falls back to a generic icon in the resources folder.
-               */
-              icon:
-                userImgData != null &&
-                userImgData[0] === msg.title &&
-                userImgData[1] != null
-                  ? nativeImage.createFromDataURL(userImgData[1])
-                  : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
-              body: msg.options.body,
-            };
-        notificationOpts.silent = !state.notificationSoundEnabled;
-        const customNotification = new Notification(notificationOpts);
-
-        if (IS_MAC) {
-          if (!mainWindow.isFocused()) {
-            state.unreadNotificationCount += 1;
-            app.dock.setBadge("" + state.unreadNotificationCount);
           }
+
+          trayManager?.toggleOverlay(true);
+
+          customNotification.once("click", () => {
+            mainWindow.show();
+          });
+
+          // Allows us to marry our custom notification and its behavior with the helpful behavior
+          // (conversation highlighting) that Google provides. See the webview bridge for details.
+          global.currentNotification = customNotification;
+          event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
+
+          customNotification.show();
         }
-
-        trayManager?.toggleOverlay(true);
-
-        customNotification.once("click", () => {
-          mainWindow.show();
-        });
-
-        // Allows us to marry our custom notification and its behavior with the helpful behavior
-        // (conversation highlighting) that Google provides. See the webview bridge for details.
-        global.currentNotification = customNotification;
-        event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
-
-        customNotification.show();
       }
-    });
+    );
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
       if (state.bridgeInitDone) {
