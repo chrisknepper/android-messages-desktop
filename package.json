@@ -19,7 +19,7 @@
     "build": "webpack --config-name app --mode=production",
     "build:dev": "webpack --config-name app --mode=development",
     "icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
-    "lint": "eslint --fix src/**/*.js||ts"
+    "lint": "eslint --fix --ext .ts,.js ./src"
   },
   "dependencies": {
     "about-window": "1.13.4",

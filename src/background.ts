@@ -61,7 +61,7 @@ const isFirstInstance = app.requestSingleInstanceLock();
 if (!isFirstInstance) {
   app.quit();
 } else {
-  app.on("second-instance", (_event, _commandLine, _workingDirectory) => {
+  app.on("second-instance", () => {
     if (mainWindow) {
       if (!mainWindow.isVisible()) {
         mainWindow.show();
