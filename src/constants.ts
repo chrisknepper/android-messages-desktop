@@ -24,9 +24,7 @@ export const IS_LINUX = osName === "linux";
 
 // Environment and paths
 export const IS_DEV = process.env.NODE_ENV === "development";
-export const BASE_APP_PATH = IS_DEV
-  ? path.resolve(__dirname, "..")
-  : process.resourcesPath;
+export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
 export const USER_DATA_PATH = (): string => app.getPath("userData"); // This has to be a function call because app.ready callback must be fired before this path can be used
 export const SPELLING_DICTIONARIES_PATH = (): string =>

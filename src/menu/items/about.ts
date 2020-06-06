@@ -1,4 +1,4 @@
-import { IS_DEV } from "../../constants";
+import { IS_DEV, RESOURCES_PATH } from "../../constants";
 import openAboutWindow from "about-window";
 import { app, MenuItemConstructorOptions } from "electron";
 import * as path from "path";
@@ -24,13 +24,7 @@ export const aboutMenuItem: MenuItemConstructorOptions = {
   click: () => {
     openAboutWindow({
       // TODO: Make this not sketchy as hell
-      icon_path: path.resolve(
-        __dirname,
-        "..",
-        "resources",
-        "icons",
-        "512x512.png"
-      ),
+      icon_path: path.resolve(RESOURCES_PATH, "icons", "512x512.png"),
       copyright: `<div style="text-align: center">Copyright who needs those${disclaimerText}${licenseText}${dictionaryLicenseText}</div>`,
       product_name: productName,
       description: descriptionWithLocale,

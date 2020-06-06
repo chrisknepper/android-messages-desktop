@@ -36,6 +36,8 @@ import {
   EVENT_SPELL_ADD_CUSTOM_WORD,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
+  BASE_APP_PATH,
+  RESOURCES_PATH,
 } from "./constants";
 
 const state = {
@@ -225,7 +227,7 @@ if (!isFirstInstance) {
 
     mainWindow.loadURL(
       url.format({
-        pathname: path.join(__dirname, "app.html"),
+        pathname: path.resolve(BASE_APP_PATH, "app.html"),
         protocol: "file:",
         slashes: true,
       })
@@ -271,13 +273,7 @@ if (!isFirstInstance) {
                * know what broke it (and I do not really care) but I am going to assume a security header.
                * I am going to use one of the icons in the resources folder because it is convienet.
                */
-              icon: path.resolve(
-                __dirname,
-                "..",
-                "resources",
-                "icons",
-                "64x64.png"
-              ),
+              icon: path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
               body: msg.options.body,
             };
         notificationOpts.silent = !state.notificationSoundEnabled;
