@@ -16,12 +16,12 @@ import {
   nativeImage,
 } from "electron";
 import { autoUpdater } from "electron-updater";
-import { baseMenuTemplate } from "./menu/base_menu_template";
-import { devMenuTemplate } from "./menu/dev_menu_template";
-import { helpMenuTemplate } from "./menu/help_menu_template";
+import { baseMenuTemplate } from "./menu/baseMenu";
+import { devMenuTemplate } from "./menu/devMenu";
+import { helpMenuTemplate } from "./menu/helpMenu";
 import { CustomBrowserWindow } from "./helpers/window";
-import { getDictionary } from "./helpers/dictionary_manager";
-import { TrayManager } from "./helpers/tray_manager";
+import { getDictionary } from "./helpers/dictionaryManager";
+import { TrayManager } from "./helpers/trayManager";
 import * as settings from "electron-settings";
 import {
   IS_MAC,
@@ -38,7 +38,7 @@ import {
   EVENT_UPDATE_USER_SETTING,
   BASE_APP_PATH,
   RESOURCES_PATH,
-} from "./constants";
+} from "./helpers/constants";
 
 const state = {
   unreadNotificationCount: 0,

@@ -7,7 +7,7 @@ import {
 } from "electron";
 import * as settings from "electron-settings";
 import { separator } from "./items/separator";
-import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../constants";
+import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../helpers/constants";
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "Preferences" : "Settings",

@@ -1,5 +1,5 @@
 import { app, MenuItemConstructorOptions } from "electron";
-import { IS_MAC } from "../constants";
+import { IS_MAC } from "../helpers/constants";
 
 export const trayMenuTemplate: MenuItemConstructorOptions[] = [
   {

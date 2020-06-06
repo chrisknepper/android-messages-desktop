@@ -43,7 +43,7 @@ const app = merge(base, {
   entry: {
     background: "./src/background.ts",
     app: "./src/app.ts",
-    bridge: "./src/helpers/webview/bridge.ts",
+    bridge: "./src/bridge.ts",
   },
   output: {
     filename: "[name].js",

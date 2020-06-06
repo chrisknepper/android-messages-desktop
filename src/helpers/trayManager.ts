@@ -1,13 +1,13 @@
 import * as path from "path";
 import { app, Tray, Menu } from "electron";
-import { trayMenuTemplate } from "../menu/tray_menu_template";
+import { trayMenuTemplate } from "../menu/trayMenu";
 import {
   IS_MAC,
   IS_LINUX,
   IS_WINDOWS,
   SETTING_TRAY_ENABLED,
   RESOURCES_PATH,
-} from "../constants";
+} from "./constants";
 import * as settings from "electron-settings";
 
 export class TrayManager {

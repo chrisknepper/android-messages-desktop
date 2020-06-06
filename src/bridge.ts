@@ -1,21 +1,21 @@
 // This script is injected into the webview.
 
-import { popupContextMenu } from "./context_menu";
+import { popupContextMenu } from "./menu/contextMenu";
 import {
   EVENT_WEBVIEW_NOTIFICATION,
   EVENT_NOTIFICATION_REFLECT_READY,
   EVENT_BRIDGE_INIT,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
-} from "../../constants";
+} from "./helpers/constants";
 import { ipcRenderer, remote } from "electron";
-import { handleEnterPrefToggle } from "./input_manager";
+import { handleEnterPrefToggle } from "./helpers/inputManager";
 import fs from "fs";
 import {
   SpellCheckerProvider,
   attachSpellCheckProvider,
 } from "electron-hunspell";
-import { Dictionary } from "../dictionary_manager";
+import { Dictionary } from "./helpers/dictionaryManager";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);

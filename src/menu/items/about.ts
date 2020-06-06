@@ -1,4 +1,4 @@
-import { IS_DEV, RESOURCES_PATH } from "../../constants";
+import { IS_DEV, RESOURCES_PATH } from "../../helpers/constants";
 import openAboutWindow from "about-window";
 import { app, MenuItemConstructorOptions } from "electron";
 import * as path from "path";

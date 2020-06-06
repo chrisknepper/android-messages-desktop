@@ -1,5 +1,5 @@
 import { app, MenuItemConstructorOptions } from "electron";
-import { IS_WINDOWS } from "../constants";
+import { IS_WINDOWS } from "../helpers/constants";
 import { checkForUpdatesMenuItem } from "./items/check_for_updates";
 import { separator } from "./items/separator";
 

@@ -1,7 +1,7 @@
 import { app, MenuItemConstructorOptions } from "electron";
 import { aboutMenuItem } from "./items/about";
 import { checkForUpdatesMenuItem } from "./items/check_for_updates";
-import { settingsMenu } from "./settings_menu_template";
+import { settingsMenu } from "./settingsMenu";
 
 // This is the "Application" menu, which is only used on macOS
 export const appMenuTemplate: MenuItemConstructorOptions = {

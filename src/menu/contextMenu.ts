@@ -4,7 +4,7 @@ import {
   remote,
   ContextMenuParams,
 } from "electron";
-import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../../constants";
+import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../helpers/constants";
 
 const { Menu, app } = remote;
 

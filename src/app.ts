@@ -1,7 +1,7 @@
 import "./stylesheets/main.css";
 
 import { ipcRenderer, remote, WebviewTag } from "electron";
-import { EVENT_UPDATE_USER_SETTING, IS_MAC } from "./constants";
+import { EVENT_UPDATE_USER_SETTING, IS_MAC } from "./helpers/constants";
 
 const app = remote.app;
 
