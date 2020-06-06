@@ -5,6 +5,7 @@ import { SpellCheckerProvider } from "electron-hunspell";
 declare global {
   interface Window {
     spellCheckHandler?: SpellCheckerProvider;
+    getUserImg: () => Promise<Array<string | undefined> | undefine>;
   }
 
   namespace Electron {

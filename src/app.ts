@@ -9,6 +9,11 @@ const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
 ) as WebviewTag;
 
+window.getUserImg = async (): Promise<Array<string | undefined> | undefined> =>
+  await androidMessagesWebview.executeJavaScript(
+    `[document.querySelector("h3.name").textContent, document.querySelector("img").src]`
+  );
+
 androidMessagesWebview.addEventListener("dom-ready", () => {
   app.mainWindow?.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs

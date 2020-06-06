@@ -13,6 +13,7 @@ import {
   nativeTheme,
   MenuItemConstructorOptions,
   BrowserWindowConstructorOptions,
+  nativeImage,
 } from "electron";
 import { autoUpdater } from "electron-updater";
 import { baseMenuTemplate } from "./menu/base_menu_template";
@@ -238,8 +239,12 @@ if (!isFirstInstance) {
       }
     });
 
-    ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, (event, msg) => {
+    ipcMain.on(EVENT_WEBVIEW_NOTIFICATION, async (event, msg) => {
       if (msg.options) {
+        const userImgData = (await mainWindow.webContents.executeJavaScript(
+          `window.getUserImg()`
+        )) as Array<string | undefined> | undefined;
+
         const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
           ? {
               title: "Android Messages Desktop",
@@ -248,22 +253,18 @@ if (!isFirstInstance) {
           : {
               title: msg.title,
               /*
-               * TODO: Icon is just the logo, which is the only image sent by Google, hopefully someday they will pass
-               * the sender's picture/avatar here.
-               *
-               * We may be able to just do it live by:
-               * 1. Traversing the DOM for the conversation which matches the sender
-               * 2. Converting to to SVG to Canvas to PNG using: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
-               * 3. Sending image URL which Electron can display via nativeImage.createFromDataURL
-               * This would likely also require copying computed style properties into the element to ensure it looks right.
-               * There also appears to be a library: http://html2canvas.hertzen.com
+               * This is what we call absolute shenanigans. Above we call a function in the render process
+               * That function calls another function in the webView retrieving the name of the message at the top and the respective image
+               * It could technically be done without polluting the window but it would have been ugly as hell (as if this is not)
+               * Bellow it makes sure everything is defined and checks if the author matches the title of the notification
+               * If something is undefined it falls back to a generic icon in the resources folder.
                */
-              /*
-               * Google's image for notifications was not working for some reason. I do not
-               * know what broke it (and I do not really care) but I am going to assume a security header.
-               * I am going to use one of the icons in the resources folder because it is convienet.
-               */
-              icon: path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
+              icon:
+                userImgData != null &&
+                userImgData[0] === msg.title &&
+                userImgData[1] != null
+                  ? nativeImage.createFromDataURL(userImgData[1])
+                  : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
               body: msg.options.body,
             };
         notificationOpts.silent = !state.notificationSoundEnabled;
