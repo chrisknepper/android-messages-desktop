@@ -81,7 +81,7 @@ export class TrayManager {
     }
   }
 
-  public showMinimizeToTrayWarning() {
+  public showMinimizeToTrayWarning(): void {
     if (IS_WINDOWS && this.enabled) {
       const seenMinimizeToTrayWarning = settings.get(
         "seenMinimizeToTrayWarningPref",
