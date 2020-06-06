@@ -1,5 +1,3 @@
-// Provide context menus (copy, paste, save image, etc...) for right-click interaction.
-
 import {
   ipcRenderer,
   MenuItemConstructorOptions,
@@ -9,6 +7,10 @@ import {
 import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../../constants";
 
 const { Menu, app } = remote;
+
+// WARNING THIS IS THE ONLY PLACE LEFT WITH FORCE TYPECASTS TO ANY
+// IT HAS NO SIDE EFFECTS
+// I WOULD NOT DO IT BUT I AM NOT POSITIVE HOW TO PROPERLY TYPE IT
 
 const standardMenuTemplate: MenuItemConstructorOptions[] = [
   {
