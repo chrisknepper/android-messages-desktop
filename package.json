@@ -14,7 +14,7 @@
   },
   "main": "app/background.js",
   "scripts": {
-    "start": "yarn build:dev && electron ./app/background.js",
+    "start": "yarn build:dev && NODE_ENV=development electron ./app/background.js",
     "dist": "yarn build && electron-builder --config electron-builder.js",
     "build": "webpack --config-name app --mode=production",
     "build:dev": "webpack --config-name app --mode=development",

@@ -16,8 +16,6 @@ import {
   attachSpellCheckProvider,
 } from "electron-hunspell";
 
-type TOFIX = any;
-
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
@@ -28,13 +26,16 @@ window.onload = () => {
   // Without observing the DOM, we don't have a reliable way to let the main process know once
   // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
   // when we need to init the spellchecker
-  const onMutation = (mutationsList: TOFIX, observer: MutationObserver) => {
+  const onMutation = (
+    mutationsList: MutationRecord[],
+    observer: MutationObserver
+  ) => {
     if (document.querySelector("mw-main-nav")) {
       // we're definitely logged-in if this is in the DOM
       ipcRenderer.send(EVENT_BRIDGE_INIT);
       observer.disconnect();
     }
-    // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
+    //   // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
   };
 
   const observer = new MutationObserver(onMutation);
@@ -58,7 +59,7 @@ ipcRenderer.once(
       spellCheckFiles.userLanguageDicFile
     ) {
       const provider = new SpellCheckerProvider();
-      (window as TOFIX).spellCheckHandler = provider;
+      window.spellCheckHandler = provider;
       await provider.initialize({}); // Empty brace correct, see: https://github.com/kwonoj/electron-hunspell/blob/master/example/browserWindow.ts
 
       await provider.loadDictionary(
@@ -70,19 +71,14 @@ ipcRenderer.once(
       const attached = await attachSpellCheckProvider(provider);
       attached.switchLanguage(dictionaryLocaleKey);
 
-      const table = (window as TOFIX).spellCheckHandler.spellCheckerTable;
-      if (
-        dictionaryLocaleKey in customWords &&
-        table &&
-        dictionaryLocaleKey in table
-      ) {
+      if (dictionaryLocaleKey in customWords) {
         for (
           let i = 0, n = customWords[dictionaryLocaleKey].length;
           i < n;
           i++
         ) {
           const word = customWords[dictionaryLocaleKey][i];
-          table[dictionaryLocaleKey].spellChecker.addWord(word);
+          window.spellCheckHandler.addWord(dictionaryLocaleKey, word);
         }
       }
     }
@@ -138,14 +134,18 @@ Notification = function (title: string, options?: NotificationOptions) {
    * time we can reliably get a reference to the Electron notification and attach Google's click
    * event listener.
    */
-  let originalClickListener: (() => void) | null = null;
+
+  type Type = "click" | "close" | "error" | "show";
+  type Listener = (ev: NotificationEventMap[Type]) => unknown;
+  type Options = undefined | boolean | AddEventListenerOptions;
+  let originalClickListener: Listener | null = null;
 
   const originalAddEventListener = notificationToSend.addEventListener;
   // Seems silly to have these be correct as there is no way to mess it up
   notificationToSend.addEventListener = (
-    type: TOFIX,
-    listener: TOFIX,
-    options: TOFIX
+    type: Type,
+    listener: Listener,
+    options?: Options
   ) => {
     if (type === "click") {
       originalClickListener = listener;

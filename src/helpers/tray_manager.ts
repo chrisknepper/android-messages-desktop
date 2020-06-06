@@ -10,8 +10,6 @@ import {
 } from "../constants";
 import * as settings from "electron-settings";
 
-type TOFIX = any;
-
 export class TrayManager {
   public enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX) as boolean;
   public iconPath = this.getIconPath();
@@ -68,9 +66,7 @@ export class TrayManager {
 
   private handleTrayClick(event: Electron.KeyboardEvent) {
     event.preventDefault();
-    if ((app as TOFIX).mainWindow) {
-      (app as TOFIX).mainWindow.show();
-    }
+    app.mainWindow?.show();
   }
 
   private destroy(): void {
@@ -122,9 +118,9 @@ export class TrayManager {
     if (!newValue) {
       if (this.tray) {
         this.destroy();
-        if (!IS_MAC && (app as TOFIX).mainWindow) {
-          if (!(app as TOFIX).mainWindow.isVisible()) {
-            (app as TOFIX).mainWindow.show();
+        if (!IS_MAC) {
+          if (!app.mainWindow?.isVisible()) {
+            app.mainWindow?.show();
           }
         }
       }

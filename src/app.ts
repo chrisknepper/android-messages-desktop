@@ -1,18 +1,16 @@
 import "./stylesheets/main.css";
 
-import { ipcRenderer, remote } from "electron";
+import { ipcRenderer, remote, WebviewTag } from "electron";
 import { EVENT_UPDATE_USER_SETTING, IS_MAC } from "./constants";
-
-type TOFIX = any;
 
 const app = remote.app;
 
 const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
-) as TOFIX;
+) as WebviewTag;
 
 androidMessagesWebview.addEventListener("dom-ready", () => {
-  (app as TOFIX).mainWindow.on("focus", () => {
+  app.mainWindow?.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs
     androidMessagesWebview.dispatchEvent(new Event("focus"));
   });

@@ -19,7 +19,7 @@ import { autoUpdater } from "electron-updater";
 import { baseMenuTemplate } from "./menu/base_menu_template";
 import { devMenuTemplate } from "./menu/dev_menu_template";
 import { helpMenuTemplate } from "./menu/help_menu_template";
-import { Window } from "./helpers/window";
+import { CustomBrowserWindow } from "./helpers/window";
 import { getDictionary } from "./helpers/dictionary_manager";
 import { TrayManager } from "./helpers/tray_manager";
 import * as settings from "electron-settings";
@@ -48,10 +48,9 @@ const state = {
   useSystemDarkMode: true,
 };
 
-type TOFIX = any;
 type CustomWords = Record<string, string[]>;
 
-let mainWindow: TOFIX = null;
+let mainWindow: CustomBrowserWindow;
 
 // Prevent multiple instances of the app which causes many problems with an app like ours
 // Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
@@ -205,25 +204,23 @@ if (!isFirstInstance) {
       show: !startInTray, //Starts in tray if set
       titleBarStyle: IS_MAC ? "hiddenInset" : "default", //Turn on hidden frame on a Mac
       webPreferences: {
-        contextIsolation: false,
         nodeIntegration: true,
         webviewTag: true,
+        enableRemoteModule: true,
       },
     };
 
     if (IS_LINUX) {
       // Setting the icon in Linux tends to be finicky without explicitly setting it like this.
       // See: https://github.com/electron/electron/issues/6205
-      mainWindowOptions.icon = path.join(
-        __dirname,
-        "..",
-        "resources",
+      mainWindowOptions.icon = path.resolve(
+        RESOURCES_PATH,
         "icons",
         "128x128.png"
       );
     }
 
-    mainWindow = new Window("main", mainWindowOptions);
+    mainWindow = new CustomBrowserWindow("main", mainWindowOptions);
 
     mainWindow.loadURL(
       url.format({
@@ -235,7 +232,7 @@ if (!isFirstInstance) {
 
     trayManager.startIfEnabled();
 
-    (app as TOFIX).mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
+    app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
 
     mainWindow.on("focus", () => {
       if (IS_MAC) {
@@ -294,7 +291,7 @@ if (!isFirstInstance) {
 
         // Allows us to marry our custom notification and its behavior with the helpful behavior
         // (conversation highlighting) that Google provides. See the webview bridge for details.
-        (global as TOFIX).currentNotification = customNotification;
+        global.currentNotification = customNotification;
         event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
 
         customNotification.show();
@@ -394,10 +391,6 @@ if (!isFirstInstance) {
         app.quit(); // If we don't explicitly call this, the webview and mainWindow get destroyed but background process still runs.
       }
     });
-
-    if (IS_DEV) {
-      mainWindow.openDevTools();
-    }
 
     app.on("web-contents-created", (e, contents) => {
       // Check for a webview

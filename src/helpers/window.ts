@@ -29,7 +29,7 @@ interface Position extends Size {
  * @class Window
  * @extends {BrowserWindow}
  */
-export class Window extends BrowserWindow {
+export class CustomBrowserWindow extends BrowserWindow {
   private userDataDir = jetpack.cwd(app.getPath("userData"));
 
   private stateStoreFile: string;

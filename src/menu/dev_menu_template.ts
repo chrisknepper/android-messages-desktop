@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app } from "electron";
 
 export const devMenuTemplate = {
   label: "Development",
@@ -6,8 +6,12 @@ export const devMenuTemplate = {
     {
       label: "Reload",
       accelerator: "CmdOrCtrl+R",
-      click: (): void =>
-        BrowserWindow.getFocusedWindow()?.webContents.reloadIgnoringCache(),
+      click: (): void => app.mainWindow?.webContents.reloadIgnoringCache(),
+    },
+    {
+      label: "Developer Tools",
+      accelerator: "CmdOrCtrl+Shift+I",
+      click: (): void => app.mainWindow?.webContents.openDevTools(),
     },
     {
       label: "Quit",

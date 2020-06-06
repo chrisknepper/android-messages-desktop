@@ -8,8 +8,6 @@ import {
 } from "electron";
 import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../../constants";
 
-type TOFIX = any;
-
 const { Menu } = remote;
 
 const standardMenuTemplate: MenuItemConstructorOptions[] = [
@@ -113,11 +111,7 @@ export const popupContextMenu = async (
     default:
       if (params.isEditable) {
         const textMenuTemplateCopy = [...textMenuTemplate];
-        if (
-          (window as TOFIX).spellCheckHandler &&
-          params.misspelledWord &&
-          typeof params.misspelledWord === "string"
-        ) {
+        if (window.spellCheckHandler && params.misspelledWord) {
           const booboo = params.selectionText;
           textMenuTemplateCopy.unshift({
             type: "separator",
@@ -126,12 +120,15 @@ export const popupContextMenu = async (
             label: `Add ${booboo} to Dictionary`,
             click: async () => {
               // Immediately clear red underline
-              (event as TOFIX).sender.replaceMisspelling(booboo);
+              console.log(event);
+
+              (event as any).sender.replaceMisspelling(booboo);
               // Add new custom word to dictionary for the current session
-              const localeKey = await (window as TOFIX).spellCheckHandler.getSelectedDictionaryLanguage();
-              (window as TOFIX).spellCheckHandler.spellCheckerTable[
-                localeKey
-              ].spellChecker.addWord(booboo);
+              // Until I restructure all this ts demands a default
+              const localeKey =
+                (await window.spellCheckHandler?.getSelectedDictionaryLanguage()) ||
+                "en-GB";
+              window.spellCheckHandler?.addWord(localeKey, booboo);
               // Send new custom word to main process so it will be added to the dictionary at the start of future sessions
               ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {
                 newCustomWord: booboo,
@@ -139,7 +136,7 @@ export const popupContextMenu = async (
             },
           });
 
-          const suggestions = (await (window as TOFIX).spellCheckHandler.getSuggestion(
+          const suggestions = (await window.spellCheckHandler.getSuggestion(
             params.misspelledWord
           )) as string[];
           if (suggestions && suggestions.length) {
@@ -155,9 +152,7 @@ export const popupContextMenu = async (
                 const item = {
                   label: correction,
                   click: () => {
-                    return (event as TOFIX).sender.replaceMisspelling(
-                      correction
-                    );
+                    return (event as any).sender.replaceMisspelling(correction);
                   },
                 };
 

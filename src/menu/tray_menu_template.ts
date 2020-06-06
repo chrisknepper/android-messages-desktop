@@ -1,14 +1,12 @@
-import { app, MenuItemConstructorOptions, BrowserWindow } from "electron";
+import { app, MenuItemConstructorOptions } from "electron";
 import { IS_MAC } from "../constants";
-
-type TOFIX = any;
 
 export const trayMenuTemplate: MenuItemConstructorOptions[] = [
   {
     label: "Show/Hide Android Messages",
     click: (): void => {
-      const mainWindow: BrowserWindow = (app as TOFIX).mainWindow;
-      if (mainWindow) {
+      const mainWindow = app.mainWindow;
+      if (mainWindow != null) {
         if (mainWindow.isVisible()) {
           if (IS_MAC) {
             app.hide();
