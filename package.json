@@ -16,8 +16,8 @@
   "scripts": {
     "start": "yarn build:dev && electron ./app/background.js",
     "dist": "yarn build && electron-builder --config electron-builder.js",
-    "build": "webpack --config=build/webpack.app.config.js --mode=production",
-    "build:dev": "webpack --config=build/webpack.app.config.js --mode=development",
+    "build": "webpack --config-name app --mode=production",
+    "build:dev": "webpack --config-name app --mode=development",
     "icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
     "lint": "eslint --fix src/**/*.js||ts"
   },
@@ -33,8 +33,12 @@
     "@babel/core": "7.10.2",
     "@babel/preset-env": "7.10.2",
     "@types/electron-settings": "^3.1.1",
+    "@types/friendly-errors-webpack-plugin": "^0.1.2",
     "@types/node": "12",
     "@types/node-fetch": "^2.5.7",
+    "@types/webpack": "^4.41.17",
+    "@types/webpack-merge": "^4.1.5",
+    "@types/webpack-node-externals": "^1.7.1",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
     "babel-loader": "8.1.0",
@@ -56,10 +60,11 @@
     "spectron": "^11.0.0",
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.5",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.5",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
-    "webpack-merge": "^4.1.0",
+    "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.6.0"
   }
 }
