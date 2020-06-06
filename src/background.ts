@@ -227,7 +227,7 @@ if (!isFirstInstance) {
 
     mainWindow.loadURL(
       url.format({
-        pathname: path.resolve(BASE_APP_PATH, "app.html"),
+        pathname: path.resolve(BASE_APP_PATH, "app", "app.html"),
         protocol: "file:",
         slashes: true,
       })
