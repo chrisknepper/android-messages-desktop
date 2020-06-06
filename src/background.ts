@@ -243,10 +243,6 @@ if (!isFirstInstance) {
       EVENT_WEBVIEW_NOTIFICATION,
       async (event, msg: { title: string; options?: NotificationOptions }) => {
         if (msg.options) {
-          const userImgData = (await mainWindow.webContents.executeJavaScript(
-            `window.getUserImg("${msg.title}")`
-          )) as string | undefined;
-
           const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
             ? {
                 title: "Android Messages Desktop",
@@ -262,8 +258,8 @@ if (!isFirstInstance) {
                  * If something is undefined it falls back to a generic icon in the resources folder.
                  */
                 icon:
-                  userImgData != null
-                    ? nativeImage.createFromDataURL(userImgData)
+                  msg.options.image != null
+                    ? nativeImage.createFromDataURL(msg.options.image)
                     : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
                 body: msg.options.body || "",
               };

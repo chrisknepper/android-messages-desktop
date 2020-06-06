@@ -79,6 +79,13 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
+"@types/dom-to-image@^2.6.1":
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/@types/dom-to-image/-/dom-to-image-2.6.1.tgz#2b30a7080448b3b9265683886ca429bc6ae6112f"
+  integrity sha512-pTaEZxf1sZVRE5FDji9kmdiZLr2a4JLR1IQvJtuIsDXmq0Tv+lLpZqxXf/7wzMMIicMImXrrAZUEgf1XJpzksg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/electron-settings@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@types/electron-settings/-/electron-settings-3.1.1.tgz#e3f8246ee1a8fc66b08203792d09589df355c776"
@@ -1529,6 +1536,11 @@ dom-serializer@0:
   dependencies:
     domelementtype "^2.0.1"
     entities "^2.0.0"
+
+dom-to-image@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/dom-to-image/-/dom-to-image-2.6.0.tgz#8a503608088c87b1c22f9034ae032e1898955867"
+  integrity sha1-ilA2CAiMh7HCL5A0rgMuGJiVWGc=
 
 domain-browser@^1.1.1:
   version "1.2.0"

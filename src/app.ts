@@ -9,31 +9,6 @@ const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
 ) as WebviewTag;
 
-// Writing a JS Function that will be to stringed into the file for a nicer editor experience
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-function getUserImgWebview(name) {
-  const nodes = Array.from(document.querySelectorAll("h3.name")).filter(
-    (e) => name === e.textContent
-  );
-
-  if (
-    nodes.length > 0 &&
-    nodes[0].parentElement &&
-    nodes[0].parentElement.parentElement
-  ) {
-    const img = nodes[0].parentElement.parentElement.querySelector("img");
-    if (img) {
-      return img.src;
-    }
-  }
-}
-
-window.getUserImg = async (name: string): Promise<string | undefined> =>
-  await androidMessagesWebview.executeJavaScript(
-    `(${getUserImgWebview.toString()})("${name}")`
-  );
-
 androidMessagesWebview.addEventListener("dom-ready", () => {
   app.mainWindow?.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs

@@ -6,7 +6,7 @@
     "name": "Kyle Rosenberg",
     "email": "kyle@ekrosenberg.com"
   },
-  "license" : "SEE LICENSE IN LISCENSE",
+  "license": "SEE LICENSE IN LISCENSE",
   "copyright": "Copyright 2020 Kyle Rosenberg",
   "homepage": "https://github.com/OrangeDrangon/android-messages-desktop",
   "repository": {
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "about-window": "1.13.4",
+    "dom-to-image": "^2.6.0",
     "electron-hunspell": "1.1.2",
     "electron-settings": "3.2.0",
     "electron-updater": "4.3.1",
@@ -34,6 +35,7 @@
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "@types/dom-to-image": "^2.6.1",
     "@types/electron-settings": "^3.1.1",
     "@types/friendly-errors-webpack-plugin": "^0.1.2",
     "@types/node": "12",

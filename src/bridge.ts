@@ -16,6 +16,9 @@ import {
   attachSpellCheckProvider,
 } from "electron-hunspell";
 import { Dictionary } from "./helpers/dictionaryManager";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import domtoimg from "dom-to-image";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -98,6 +101,30 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
   }
 });
 
+async function getImg(name: string): Promise<string | undefined> {
+  const nodes = Array.from(document.querySelectorAll("h3.name")).filter((e) =>
+    name.startsWith(e.textContent || "")
+  );
+
+  if (
+    nodes.length > 0 &&
+    nodes[0].parentElement &&
+    nodes[0].parentElement.parentElement
+  ) {
+    const parent = nodes[0].parentElement.parentElement;
+    const img = parent.querySelector("img");
+    if (img) {
+      return img.src;
+    } else {
+      const noImg = parent.querySelector("div.non-image-avatar");
+      if (noImg && (window as any).domtoimg) {
+        return await (window as any).domtoimg.toPng(noImg);
+      }
+    }
+  }
+  return undefined;
+}
+
 const OriginalBrowserNotification = Notification;
 
 /*
@@ -114,7 +141,10 @@ const OriginalBrowserNotification = Notification;
 // It hurts but this is so antipattern I am telling the ts compiler to screw itself
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Notification = function (title: string, options?: NotificationOptions) {
+Notification = async function (title: string, options?: NotificationOptions) {
+  if (options) {
+    options.image = await getImg(title);
+  }
   const notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
   /*
@@ -182,3 +212,4 @@ Notification.prototype = OriginalBrowserNotification.prototype;
 // @ts-ignore
 Notification.permission = OriginalBrowserNotification.permission;
 Notification.requestPermission = OriginalBrowserNotification.requestPermission;
+(window as any).domtoimg = domtoimg;
