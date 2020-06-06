@@ -16,11 +16,11 @@ export const osMap = {
 };
 
 // Operating system
-export const osName = process.platform;
-export const osNameFriendly = osMap[osName];
-export const IS_WINDOWS = osName === "win32";
-export const IS_MAC = osName === "darwin";
-export const IS_LINUX = osName === "linux";
+const OS_NAME = process.platform;
+export const OS_NAME_FRIENDLY = osMap[OS_NAME];
+export const IS_WINDOWS = OS_NAME === "win32";
+export const IS_MAC = OS_NAME === "darwin";
+export const IS_LINUX = OS_NAME === "linux";
 
 // Environment and paths
 export const IS_DEV = process.env.NODE_ENV === "development";
@@ -42,6 +42,3 @@ export const EVENT_BRIDGE_INIT = "messages-bridge-init";
 export const EVENT_SPELL_ADD_CUSTOM_WORD = "messages-spelling-add-custom-word";
 export const EVENT_SPELLING_REFLECT_READY = "messages-spelling-reflect-ready";
 export const EVENT_UPDATE_USER_SETTING = "messages-update-user-setting";
-
-// Misc.
-export const DICTIONARY_CACHE_TIME = 2592000000; // 30 days in milliseconds
