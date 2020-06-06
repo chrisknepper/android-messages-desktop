@@ -1,6 +1,6 @@
 import { app, MenuItemConstructorOptions } from "electron";
 import { IS_WINDOWS } from "../helpers/constants";
-import { checkForUpdatesMenuItem } from "./items/check_for_updates";
+import { checkForUpdatesMenuItem } from "./items/checkForUpdates";
 import { separator } from "./items/separator";
 
 const submenu: MenuItemConstructorOptions[] = [
