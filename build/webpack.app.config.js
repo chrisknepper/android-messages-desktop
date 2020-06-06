@@ -13,7 +13,4 @@ module.exports = merge(base(), {
     filename: "[name].js",
     path: path.resolve(__dirname, "../app"),
   },
-  resolve: {
-    extensions: [".ts", ".js"]
-  },
 });

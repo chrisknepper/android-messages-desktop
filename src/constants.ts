@@ -23,7 +23,7 @@ export const IS_MAC = osName === "darwin";
 export const IS_LINUX = osName === "linux";
 
 // Environment and paths
-export const IS_DEV = process.env.name === "development";
+export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = IS_DEV
   ? path.resolve(__dirname, "..")
   : process.resourcesPath;

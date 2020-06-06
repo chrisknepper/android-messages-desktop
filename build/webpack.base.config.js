@@ -27,20 +27,10 @@ module.exports = (env) => {
           test: /\.css$/,
           use: ["style-loader", "css-loader"],
         },
-        {
-          test: /\.(png|jpg|gif)$/,
-          use: [
-            {
-              loader: "file-loader",
-              options: {
-                useRelativePath: process.env.NODE_ENV === "development",
-                emitFile: false,
-                name: "[name].[ext]",
-              },
-            },
-          ],
-        },
       ],
+    },
+    resolve: {
+      extensions: [".ts", ".js", ".css"],
     },
     plugins: [
       new FriendlyErrorsWebpackPlugin({

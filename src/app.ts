@@ -1,7 +1,7 @@
 import "./stylesheets/main.css";
 
 import { ipcRenderer, remote } from "electron";
-import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from "./constants";
+import { EVENT_UPDATE_USER_SETTING, IS_MAC } from "./constants";
 
 type TOFIX = any;
 
@@ -11,22 +11,7 @@ const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
 ) as TOFIX;
 
-androidMessagesWebview.addEventListener("did-finish-load", () => {
-  // just before onLoad
-  console.log("finished loading");
-});
-
-androidMessagesWebview.addEventListener("did-stop-loading", () => {
-  // coincident with onLoad, can fire multiple times
-  console.log("done loading");
-});
-
 androidMessagesWebview.addEventListener("dom-ready", () => {
-  console.log("dom ready");
-
-  if (IS_DEV) {
-    androidMessagesWebview.getWebContents().openDevTools();
-  }
   (app as TOFIX).mainWindow.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs
     androidMessagesWebview.dispatchEvent(new Event("focus"));
