@@ -1,7 +1,7 @@
 module.exports = {
   appId: "pw.electron.android-messages",
   productName: "AndroidMessages",
-  copyright: "Copyright who needs those",
+  copyright: "Copyright 2018 Chris Knepper",
   files: ["app/**/*", "resources/**/*"],
   directories: {
     buildResources: "resources",
