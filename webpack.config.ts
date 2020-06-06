@@ -18,14 +18,9 @@ const base: Configuration = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: ["babel-loader"],
-      },
-      {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "ts-loader"],
+        use: ["ts-loader"],
       },
       {
         test: /\.css$/,
