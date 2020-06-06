@@ -4,7 +4,6 @@
 // window from here.
 
 import * as path from "path";
-import * as url from "url";
 import {
   app,
   Menu,
@@ -222,13 +221,7 @@ if (!isFirstInstance) {
 
     mainWindow = new CustomBrowserWindow("main", mainWindowOptions);
 
-    mainWindow.loadURL(
-      url.format({
-        pathname: path.resolve(BASE_APP_PATH, "app", "app.html"),
-        protocol: "file:",
-        slashes: true,
-      })
-    );
+    mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "app.html"));
 
     trayManager.startIfEnabled();
 
@@ -311,37 +304,28 @@ if (!isFirstInstance) {
         enterToSend: pressEnterToSendEnabled,
         useDarkMode: useSystemDarkMode ? nativeTheme.shouldUseDarkColors : null,
       });
+      const locale = app.getLocale();
 
-      let spellCheckFiles = null;
-      let customWords = null;
-      const currentLanguage = app.getLocale();
       try {
         // Spellchecking is supported for the current language
-        spellCheckFiles = await getDictionary(currentLanguage);
-
-        // We send an event with the language key and array of custom words to the webview bridge which contains the
-        // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
-        // between electron processes is hacky at best and impossible at worst.
-        const existingCustomWords = settings.get(
+        const spellCheckFiles = await getDictionary(locale);
+        const customWords = settings.get(
           SETTING_CUSTOM_WORDS,
           {}
         ) as CustomWords;
 
-        customWords = {};
-        if (currentLanguage in existingCustomWords) {
-          customWords = {
-            [currentLanguage]: existingCustomWords[currentLanguage],
-          };
-        }
+        // We send an event with the language key and array of custom words to the webview bridge which contains the
+        // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+        // between electron processes is hacky at best and impossible at worst.
+
+        event.sender.send(EVENT_SPELLING_REFLECT_READY, {
+          locale,
+          spellCheckFiles,
+          customWords,
+        });
       } catch (error) {
         // TODO: Display this as an error message to the user?
       }
-
-      event.sender.send(EVENT_SPELLING_REFLECT_READY, {
-        dictionaryLocaleKey: currentLanguage,
-        spellCheckFiles,
-        customWords,
-      });
     });
 
     ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (_event, msg) => {
@@ -382,7 +366,6 @@ if (!isFirstInstance) {
     };
 
     mainWindow.on("close", (event: Electron.Event) => {
-      console.log("close window called");
       if (!shouldExitOnMainWindowClosed()) {
         event.preventDefault();
         mainWindow.hide();

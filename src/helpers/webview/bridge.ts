@@ -15,6 +15,7 @@ import {
   SpellCheckerProvider,
   attachSpellCheckProvider,
 } from "electron-hunspell";
+import { Dictionary } from "../dictionary_manager";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -46,40 +47,37 @@ window.onload = () => {
   });
 };
 
+interface EventSpellingReadyParams {
+  locale: string;
+  spellCheckFiles: Dictionary;
+  customWords: Record<string, string[]>;
+}
+
 // The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
 // and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
 // loads the spellchecker, if needed.
 ipcRenderer.once(
   EVENT_SPELLING_REFLECT_READY,
-  async (event, { dictionaryLocaleKey, spellCheckFiles, customWords }) => {
-    if (
-      dictionaryLocaleKey &&
-      spellCheckFiles &&
-      spellCheckFiles.userLanguageAffFile &&
-      spellCheckFiles.userLanguageDicFile
-    ) {
-      const provider = new SpellCheckerProvider();
-      window.spellCheckHandler = provider;
-      await provider.initialize({}); // Empty brace correct, see: https://github.com/kwonoj/electron-hunspell/blob/master/example/browserWindow.ts
+  async (
+    _event,
+    { locale, spellCheckFiles, customWords }: EventSpellingReadyParams
+  ) => {
+    const provider = new SpellCheckerProvider();
+    window.spellCheckHandler = provider;
+    await provider.initialize();
 
-      await provider.loadDictionary(
-        dictionaryLocaleKey,
-        fs.readFileSync(spellCheckFiles.userLanguageDicFile),
-        fs.readFileSync(spellCheckFiles.userLanguageAffFile)
-      );
+    await provider.loadDictionary(
+      locale,
+      fs.readFileSync(spellCheckFiles.dic),
+      fs.readFileSync(spellCheckFiles.aff)
+    );
 
-      const attached = await attachSpellCheckProvider(provider);
-      attached.switchLanguage(dictionaryLocaleKey);
+    const attached = await attachSpellCheckProvider(provider);
+    attached.switchLanguage(locale);
 
-      if (dictionaryLocaleKey in customWords) {
-        for (
-          let i = 0, n = customWords[dictionaryLocaleKey].length;
-          i < n;
-          i++
-        ) {
-          const word = customWords[dictionaryLocaleKey][i];
-          window.spellCheckHandler.addWord(dictionaryLocaleKey, word);
-        }
+    if (locale in customWords) {
+      for (const word of customWords[locale]) {
+        window.spellCheckHandler.addWord(locale, word);
       }
     }
   }

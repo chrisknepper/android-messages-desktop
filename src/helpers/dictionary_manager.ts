@@ -38,17 +38,17 @@ async function getLanguageObject(locale: string): Promise<GithubEntry> {
    * larger number of speakers of that language.
    */
 
-  if (locale === "en") {
-    locale = "en-GB";
-  } else if (locale === "hy") {
-    locale = "hy-arevela";
+  if (locale === "en-US") {
+    locale = "en";
+  } else if (locale === "de-DE") {
+    locale = "de";
   }
 
   let language: GithubEntry;
 
   // Every locale code for which a dictionary exists, as an array
   const supportedLanguages = (await getSupportedLanguages()).filter(
-    (language) => language.name === "dir"
+    (language) => language.type === "dir"
   );
   const names = supportedLanguages.map((language) => language.name);
   if (names.includes(locale)) {
@@ -64,11 +64,10 @@ async function getLanguageObject(locale: string): Promise<GithubEntry> {
       throw new Error("Locale not supported");
     }
   }
-
   return language;
 }
 
-interface Dictionary {
+export interface Dictionary {
   aff: string;
   dic: string;
 }
@@ -77,33 +76,35 @@ export async function getDictionary(locale: string): Promise<Dictionary> {
   const language = await getLanguageObject(locale);
   const dirPath = path.resolve(SPELLING_DICTIONARIES_PATH(), language.name);
   const fileRoot = path.resolve(dirPath, "index");
-  // if dir doesnt exist
-  if (!(await fsJetpack.dirAsync(dirPath))) {
-    // if both files dont exist
-    if (
-      !(await fsJetpack.existsAsync(fileRoot + ".aff")) ||
-      !(await fsJetpack.existsAsync(fileRoot + ".dic"))
-    ) {
-      const downloadEntries = (await (
-        await fetch(language.url)
-      ).json()) as GithubEntry[];
-      const downloads = downloadEntries.filter((download) =>
-        ["aff", "dic"].includes(download.name.split(".")[1])
-      );
-      await Promise.all(
-        downloads.map(async (download) => {
-          if (download.download_url) {
-            const content = await (await fetch(download.download_url)).text();
-            return await fsJetpack.writeAsync(
-              fileRoot + download.name.split(".")[1],
-              content
-            );
-          } else {
-            throw new Error("Download not found");
-          }
-        })
-      );
-    }
+
+  // creates dir
+  const langDir = await fsJetpack.dirAsync(dirPath);
+  // if both files dont exist
+  const contents = await langDir.listAsync();
+
+  if (
+    !contents?.includes(fileRoot + ".aff") ||
+    !contents?.includes(fileRoot + ".dic")
+  ) {
+    const downloadEntries = (await (
+      await fetch(language.url)
+    ).json()) as GithubEntry[];
+    const downloads = downloadEntries.filter((download) =>
+      ["aff", "dic"].includes(download.name.split(".")[1])
+    );
+    await Promise.all(
+      downloads.map(async (download) => {
+        if (download.download_url) {
+          const content = await (await fetch(download.download_url)).text();
+          return await fsJetpack.writeAsync(
+            fileRoot + "." + download.name.split(".")[1],
+            content
+          );
+        } else {
+          throw new Error("Download not found");
+        }
+      })
+    );
   }
   return {
     aff: fileRoot + ".aff",

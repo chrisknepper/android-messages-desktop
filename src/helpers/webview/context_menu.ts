@@ -8,7 +8,7 @@ import {
 } from "electron";
 import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../../constants";
 
-const { Menu } = remote;
+const { Menu, app } = remote;
 
 const standardMenuTemplate: MenuItemConstructorOptions[] = [
   {
@@ -64,7 +64,7 @@ export const popupContextMenu = async (
   // As of Electron 4, Menu.popup no longer accepts being called with the signature popup(remote.getCurrentWindow())
   // It must be passed as an object with the window key. Is this change silly? Yes. Will we know why it was done? No.
   const menuPopupArgs = {
-    window: remote.getCurrentWindow(),
+    window: app.mainWindow,
   };
 
   switch (params.mediaType) {
@@ -120,7 +120,6 @@ export const popupContextMenu = async (
             label: `Add ${booboo} to Dictionary`,
             click: async () => {
               // Immediately clear red underline
-              console.log(event);
 
               (event as any).sender.replaceMisspelling(booboo);
               // Add new custom word to dictionary for the current session
