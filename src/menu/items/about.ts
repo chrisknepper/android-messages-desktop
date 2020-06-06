@@ -25,7 +25,7 @@ export const aboutMenuItem: MenuItemConstructorOptions = {
     openAboutWindow({
       // TODO: Make this not sketchy as hell
       icon_path: path.resolve(RESOURCES_PATH, "icons", "512x512.png"),
-      copyright: `<div style="text-align: center">Copyright (c) 2018 Chris Knepper${disclaimerText}${licenseText}${dictionaryLicenseText}</div>`,
+      copyright: `<div style="text-align: center">Copyright (c) 2020 Kyle Rosenberg${disclaimerText}${licenseText}${dictionaryLicenseText}</div>`,
       product_name: productName,
       description: descriptionWithLocale,
       open_devtools: IS_DEV,
