@@ -79,23 +79,12 @@ export const popupContextMenu = async (
           {
             label: `Save ${mediaType} As...`,
             click: () => {
-              // This call *would* do this in one line, but is only a thing in IE (???)
-              // document.execCommand('SaveAs', true, params.srcURL);
               const link = document.createElement("a");
               link.href = params.srcURL;
-              /*
-               * Leaving the URL root results in the file extension being truncated.
-               * The resulting filename from this also appears to be consistent with
-               * saving the image via dragging or the Chrome context menu...winning!
-               *
-               * Since the URL change from messages.android.com, the URL root of the files
-               * is messages.google.com (note the lack of /web/ in the path)
-               */
               link.download = params.srcURL.replace(
                 "blob:https://messages.google.com/",
                 ""
               );
-              // Trigger save dialog by clicking the "link"
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -122,13 +111,12 @@ export const popupContextMenu = async (
             label: `Add ${booboo} to Dictionary`,
             click: async () => {
               // Immediately clear red underline
-
               (event as any).sender.replaceMisspelling(booboo);
               // Add new custom word to dictionary for the current session
               // Until I restructure all this ts demands a default
               const localeKey =
                 (await window.spellCheckHandler?.getSelectedDictionaryLanguage()) ||
-                "en-GB";
+                "en";
               window.spellCheckHandler?.addWord(localeKey, booboo);
               // Send new custom word to main process so it will be added to the dictionary at the start of future sessions
               ipcRenderer.send(EVENT_SPELL_ADD_CUSTOM_WORD, {

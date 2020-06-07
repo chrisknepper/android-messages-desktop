@@ -1,8 +1,3 @@
-// This is main process of Electron, started as first thing when your
-// app starts. It runs through entire life of your application.
-// It doesn't have any windows which you can see on screen, but we can open
-// window from here.
-
 import * as path from "path";
 import {
   app,
@@ -52,9 +47,11 @@ type CustomWords = Record<string, string[]>;
 
 let mainWindow: CustomBrowserWindow;
 
-// Prevent multiple instances of the app which causes many problems with an app like ours
-// Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
-// Adapted from https://github.com/electron/electron/blob/v4.0.4/docs/api/app.md#apprequestsingleinstancelock
+/**
+ * Prevent multiple instances of the app which causes many problems with an app like ours
+ * Without this, if an instance were minimized to the tray in Windows, clicking a shortcut would launch another instance, icky
+ * Adapted from https://www.electronjs.org/docs/api/app#apprequestsingleinstancelock
+ */
 const isFirstInstance = app.requestSingleInstanceLock();
 
 if (!isFirstInstance) {
@@ -79,18 +76,20 @@ if (!isFirstInstance) {
     Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
   };
 
-  // Save userData in separate folders for each environment.
-  // Thanks to this you can use production and development versions of the app
-  // on same machine like those are two separate apps.
+  /**
+   * Save userData in separate folders for each environment.
+   * Thanks to this you can use production and development versions of the app
+   * on same machine like those are two separate apps.
+   */
   if (IS_DEV) {
     const userDataPath = app.getPath("userData");
-    app.setPath("userData", `${userDataPath} (${process.env.name})`);
+    app.setPath("userData", `${userDataPath}-(${process.env.NODE_ENV})`);
   }
 
   if (IS_WINDOWS) {
     // Stupid, DUMB calls that have to be made to let notifications come through on Windows (only Windows 10?)
     // See: https://github.com/electron/electron/issues/10864#issuecomment-382519150
-    app.setAppUserModelId("com.knepper.android-messages-desktop");
+    app.setAppUserModelId("pw.kmr.android-messages-desktop");
     app.setAsDefaultProtocolClient("android-messages-desktop");
   }
 
@@ -211,8 +210,6 @@ if (!isFirstInstance) {
     };
 
     if (IS_LINUX) {
-      // Setting the icon in Linux tends to be finicky without explicitly setting it like this.
-      // See: https://github.com/electron/electron/issues/6205
       mainWindowOptions.icon = path.resolve(
         RESOURCES_PATH,
         "icons",
@@ -253,18 +250,11 @@ if (!isFirstInstance) {
               }
             : {
                 title,
-                /*
-                 * This is what we call absolute shenanigans. Above we call a function in the render process
-                 * That function calls another function in the webView retrieving the name of the message at the top and the respective image
-                 * It could technically be done without polluting the window but it would have been ugly as hell (as if this is not)
-                 * Bellow it makes sure everything is defined and checks if the author matches the title of the notification
-                 * If something is undefined it falls back to a generic icon in the resources folder.
-                 */
+                body: options.body || "",
                 icon:
                   options.image != null
                     ? nativeImage.createFromDataURL(options.image)
                     : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
-                body: options.body || "",
               };
           notificationOpts.silent = !state.notificationSoundEnabled;
           const customNotification = new Notification(notificationOpts);

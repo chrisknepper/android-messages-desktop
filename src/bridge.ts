@@ -136,7 +136,7 @@ function getCacheKey(title: string): string {
 
 const OriginalBrowserNotification = Notification;
 
-/*
+/**
  * Override the webview's window's instance of the Notification class and forward their data to the
  * main process. This is Necessary to generate and send a custom notification via Electron instead
  * of just forwarding the webview (Google) ones.
@@ -166,7 +166,7 @@ Notification = function (title: string, options?: NotificationOptions) {
   }
   const notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
-  /*
+  /**
    * Google's own notifications have a click event listener which takes care of highlighting
    * the conversation a notification belongs to, but this click listener does not carry over
    * when we block Google's and create our own Electron notification.

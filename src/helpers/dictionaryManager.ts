@@ -23,21 +23,6 @@ async function getSupportedLanguages(): Promise<GithubEntry[]> {
 }
 
 async function getLanguageObject(locale: string): Promise<GithubEntry> {
-  /*
-   * It is possible for Electron to return a locale code for which there are multiple
-   * "close match" dictionaries but no exact match. For these special cases, we
-   * hardcode which dictionary should be used here.
-   *
-   *  For a system returning just generic "English", load the Queen's English because its spellings
-   * are more common anywhere outside of USA, where en-US should always be returned.
-   *
-   * Electron returns "hy" for any dialect of Armenian but there are only dictionaries for Eastern
-   * Armenian and Western Armenian--no generic "Armenian." According to Wikipedia, Eastern Armenian
-   * is more widely spoken and acts as a superset of Western Armenian. Since there is no other
-   * reliable way to tell which dialect a user would prefer, we use Eastern Armenian because of the
-   * larger number of speakers of that language.
-   */
-
   if (locale === "en-US") {
     locale = "en";
   } else if (locale === "de-DE") {
