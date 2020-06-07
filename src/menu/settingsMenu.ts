@@ -1,13 +1,13 @@
 import {
-  dialog,
-  MenuItemConstructorOptions,
-  MenuItem,
   BrowserWindow,
+  dialog,
   Menu,
+  MenuItem,
+  MenuItemConstructorOptions,
 } from "electron";
-import * as settings from "electron-settings";
-import { separator } from "./items/separator";
+import settings from "electron-settings";
 import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../helpers/constants";
+import { separator } from "./items/separator";
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "Preferences" : "Settings",

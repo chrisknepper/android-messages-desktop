@@ -2,8 +2,8 @@ import { Configuration } from "webpack";
 import nodeExternals from "webpack-node-externals";
 import FriendlyErrors from "friendly-errors-webpack-plugin";
 import HTMLWebpackPlguin from "html-webpack-plugin";
-import * as process from "process";
-import * as path from "path";
+import process from "process";
+import path from "path";
 import merge from "webpack-merge";
 
 const base: Configuration = {

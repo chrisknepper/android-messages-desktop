@@ -1,22 +1,22 @@
 // This script is injected into the webview.
 
-import { popupContextMenu } from "./menu/contextMenu";
-import {
-  EVENT_WEBVIEW_NOTIFICATION,
-  EVENT_NOTIFICATION_REFLECT_READY,
-  EVENT_BRIDGE_INIT,
-  EVENT_SPELLING_REFLECT_READY,
-  EVENT_UPDATE_USER_SETTING,
-} from "./helpers/constants";
+import domtoimg from "dom-to-image";
 import { ipcRenderer, remote } from "electron";
-import { handleEnterPrefToggle } from "./helpers/inputManager";
+import {
+  attachSpellCheckProvider,
+  SpellCheckerProvider,
+} from "electron-hunspell";
 import fs from "fs";
 import {
-  SpellCheckerProvider,
-  attachSpellCheckProvider,
-} from "electron-hunspell";
+  EVENT_BRIDGE_INIT,
+  EVENT_NOTIFICATION_REFLECT_READY,
+  EVENT_SPELLING_REFLECT_READY,
+  EVENT_UPDATE_USER_SETTING,
+  EVENT_WEBVIEW_NOTIFICATION,
+} from "./helpers/constants";
 import { Dictionary } from "./helpers/dictionaryManager";
-import domtoimg from "dom-to-image";
+import { handleEnterPrefToggle } from "./helpers/inputManager";
+import { popupContextMenu } from "./menu/contextMenu";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -195,7 +195,7 @@ Notification = function (title: string, options?: NotificationOptions) {
    * However, Electron does not support sending functions or otherwise non-JSON data across IPC.
    * To solve this and be able to have both our click event listener (so we can show the app
    * window) and Google's (so the converstaion gets selected/highlighted), when the main process
-   * asyncronously receives the notification data, it asyncronously sends a message back at which
+   yncronously receives the notification data, it asyncronously sends a message back at which
    * time we can reliably get a reference to the Electron notification and attach Google's click
    * event listener.
    */

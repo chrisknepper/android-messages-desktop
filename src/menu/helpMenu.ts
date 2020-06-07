@@ -1,4 +1,4 @@
-import { shell, MenuItemConstructorOptions } from "electron";
+import { MenuItemConstructorOptions, shell } from "electron";
 import { IS_MAC, IS_WINDOWS } from "../helpers/constants";
 import { aboutMenuItem } from "./items/about";
 import { checkForUpdatesMenuItem } from "./items/checkForUpdates";

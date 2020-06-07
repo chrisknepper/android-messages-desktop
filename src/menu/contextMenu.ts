@@ -1,8 +1,8 @@
 import {
+  ContextMenuParams,
   ipcRenderer,
   MenuItemConstructorOptions,
   remote,
-  ContextMenuParams,
 } from "electron";
 import { EVENT_SPELL_ADD_CUSTOM_WORD } from "../helpers/constants";
 

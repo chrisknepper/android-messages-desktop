@@ -1,7 +1,7 @@
-import * as path from "path";
-import * as fsJetpack from "fs-jetpack";
-import { SPELLING_DICTIONARIES_PATH, RESOURCES_PATH } from "./constants";
+import fsJetpack from "fs-jetpack";
 import fetch from "node-fetch";
+import path from "path";
+import { RESOURCES_PATH, SPELLING_DICTIONARIES_PATH } from "./constants";
 
 interface GithubEntry {
   name: string;

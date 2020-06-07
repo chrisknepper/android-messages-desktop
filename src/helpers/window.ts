@@ -6,10 +6,10 @@
 import {
   app,
   BrowserWindow,
-  screen,
   BrowserWindowConstructorOptions,
+  screen,
 } from "electron";
-import * as jetpack from "fs-jetpack";
+import jetpack from "fs-jetpack";
 
 interface Size {
   width: number;

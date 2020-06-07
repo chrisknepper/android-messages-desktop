@@ -1,14 +1,14 @@
-import * as path from "path";
-import { app, Tray, Menu } from "electron";
+import { app, Menu, Tray } from "electron";
+import settings from "electron-settings";
+import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
 import {
-  IS_MAC,
   IS_LINUX,
+  IS_MAC,
   IS_WINDOWS,
-  SETTING_TRAY_ENABLED,
   RESOURCES_PATH,
+  SETTING_TRAY_ENABLED,
 } from "./constants";
-import * as settings from "electron-settings";
 
 export class TrayManager {
   public enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX) as boolean;

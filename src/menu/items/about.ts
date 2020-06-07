@@ -1,7 +1,7 @@
-import { IS_DEV, RESOURCES_PATH } from "../../helpers/constants";
 import openAboutWindow from "about-window";
 import { app, MenuItemConstructorOptions } from "electron";
-import * as path from "path";
+import path from "path";
+import { IS_DEV, RESOURCES_PATH } from "../../helpers/constants";
 
 const productName = "Android Messages Desktop";
 const localeStyle =

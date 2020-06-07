@@ -1,5 +1,5 @@
-import * as process from "process";
-import * as path from "path";
+import process from "process";
+import path from "path";
 import { app } from "electron";
 
 export const osMap = {
@@ -33,6 +33,12 @@ export const SPELLING_DICTIONARIES_PATH = (): string =>
 // Settings
 export const SETTING_TRAY_ENABLED = "trayEnabledPref";
 export const SETTING_CUSTOM_WORDS = "savedCustomDictionaryWords";
+export const SETTING_NOTIFICATION_SOUND = "notificationSoundEnabledPref";
+export const SETTING_ENTER_TO_SEND = "pressEnterToSendPref";
+export const SETTING_HIDE_NOTIFICATION = "hideNotificationContentPref";
+export const SETTING_SYSTEM_DARK_MODE = "useSystemDarkModePref";
+export const SETTING_START_IN_TRAY = "startInTrayPref";
+export const SETTING_AUTOHIDE_MENU = "autoHideMenuPref";
 
 // Events
 export const EVENT_WEBVIEW_NOTIFICATION = "messages-webview-notification";

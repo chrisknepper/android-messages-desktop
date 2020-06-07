@@ -1,46 +1,43 @@
-import * as path from "path";
 import {
   app,
-  Menu,
   ipcMain,
-  Notification,
-  shell,
-  nativeTheme,
-  MenuItemConstructorOptions,
-  BrowserWindowConstructorOptions,
+  Menu,
   nativeImage,
+  nativeTheme,
+  Notification,
+  NotificationConstructorOptions,
+  shell,
 } from "electron";
+import settings from "electron-settings";
 import { autoUpdater } from "electron-updater";
+import path from "path";
+import {
+  BASE_APP_PATH,
+  EVENT_BRIDGE_INIT,
+  EVENT_NOTIFICATION_REFLECT_READY,
+  EVENT_SPELLING_REFLECT_READY,
+  EVENT_SPELL_ADD_CUSTOM_WORD,
+  EVENT_UPDATE_USER_SETTING,
+  EVENT_WEBVIEW_NOTIFICATION,
+  IS_DEV,
+  IS_LINUX,
+  IS_MAC,
+  IS_WINDOWS,
+  RESOURCES_PATH,
+  SETTING_CUSTOM_WORDS,
+  SETTING_TRAY_ENABLED,
+} from "./helpers/constants";
+import { getDictionary } from "./helpers/dictionaryManager";
+import { SettingsManager } from "./helpers/settingsManager";
+import { TrayManager } from "./helpers/trayManager";
+import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
 import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
-import { CustomBrowserWindow } from "./helpers/window";
-import { getDictionary } from "./helpers/dictionaryManager";
-import { TrayManager } from "./helpers/trayManager";
-import * as settings from "electron-settings";
-import {
-  IS_MAC,
-  IS_WINDOWS,
-  IS_LINUX,
-  IS_DEV,
-  SETTING_TRAY_ENABLED,
-  SETTING_CUSTOM_WORDS,
-  EVENT_WEBVIEW_NOTIFICATION,
-  EVENT_NOTIFICATION_REFLECT_READY,
-  EVENT_BRIDGE_INIT,
-  EVENT_SPELL_ADD_CUSTOM_WORD,
-  EVENT_SPELLING_REFLECT_READY,
-  EVENT_UPDATE_USER_SETTING,
-  BASE_APP_PATH,
-  RESOURCES_PATH,
-} from "./helpers/constants";
 
 const state = {
   unreadNotificationCount: 0,
-  notificationSoundEnabled: true,
-  notificationContentHidden: false,
   bridgeInitDone: false,
-  useSystemDarkMode: true,
 };
 
 type CustomWords = Record<string, string[]>;
@@ -65,10 +62,8 @@ if (!isFirstInstance) {
     }
   });
 
-  let trayManager: TrayManager | null = null;
-
   const setApplicationMenu = () => {
-    const menus: Array<MenuItemConstructorOptions> = baseMenuTemplate;
+    const menus = baseMenuTemplate;
     if (IS_DEV) {
       menus.push(devMenuTemplate);
     }
@@ -93,43 +88,16 @@ if (!isFirstInstance) {
     app.setAsDefaultProtocolClient("android-messages-desktop");
   }
 
+  let trayManager: TrayManager;
+  let settingsManager: SettingsManager;
+
   app.on("ready", () => {
     trayManager = new TrayManager();
-
-    // TODO: Create a preference manager which handles all of these
-    const autoHideMenuBar = settings.get("autoHideMenuPref", false) as boolean;
-    const startInTray = settings.get("startInTrayPref", false) as boolean;
-    const notificationSoundEnabled = settings.get(
-      "notificationSoundEnabledPref",
-      true
-    ) as boolean;
-    const pressEnterToSendEnabled = settings.get(
-      "pressEnterToSendPref",
-      true
-    ) as boolean;
-    const hideNotificationContent = settings.get(
-      "hideNotificationContentPref",
-      false
-    ) as boolean;
-    const useSystemDarkMode = settings.get(
-      "useSystemDarkModePref",
-      true
-    ) as boolean;
-    settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
-    settings.watch("notificationSoundEnabledPref", (newValue) => {
-      state.notificationSoundEnabled = newValue;
-    });
-    settings.watch("pressEnterToSendPref", (newValue) => {
-      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
-        enterToSend: newValue,
-      });
-    });
-    settings.watch("hideNotificationContentPref", (newValue) => {
-      state.notificationContentHidden = newValue;
-    });
-    settings.watch("useSystemDarkModePref", (newValue) => {
-      state.useSystemDarkMode = newValue;
-    });
+    settingsManager = new SettingsManager();
+    settingsManager.addWatcher(
+      SETTING_TRAY_ENABLED,
+      trayManager.handleTrayEnabledToggle
+    );
 
     setApplicationMenu();
     const menuInstance = Menu.getApplicationMenu();
@@ -141,7 +109,7 @@ if (!isFirstInstance) {
     }
 
     nativeTheme.on("updated", () => {
-      if (state.useSystemDarkMode) {
+      if (settingsManager.systemDarkMode) {
         mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
           useDarkMode: nativeTheme.shouldUseDarkColors,
         });
@@ -168,13 +136,12 @@ if (!isFirstInstance) {
 
       if (!IS_MAC) {
         // Sets checked status based on user prefs
-        menuInstance.getMenuItemById(
-          "autoHideMenuBarMenuItem"
-        ).checked = autoHideMenuBar;
+        menuInstance.getMenuItemById("autoHideMenuBarMenuItem").checked =
+          settingsManager.autoHideMenu;
         trayMenuItem.enabled = trayManager.enabled;
       }
 
-      trayMenuItem.checked = startInTray;
+      trayMenuItem.checked = settingsManager.startInTray;
       enableTrayIconMenuItem.checked = trayManager.enabled;
 
       if (IS_WINDOWS) {
@@ -184,46 +151,37 @@ if (!isFirstInstance) {
         trayClickShortcutMenuItem.enabled = trayManager.enabled;
       }
 
-      notificationSoundEnabledMenuItem.checked = notificationSoundEnabled;
-      pressEnterToSendMenuItem.checked = pressEnterToSendEnabled;
-      hideNotificationContentMenuItem.checked = hideNotificationContent;
-      useSystemDarkModeMenuItem.checked = useSystemDarkMode;
-
-      state.notificationSoundEnabled = notificationSoundEnabled;
-      state.notificationContentHidden = hideNotificationContent;
-      state.useSystemDarkMode = useSystemDarkMode;
+      notificationSoundEnabledMenuItem.checked =
+        settingsManager.notificationSound;
+      pressEnterToSendMenuItem.checked = settingsManager.enterToSend;
+      hideNotificationContentMenuItem.checked =
+        settingsManager.hideNotificationContent;
+      useSystemDarkModeMenuItem.checked = settingsManager.systemDarkMode;
     }
 
     autoUpdater.checkForUpdatesAndNotify();
 
-    const mainWindowOptions: BrowserWindowConstructorOptions = {
+    mainWindow = new CustomBrowserWindow("main", {
       width: 1100,
       height: 800,
-      autoHideMenuBar: autoHideMenuBar,
-      show: !startInTray, //Starts in tray if set
+      autoHideMenuBar: settingsManager.autoHideMenu,
+      show: !settingsManager.startInTray, //Starts in tray if set
       titleBarStyle: IS_MAC ? "hiddenInset" : "default", //Turn on hidden frame on a Mac
+      icon: IS_LINUX
+        ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
+        : undefined,
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
         enableRemoteModule: true,
       },
-    };
-
-    if (IS_LINUX) {
-      mainWindowOptions.icon = path.resolve(
-        RESOURCES_PATH,
-        "icons",
-        "128x128.png"
-      );
-    }
-
-    mainWindow = new CustomBrowserWindow("main", mainWindowOptions);
-
+    });
     mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "index.html"));
 
-    trayManager.startIfEnabled();
+    // Quick and dirty way for renderer process to access mainWindow for communication
+    app.mainWindow = mainWindow;
 
-    app.mainWindow = mainWindow; // Quick and dirty way for renderer process to access mainWindow for communication
+    trayManager.startIfEnabled();
 
     mainWindow.on("focus", () => {
       if (IS_MAC) {
@@ -243,7 +201,7 @@ if (!isFirstInstance) {
         { title, options }: { title: string; options?: NotificationOptions }
       ) => {
         if (options) {
-          const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
+          const notificationOpts: NotificationConstructorOptions = settingsManager.hideNotificationContent
             ? {
                 title: "Android Messages Desktop",
                 body: "New Message",
@@ -256,13 +214,13 @@ if (!isFirstInstance) {
                     ? nativeImage.createFromDataURL(options.image)
                     : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
               };
-          notificationOpts.silent = !state.notificationSoundEnabled;
+          notificationOpts.silent = !settingsManager.notificationSound;
           const customNotification = new Notification(notificationOpts);
 
           if (IS_MAC) {
             if (!mainWindow.isFocused()) {
               state.unreadNotificationCount += 1;
-              app.dock.setBadge("" + state.unreadNotificationCount);
+              app.dock.setBadge(state.unreadNotificationCount.toString());
             }
           }
 
@@ -292,8 +250,10 @@ if (!isFirstInstance) {
       // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
       // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
       mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
-        enterToSend: pressEnterToSendEnabled,
-        useDarkMode: useSystemDarkMode ? nativeTheme.shouldUseDarkColors : null,
+        enterToSend: settingsManager.enterToSend,
+        useDarkMode: settingsManager.systemDarkMode
+          ? nativeTheme.shouldUseDarkColors
+          : null,
       });
       const locale = app.getLocale();
 
