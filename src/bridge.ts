@@ -16,14 +16,12 @@ import {
   attachSpellCheckProvider,
 } from "electron-hunspell";
 import { Dictionary } from "./helpers/dictionaryManager";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
 import domtoimg from "dom-to-image";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
-window.onload = () => {
+window.addEventListener("load", () => {
   // Conditionally let the main process know the page is (essentially) done loading.
   // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
 
@@ -48,7 +46,7 @@ window.onload = () => {
     childList: true,
     attributes: true,
   });
-};
+});
 
 interface EventSpellingReadyParams {
   locale: string;
@@ -101,28 +99,39 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
   }
 });
 
-async function getImg(name: string): Promise<string | undefined> {
-  const nodes = Array.from(document.querySelectorAll("h3.name")).filter((e) =>
-    name.startsWith(e.textContent || "")
-  );
+const imgCache: { [key: string]: string | (() => Promise<void>) } = {};
 
-  if (
-    nodes.length > 0 &&
-    nodes[0].parentElement &&
-    nodes[0].parentElement.parentElement
-  ) {
-    const parent = nodes[0].parentElement.parentElement;
-    const img = parent.querySelector("img");
-    if (img) {
-      return img.src;
-    } else {
-      const noImg = parent.querySelector("div.non-image-avatar");
-      if (noImg && (window as any).domtoimg) {
-        return await (window as any).domtoimg.toPng(noImg);
+// This is geto and needs fixed
+function getAllProfileImgs(): void {
+  const conversations = Array.from(
+    document.querySelectorAll("mws-conversation-list-item")
+  );
+  conversations.forEach((conversation) => {
+    const name = conversation.querySelector("h3.name")?.textContent;
+    if (name != null) {
+      const imgTag = conversation.querySelector("img");
+      let imgData: string | (() => Promise<void>);
+      if (imgTag != null) {
+        imgData = imgTag.src;
+      } else {
+        const nonImgImg = conversation.querySelector("div.non-image-avatar");
+        if (nonImgImg == null) {
+          return;
+        }
+        imgData = async () => {
+          imgCache[name] = await domtoimg.toPng(nonImgImg);
+        };
       }
+      imgCache[name] = imgData;
     }
+  });
+}
+
+function getCacheKey(title: string): string {
+  if (title.includes(" •")) {
+    return title.split(" •")[0];
   }
-  return undefined;
+  return title;
 }
 
 const OriginalBrowserNotification = Notification;
@@ -141,9 +150,19 @@ const OriginalBrowserNotification = Notification;
 // It hurts but this is so antipattern I am telling the ts compiler to screw itself
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Notification = async function (title: string, options?: NotificationOptions) {
+Notification = function (title: string, options?: NotificationOptions) {
+  if (Object.keys(imgCache).length === 0) {
+    getAllProfileImgs();
+  }
   if (options) {
-    options.image = await getImg(title);
+    const cached = imgCache[getCacheKey(title)];
+    if (cached) {
+      if (typeof cached === "string") {
+        options.image = cached;
+      } else {
+        cached();
+      }
+    }
   }
   const notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
@@ -212,4 +231,3 @@ Notification.prototype = OriginalBrowserNotification.prototype;
 // @ts-ignore
 Notification.permission = OriginalBrowserNotification.permission;
 Notification.requestPermission = OriginalBrowserNotification.requestPermission;
-(window as any).domtoimg = domtoimg;

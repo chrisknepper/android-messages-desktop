@@ -241,15 +241,18 @@ if (!isFirstInstance) {
 
     ipcMain.on(
       EVENT_WEBVIEW_NOTIFICATION,
-      async (event, msg: { title: string; options?: NotificationOptions }) => {
-        if (msg.options) {
+      (
+        event,
+        { title, options }: { title: string; options?: NotificationOptions }
+      ) => {
+        if (options) {
           const notificationOpts: Electron.NotificationConstructorOptions = state.notificationContentHidden
             ? {
                 title: "Android Messages Desktop",
                 body: "New Message",
               }
             : {
-                title: msg.title,
+                title,
                 /*
                  * This is what we call absolute shenanigans. Above we call a function in the render process
                  * That function calls another function in the webView retrieving the name of the message at the top and the respective image
@@ -258,10 +261,10 @@ if (!isFirstInstance) {
                  * If something is undefined it falls back to a generic icon in the resources folder.
                  */
                 icon:
-                  msg.options.image != null
-                    ? nativeImage.createFromDataURL(msg.options.image)
+                  options.image != null
+                    ? nativeImage.createFromDataURL(options.image)
                     : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
-                body: msg.options.body || "",
+                body: options.body || "",
               };
           notificationOpts.silent = !state.notificationSoundEnabled;
           const customNotification = new Notification(notificationOpts);
