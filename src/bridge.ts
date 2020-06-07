@@ -101,7 +101,13 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
 
 const imgCache: { [key: string]: string | (() => Promise<void>) } = {};
 
-// This is geto and needs fixed
+/**
+ *
+ * This function initializes the imgCache
+ * It fills it with either the img data blob or a function to generate the blob
+ * TODO: Add check for already in cache allowing us to call this more than once if there is ever a cache miss
+ *
+ */
 function getAllProfileImgs(): void {
   const conversations = Array.from(
     document.querySelectorAll("mws-conversation-list-item")
@@ -119,6 +125,7 @@ function getAllProfileImgs(): void {
           return;
         }
         imgData = async () => {
+          delete imgCache[name];
           imgCache[name] = await domtoimg.toPng(nonImgImg);
         };
       }
@@ -127,6 +134,15 @@ function getAllProfileImgs(): void {
   });
 }
 
+/**
+ *
+ * Attempts to split the title of the notification in a way that yeilds a cache hit
+ * The character it splits at is hard coded and relient on google not changing it
+ * I do not know a way around this for now so it will stay
+ *
+ * @param {string} title notification title to convert to cache key
+ * @returns {string} cache key for indexing
+ */
 function getCacheKey(title: string): string {
   if (title.includes(" •")) {
     return title.split(" •")[0];
@@ -147,7 +163,6 @@ const OriginalBrowserNotification = Notification;
  * https://stackoverflow.com/questions/31231622/event-listener-for-web-notification
  * https://stackoverflow.com/questions/1421257/intercept-javascript-event
  */
-// It hurts but this is so antipattern I am telling the ts compiler to screw itself
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Notification = function (title: string, options?: NotificationOptions) {
@@ -160,6 +175,9 @@ Notification = function (title: string, options?: NotificationOptions) {
       if (typeof cached === "string") {
         options.image = cached;
       } else {
+        // Creating the image here reduces ui lag because we are not doing loads at once
+        // It is not gaurenteed to be done before the next message but this does not cause
+        // a bug because the first act of this function is to delete itself from the cache.
         cached();
       }
     }
@@ -180,6 +198,11 @@ Notification = function (title: string, options?: NotificationOptions) {
    * asyncronously receives the notification data, it asyncronously sends a message back at which
    * time we can reliably get a reference to the Electron notification and attach Google's click
    * event listener.
+   */
+
+  /**
+   * I do not understand exactly what is going on here and will leave it for the time being
+   * TODO: understand what is going on and make it better
    */
 
   type Type = "click" | "close" | "error" | "show";
@@ -208,6 +231,15 @@ Notification = function (title: string, options?: NotificationOptions) {
     }
   };
 
+  /**
+   *
+   * This is ugly and I am not positive it is necessary
+   * In the future I aim to make it so we do not need to pass the notification around as a global variable
+   * I have ideas to do so which include but are not limited to listening for an event dispatched from the main process
+   * when the notification is clicked and calling the listener instead of adding it directly
+   *
+   */
+
   ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, () => {
     const theHookedUpNotification = remote.getGlobal("currentNotification");
     if (
@@ -226,7 +258,6 @@ Notification = function (title: string, options?: NotificationOptions) {
   return notificationToSend;
 };
 Notification.prototype = OriginalBrowserNotification.prototype;
-// It hurts but this is so antipattern I am telling the ts compiler to screw itself
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Notification.permission = OriginalBrowserNotification.permission;
