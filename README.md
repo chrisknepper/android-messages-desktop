@@ -11,10 +11,6 @@ Inspired by:
 * [Google Play Music Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
 * [a Reddit post on r/Android](https://www.reddit.com/r/Android/comments/8shv6q/web_messages/e106a8r/)
 
-Based on:
-
-* [electron-boilerplate](https://github.com/szwacz/electron-boilerplate)
-
 # Download
 Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
 
