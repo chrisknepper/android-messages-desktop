@@ -1,5 +1,6 @@
 import {
   app,
+  Event as ElectronEvent,
   ipcMain,
   Menu,
   nativeImage,
@@ -10,15 +11,18 @@ import {
 } from "electron";
 import settings from "electron-settings";
 import { autoUpdater } from "electron-updater";
+import jetpack from "fs-jetpack";
 import path from "path";
 import {
   BASE_APP_PATH,
   EVENT_BRIDGE_INIT,
   EVENT_NOTIFICATION_REFLECT_READY,
+  EVENT_REFLECT_DISK_CACHE,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_SPELL_ADD_CUSTOM_WORD,
   EVENT_UPDATE_USER_SETTING,
   EVENT_WEBVIEW_NOTIFICATION,
+  IMG_CACHE_PATH,
   IS_DEV,
   IS_LINUX,
   IS_MAC,
@@ -26,8 +30,6 @@ import {
   RESOURCES_PATH,
   SETTING_CUSTOM_WORDS,
   SETTING_TRAY_ENABLED,
-  IMG_CACHE_PATH,
-  EVENT_REFLECT_DISK_CACHE,
 } from "./helpers/constants";
 import { getDictionary } from "./helpers/dictionaryManager";
 import { SettingsManager } from "./helpers/settingsManager";
@@ -36,7 +38,6 @@ import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
 import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
-import jetpack from "fs-jetpack";
 
 const state = {
   unreadNotificationCount: 0,
@@ -324,7 +325,7 @@ if (!isFirstInstance) {
       }
     };
 
-    mainWindow.on("close", (event: Electron.Event) => {
+    mainWindow.on("close", (event: ElectronEvent) => {
       if (!shouldExitOnMainWindowClosed()) {
         event.preventDefault();
         mainWindow.hide();
