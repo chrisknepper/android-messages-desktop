@@ -1,21 +1,25 @@
-import { ipcRenderer, remote } from "electron";
+import {
+  ipcRenderer,
+  Notification as ElectronNotification,
+  remote,
+} from "electron";
 import {
   attachSpellCheckProvider,
   SpellCheckerProvider,
 } from "electron-hunspell";
 import fs from "fs";
+import { CacheManager } from "./helpers/cacheManager";
 import {
   EVENT_BRIDGE_INIT,
   EVENT_NOTIFICATION_REFLECT_READY,
+  EVENT_REFLECT_DISK_CACHE,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
   EVENT_WEBVIEW_NOTIFICATION,
-  EVENT_REFLECT_DISK_CACHE,
 } from "./helpers/constants";
 import { Dictionary } from "./helpers/dictionaryManager";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
-import { CacheManager } from "./helpers/cacheManager";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -168,7 +172,7 @@ Notification = function (title: string, options?: NotificationOptions) {
   type Type = "click" | "close" | "error" | "show";
   type Listener = (ev: NotificationEventMap[Type]) => unknown;
   type Options = undefined | boolean | AddEventListenerOptions;
-  let originalClickListener: Listener | null = null;
+  let originalClickListener: Listener | undefined;
 
   const originalAddEventListener = notificationToSend.addEventListener;
   // Seems silly to have these be correct as there is no way to mess it up
@@ -201,11 +205,10 @@ Notification = function (title: string, options?: NotificationOptions) {
    */
 
   ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, () => {
-    const theHookedUpNotification = remote.getGlobal("currentNotification");
-    if (
-      typeof theHookedUpNotification === "object" &&
-      typeof originalClickListener === "function"
-    ) {
+    const theHookedUpNotification: ElectronNotification = remote.getGlobal(
+      "currentNotification"
+    );
+    if (originalClickListener != null) {
       theHookedUpNotification.once("click", originalClickListener);
     }
   });
