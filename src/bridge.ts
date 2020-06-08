@@ -1,6 +1,3 @@
-// This script is injected into the webview.
-
-import domtoimg from "dom-to-image";
 import { ipcRenderer, remote } from "electron";
 import {
   attachSpellCheckProvider,
@@ -13,13 +10,17 @@ import {
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
   EVENT_WEBVIEW_NOTIFICATION,
+  EVENT_REFLECT_DISK_CACHE,
 } from "./helpers/constants";
 import { Dictionary } from "./helpers/dictionaryManager";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
+import { CacheManager } from "./helpers/cacheManager";
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
+
+let cacheManager: CacheManager | undefined;
 
 window.addEventListener("load", () => {
   // Conditionally let the main process know the page is (essentially) done loading.
@@ -29,7 +30,7 @@ window.addEventListener("load", () => {
   // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
   // when we need to init the spellchecker
   const onMutation = (
-    mutationsList: MutationRecord[],
+    _mutationsList: MutationRecord[],
     observer: MutationObserver
   ) => {
     if (document.querySelector("mw-main-nav")) {
@@ -37,12 +38,11 @@ window.addEventListener("load", () => {
       ipcRenderer.send(EVENT_BRIDGE_INIT);
       observer.disconnect();
     }
-    //   // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
+    // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
   };
 
   const observer = new MutationObserver(onMutation);
-  // There is always a body so TS is being dumb
-  observer.observe((document.querySelector("body") as unknown) as HTMLElement, {
+  observer.observe(document.body, {
     childList: true,
     attributes: true,
   });
@@ -84,7 +84,7 @@ ipcRenderer.once(
   }
 );
 
-ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
+ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
   if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
     if (settingsList.useDarkMode) {
       // Props to Google for making the web app use dark mode entirely based on this class
@@ -99,56 +99,22 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
   }
 });
 
-const imgCache: { [key: string]: string | (() => Promise<void>) } = {};
-
 /**
  *
- * This function initializes the imgCache
- * It fills it with either the img data blob or a function to generate the blob
- * TODO: Add check for already in cache allowing us to call this more than once if there is ever a cache miss
+ * Recieves the paths for all the disk cahed images along with the base path for adding new files to the cache
+ * This is because this part of electron cannot use path.resolve and the constant relies on that in a function form due to
+ * reasons documented elsewhere
  *
  */
-function getAllProfileImgs(): void {
-  const conversations = Array.from(
-    document.querySelectorAll("mws-conversation-list-item")
-  );
-  conversations.forEach((conversation) => {
-    const name = conversation.querySelector("h3.name")?.textContent;
-    if (name != null) {
-      const imgTag = conversation.querySelector("img");
-      let imgData: string | (() => Promise<void>);
-      if (imgTag != null) {
-        imgData = imgTag.src;
-      } else {
-        const nonImgImg = conversation.querySelector("div.non-image-avatar");
-        if (nonImgImg == null) {
-          return;
-        }
-        imgData = async () => {
-          delete imgCache[name];
-          imgCache[name] = await domtoimg.toPng(nonImgImg);
-        };
-      }
-      imgCache[name] = imgData;
-    }
-  });
-}
-
-/**
- *
- * Attempts to split the title of the notification in a way that yeilds a cache hit
- * The character it splits at is hard coded and relient on google not changing it
- * I do not know a way around this for now so it will stay
- *
- * @param {string} title notification title to convert to cache key
- * @returns {string} cache key for indexing
- */
-function getCacheKey(title: string): string {
-  if (title.includes(" •")) {
-    return title.split(" •")[0];
+ipcRenderer.once(
+  EVENT_REFLECT_DISK_CACHE,
+  (
+    _event,
+    { cache, basePath }: { basePath: string; cache: Record<string, string> }
+  ): void => {
+    cacheManager = new CacheManager(basePath, new Map(Object.entries(cache)));
   }
-  return title;
-}
+);
 
 const OriginalBrowserNotification = Notification;
 
@@ -166,19 +132,13 @@ const OriginalBrowserNotification = Notification;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Notification = function (title: string, options?: NotificationOptions) {
-  if (Object.keys(imgCache).length === 0) {
-    getAllProfileImgs();
-  }
-  if (options) {
-    const cached = imgCache[getCacheKey(title)];
-    if (cached) {
-      if (typeof cached === "string") {
-        options.image = cached;
+  if (options != null && cacheManager != null) {
+    const potentialImg = cacheManager.getProfileImg(title);
+    if (potentialImg != null) {
+      if (typeof potentialImg === "string") {
+        options.image = potentialImg;
       } else {
-        // Creating the image here reduces ui lag because we are not doing loads at once
-        // It is not gaurenteed to be done before the next message but this does not cause
-        // a bug because the first act of this function is to delete itself from the cache.
-        cached();
+        potentialImg();
       }
     }
   }

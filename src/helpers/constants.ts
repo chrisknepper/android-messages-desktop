@@ -26,9 +26,11 @@ export const IS_LINUX = OS_NAME === "linux";
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
-export const USER_DATA_PATH = (): string => app.getPath("userData"); // This has to be a function call because app.ready callback must be fired before this path can be used
+export const USER_DATA_PATH = (): string => app.getPath("appData"); // This has to be a function call because app.ready callback must be fired before this path can be used
 export const SPELLING_DICTIONARIES_PATH = (): string =>
   path.resolve(USER_DATA_PATH(), "dictionaries");
+export const IMG_CACHE_PATH = (): string =>
+  path.resolve(USER_DATA_PATH(), "userimgs");
 
 // Settings
 export const SETTING_TRAY_ENABLED = "trayEnabledPref";
@@ -48,3 +50,4 @@ export const EVENT_BRIDGE_INIT = "messages-bridge-init";
 export const EVENT_SPELL_ADD_CUSTOM_WORD = "messages-spelling-add-custom-word";
 export const EVENT_SPELLING_REFLECT_READY = "messages-spelling-reflect-ready";
 export const EVENT_UPDATE_USER_SETTING = "messages-update-user-setting";
+export const EVENT_REFLECT_DISK_CACHE = "reflext-disk-cache";

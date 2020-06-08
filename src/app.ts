@@ -1,5 +1,5 @@
 import { ipcRenderer, remote, WebviewTag } from "electron";
-import { EVENT_UPDATE_USER_SETTING, IS_MAC } from "./helpers/constants";
+import { EVENT_UPDATE_USER_SETTING, IS_MAC, IS_DEV } from "./helpers/constants";
 import "./stylesheets/main.css";
 
 const app = remote.app;
@@ -7,6 +7,12 @@ const app = remote.app;
 const androidMessagesWebview = document.getElementById(
   "androidMessagesWebview"
 ) as WebviewTag;
+
+androidMessagesWebview.addEventListener("dom-ready", () => {
+  if (IS_DEV) {
+    androidMessagesWebview.openDevTools();
+  }
+});
 
 androidMessagesWebview.addEventListener("dom-ready", () => {
   app.mainWindow?.on("focus", () => {

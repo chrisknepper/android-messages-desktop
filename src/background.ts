@@ -26,6 +26,8 @@ import {
   RESOURCES_PATH,
   SETTING_CUSTOM_WORDS,
   SETTING_TRAY_ENABLED,
+  IMG_CACHE_PATH,
+  EVENT_REFLECT_DISK_CACHE,
 } from "./helpers/constants";
 import { getDictionary } from "./helpers/dictionaryManager";
 import { SettingsManager } from "./helpers/settingsManager";
@@ -34,6 +36,7 @@ import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
 import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
+import jetpack from "fs-jetpack";
 
 const state = {
   unreadNotificationCount: 0,
@@ -255,28 +258,33 @@ if (!isFirstInstance) {
           ? nativeTheme.shouldUseDarkColors
           : null,
       });
+      const basePath = IMG_CACHE_PATH();
+      const imgDir = jetpack.dir(IMG_CACHE_PATH());
+      const contents = await imgDir.listAsync(".");
+      if (contents) {
+        const cache: Record<string, string> = {};
+        for (const file of contents) {
+          const key = file.substr(0, file.length - 4);
+          cache[key] = path.resolve(IMG_CACHE_PATH(), file);
+        }
+        event.sender.send(EVENT_REFLECT_DISK_CACHE, { cache, basePath });
+      }
+
       const locale = app.getLocale();
 
-      try {
-        // Spellchecking is supported for the current language
-        const spellCheckFiles = await getDictionary(locale);
-        const customWords = settings.get(
-          SETTING_CUSTOM_WORDS,
-          {}
-        ) as CustomWords;
+      // Spellchecking is supported for the current language
+      const spellCheckFiles = await getDictionary(locale);
+      const customWords = settings.get(SETTING_CUSTOM_WORDS, {}) as CustomWords;
 
-        // We send an event with the language key and array of custom words to the webview bridge which contains the
-        // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
-        // between electron processes is hacky at best and impossible at worst.
+      // We send an event with the language key and array of custom words to the webview bridge which contains the
+      // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
+      // between electron processes is hacky at best and impossible at worst.
 
-        event.sender.send(EVENT_SPELLING_REFLECT_READY, {
-          locale,
-          spellCheckFiles,
-          customWords,
-        });
-      } catch (error) {
-        // TODO: Display this as an error message to the user?
-      }
+      event.sender.send(EVENT_SPELLING_REFLECT_READY, {
+        locale,
+        spellCheckFiles,
+        customWords,
+      });
     });
 
     ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (_event, msg) => {
