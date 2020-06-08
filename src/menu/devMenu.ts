@@ -1,7 +1,7 @@
 import { app } from "electron";
 
 export const devMenuTemplate = {
-  label: "Development",
+  label: "&Development",
   submenu: [
     {
       label: "Reload",

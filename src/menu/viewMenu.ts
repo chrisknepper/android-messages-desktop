@@ -1,7 +1,7 @@
 import { MenuItemConstructorOptions } from "electron";
 
 export const viewMenuTemplate: MenuItemConstructorOptions = {
-  label: "View",
+  label: "&View",
   submenu: [
     {
       role: "togglefullscreen",

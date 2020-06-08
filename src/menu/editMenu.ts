@@ -1,7 +1,7 @@
 import { MenuItemConstructorOptions } from "electron";
 
 export const editMenuTemplate: MenuItemConstructorOptions = {
-  label: "Edit",
+  label: "&Edit",
   submenu: [
     { label: "Undo", accelerator: "CmdOrCtrl+Z", role: "undo" },
     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", role: "redo" },

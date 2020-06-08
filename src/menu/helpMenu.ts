@@ -32,6 +32,6 @@ if (!IS_MAC) {
 }
 
 export const helpMenuTemplate: MenuItemConstructorOptions = {
-  label: "Help",
+  label: "&Help",
   submenu,
 };

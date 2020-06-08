@@ -16,6 +16,6 @@ if (!IS_WINDOWS) {
 }
 
 export const fileMenuTemplate: MenuItemConstructorOptions = {
-  label: "File",
+  label: "&File",
   submenu,
 };

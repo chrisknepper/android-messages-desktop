@@ -11,6 +11,7 @@ import { separator } from "./items/separator";
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "Preferences" : "Settings",
+  accelerator: "Alt+S",
   submenu: [
     {
       // This option doesn't apply to Mac, so this hides it but keeps the order of menu items
