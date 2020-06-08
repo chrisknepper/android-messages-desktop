@@ -24,6 +24,10 @@ module.exports = {
       },
     ],
   },
+  mac: {
+    category: "public.app-category.social-networking",
+    target: ["zip", "dmg"],
+  },
   portable: {
     artifactName: "${productName}-portable-${version}.${ext}",
   },
