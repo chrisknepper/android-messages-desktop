@@ -12,7 +12,7 @@ Inspired by:
 * [a Reddit post on r/Android](https://www.reddit.com/r/Android/comments/8shv6q/web_messages/e106a8r/)
 
 # Download
-Head over to the [latest releases](https://github.com/chrisknepper/android-messages-desktop/releases/latest) page!
+Head over to the [latest releases](https://github.com/OrangeDrangon/android-messages-desktop/releases/latest) page!
 
 **Important note:** The Windows app binary isn't signed. This doesn't seem to be a big problem, but please report any issues you run into on Windows that may be related to signing.
 
