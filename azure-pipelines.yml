@@ -42,6 +42,9 @@ steps:
 #     path: $(ELECTRON_BUILDER_CACHE_FOLDER)
 #   displayName: Cache Electron Builder
 
+- script: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
+  condtion: startsWith($(imageName), 'ubuntu')
+
 - script: yarn install --frozen-lockfile
   displayName: 'yarn install'
 
