@@ -22,6 +22,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ matrix.os }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install Ubuntu Dependencies
         if: (startsWith(matrix.os, 'ubuntu'))
         run: |
