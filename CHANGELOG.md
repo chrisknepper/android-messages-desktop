@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.0.0] - 2020-08-30
+### Added
+- Added the image of the message sender to the notification
+
+### Changed
+- Possibly fixed many of the issues people were having with shortcuts
+- Under the hood: switched to typescript
+- Under the hood: refactored a lot of things
+- Under the hood: updated all of the dependencies multiple major versions
+
 ## [3.1.0] - 2019-11-26
 ### Added
 - Setting to follow (sync) system dark mode setting, changing from dark to light and vice versa as the operating system does -- This overrides the Google-provided setting within the 3-dot menu
