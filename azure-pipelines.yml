@@ -28,6 +28,7 @@ steps:
 
 - script: yarn dist --publish never
   displayName: 'yarn dist'
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: 'dist'
