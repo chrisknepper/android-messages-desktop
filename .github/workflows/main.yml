@@ -22,10 +22,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn install --frozen-lockfile
     - run: yarn dist -lw
-      if: (startsWith(matrix.os, "ubuntu"))
+      if: (startsWith(matrix.os, 'ubuntu'))
       env:
         GH_TOKEN: ${{ secrets.GITHB_TOKEN }}
     - run: yarn dist -m
-      if: (!startsWith(matrix.os, "ubuntu"))
+      if: (!startsWith(matrix.os, 'ubuntu'))
       env:
         GH_TOKEN: ${{ secrets.GITHB_TOKEN }}
