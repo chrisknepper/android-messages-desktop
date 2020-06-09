@@ -1,6 +1,6 @@
 module.exports = {
   appId: "pw.electron.android-messages",
-  artificatName: "${productName}-${version}.${ext}",
+  artifactName: "${productName}-${version}.${ext}",
   productName: "AndroidMessages",
   copyright: "Copyright 2020 Kyle Rosenberg",
   files: ["app/**/*", "resources/**/*"],
@@ -14,7 +14,7 @@ module.exports = {
     category: "Internet",
   },
   win: {
-    artificatName: "${productName}-${version}-${arch}.${ext}",
+    artifactName: "${productName}-${version}-${arch}.${ext}",
     target: [
       {
         target: "nsis",
