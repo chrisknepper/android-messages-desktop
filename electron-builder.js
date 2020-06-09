@@ -31,4 +31,7 @@ module.exports = {
   portable: {
     artifactName: "${productName}-portable-${version}.${ext}",
   },
+  snap: {
+    publish: ["github"],
+  },
 };
