@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: sudo apt install wine64
+      - run: sudo apt install wine64 wine32
         if: (startsWith(matrix.os, 'ubuntu'))
 
       - run: yarn install --frozen-lockfile
