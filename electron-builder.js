@@ -8,7 +8,7 @@ module.exports = {
     output: "dist",
   },
   linux: {
-    target: ["AppImage", "snap", "pacman", "deb", "rpm", "freebsd", "zip"],
+    target: ["AppImage", "snap", "pacman", "deb", "zip"],
     executableName: "AndroidMessages",
     category: "Internet",
   },
