@@ -22,8 +22,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: sudo apt install wine64 wine32
+      - name: Install Ubuntu Dependencies
         if: (startsWith(matrix.os, 'ubuntu'))
+        run: |
+          sudo apt-get install wine64
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install wine32
 
       - run: yarn install --frozen-lockfile
 
