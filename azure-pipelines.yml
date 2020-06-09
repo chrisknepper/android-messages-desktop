@@ -14,7 +14,7 @@ variables:
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
   ELECTRON_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron
   ELECTRON_BUILDER_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron-builder
-  GH_TOKEN: $(GH_TOKEN)
+  GH_TOKEN: $(github_token)
 
 pool:
   vmImage: $(imageName)
