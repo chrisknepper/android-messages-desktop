@@ -35,9 +35,9 @@ jobs:
       - run: yarn dist -lw
         if: (startsWith(matrix.os, 'ubuntu'))
         env:
-          GH_TOKEN: ${{ secrets.GITHB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: yarn dist -m
         if: (!startsWith(matrix.os, 'ubuntu'))
         env:
-          GH_TOKEN: ${{ secrets.GITHB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
