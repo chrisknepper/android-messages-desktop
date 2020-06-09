@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-        os: ["macos-latest", "ubuntu-latest"]
+        os: ["macos-latest", "ubuntu-latest", "windows-latest"]
 
     steps:
       - uses: actions/checkout@v2
@@ -30,22 +30,8 @@ jobs:
           path: ./node_modules
           key: ${{ matrix.os }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install Ubuntu Dependencies
-        if: (startsWith(matrix.os, 'ubuntu'))
-        run: |
-          sudo apt-get install wine64
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install wine32
-
-      - run: yarn install --frozen-lockfile
-
-      - run: yarn dist -lw
-        if: (startsWith(matrix.os, 'ubuntu'))
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: yarn dist -m
-        if: (!startsWith(matrix.os, 'ubuntu'))
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Electron Builder
+        uses: samuelmeuli/action-electron-builder@v1.5.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
