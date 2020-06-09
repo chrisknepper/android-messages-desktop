@@ -26,7 +26,7 @@ steps:
 - script: yarn install --frozen-lockfile
   displayName: 'yarn install'
 
-- script: yarn dist
+- script: yarn dist --publish never
   displayName: 'yarn dist'
 - task: PublishBuildArtifacts@1
   inputs:
