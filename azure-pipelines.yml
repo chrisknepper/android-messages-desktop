@@ -10,11 +10,6 @@ strategy:
     windows:
       imageName: 'windows-latest'
 
-# variables:
-  # YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-  # ELECTRON_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron
-  # ELECTRON_BUILDER_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron-builder
-
 pool:
   vmImage: $(imageName)
 
@@ -23,24 +18,6 @@ steps:
   inputs:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
-
-# - task: Cache@2
-#   inputs:
-#     key: 'yarn | "$(Agent.OS)" | yarn.lock'
-#     path: $(YARN_CACHE_FOLDER)
-#   displayName: Cache Yarn Packages
-
-# - task: Cache@2
-#   inputs:
-#     key: 'electron | "$(Agent.OS)" | yarn.lock'
-#     path: $(ELECTRON_CACHE_FOLDER)
-#   displayName: Cache Electron
-
-# - task: Cache@2
-#   inputs:
-#     key: 'electron-builder | "$(Agent.OS)" | yarn.lock'
-#     path: $(ELECTRON_BUILDER_CACHE_FOLDER)
-#   displayName: Cache Electron Builder
 
 - script: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
   displayName: 'Installing Linux Dependencies'
@@ -51,5 +28,8 @@ steps:
 
 - script: yarn dist
   displayName: 'yarn dist'
-  env:
-    GH_TOKEN: $(github_token)
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'dist'
+    ArtifactName: '$(imageName)'
+    publishLocation: 'Container'
