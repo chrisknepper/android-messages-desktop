@@ -29,9 +29,8 @@ jobs:
         with:
           path: ./node_modules
           key: ${{ matrix.os }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Electron Builder
-        uses: samuelmeuli/action-electron-builder@v1.5.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          
+      - run: yarn install --frozen-lockfile
+      - run: yarn dist
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
