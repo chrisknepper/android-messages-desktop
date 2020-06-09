@@ -43,6 +43,7 @@ steps:
 #   displayName: Cache Electron Builder
 
 - script: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
+  displayName: 'Installing Linux Dependencies'
   condition: startsWith(variables['imageName'], 'ubuntu')
 
 - script: yarn install --frozen-lockfile
