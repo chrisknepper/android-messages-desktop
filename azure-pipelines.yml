@@ -10,11 +10,10 @@ strategy:
     windows:
       imageName: 'windows-latest'
 
-variables:
-  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-  ELECTRON_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron
-  ELECTRON_BUILDER_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron-builder
-  GH_TOKEN: $(github_token)
+# variables:
+  # YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+  # ELECTRON_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron
+  # ELECTRON_BUILDER_CACHE_FOLDER: $(Pipeline.Workspace)/.cache/electron-builder
 
 pool:
   vmImage: $(imageName)
@@ -25,25 +24,28 @@ steps:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
 
-- task: Cache@2
-  inputs:
-    key: 'yarn | "$(Agent.OS)" | yarn.lock'
-    path: $(YARN_CACHE_FOLDER)
-  displayName: Cache Yarn Packages
+# - task: Cache@2
+#   inputs:
+#     key: 'yarn | "$(Agent.OS)" | yarn.lock'
+#     path: $(YARN_CACHE_FOLDER)
+#   displayName: Cache Yarn Packages
 
-- task: Cache@2
-  inputs:
-    key: 'electron | "$(Agent.OS)" | yarn.lock'
-    path: $(ELECTRON_CACHE_FOLDER)
-  displayName: Cache Electron
+# - task: Cache@2
+#   inputs:
+#     key: 'electron | "$(Agent.OS)" | yarn.lock'
+#     path: $(ELECTRON_CACHE_FOLDER)
+#   displayName: Cache Electron
 
-- task: Cache@2
-  inputs:
-    key: 'electron-builder | "$(Agent.OS)" | yarn.lock'
-    path: $(ELECTRON_BUILDER_CACHE_FOLDER)
-  displayName: Cache Electron Builder
+# - task: Cache@2
+#   inputs:
+#     key: 'electron-builder | "$(Agent.OS)" | yarn.lock'
+#     path: $(ELECTRON_BUILDER_CACHE_FOLDER)
+#   displayName: Cache Electron Builder
 
-- script: |
-    yarn install --frozen-lockfile
-    yarn dist
-  displayName: 'yarn install and build'
+- script: yarn install --frozen-lockfile
+  displayName: 'yarn install'
+
+- script: yarn dist
+  displayName: 'yarn dist'
+  env:
+    GH_TOKEN: $(github_token)
