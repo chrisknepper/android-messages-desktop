@@ -6,9 +6,9 @@ Run Android Messages as a desktop app, a la iMessage. For those of us that prefe
 
 | Platform  | Status                                          |
 |-----------|-------------------------------------------------|
-| Windows   | ![Windows Build Status](https://bit.ly/3cJ0mo4) |
-| Mac       | ![Mac Build Status](https://bit.ly/3f69vIX)     |
-| Linux     | ![Linux Build Status](https://bit.ly/2XQpwwZ)   |
+| Windows   | ![Windows Build Status](https://dev.azure.com/Drangon/android-messages-desktop/_apis/build/status/OrangeDrangon.android-messages-desktop?branchName=master&jobName=Job&configuration=Job%20windows) |
+| Mac       | ![Mac Build Status](https://dev.azure.com/Drangon/android-messages-desktop/_apis/build/status/OrangeDrangon.android-messages-desktop?branchName=master&jobName=Job&configuration=Job%20mac)     |
+| Linux     | ![Linux Build Status](https://dev.azure.com/Drangon/android-messages-desktop/_apis/build/status/OrangeDrangon.android-messages-desktop?branchName=master&jobName=Job&configuration=Job%20linux)   |
 
 Inspired by:
 
