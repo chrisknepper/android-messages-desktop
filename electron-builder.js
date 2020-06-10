@@ -1,6 +1,6 @@
 module.exports = {
   appId: "pw.electron.android-messages",
-  artifactName: "${productName}-${version}-${arch}.${ext}",
+  artifactName: "${productName}-${version}.${ext}",
   productName: "AndroidMessages",
   copyright: "Copyright 2020 Kyle Rosenberg",
   files: ["app/**/*", "resources/**/*"],
@@ -14,23 +14,14 @@ module.exports = {
     category: "Internet",
   },
   win: {
-    target: [
-      {
-        target: "nsis",
-        arch: ["x64", "ia32"],
-      },
-      {
-        target: "portable",
-        arch: ["x64", "ia32"],
-      },
-    ],
+    target: ["nsis", "portable"],
   },
   mac: {
     category: "public.app-category.social-networking",
     target: ["zip", "dmg"],
   },
   portable: {
-    artifactName: "${productName}-portable-${version}-${arch}.${ext}",
+    artifactName: "${productName}-portable-${version}.${ext}",
   },
   snap: {
     publish: ["github"],
