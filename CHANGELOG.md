@@ -1,6 +1,19 @@
 # Changelog
 
-## [4.0.0] - 2020-08-30
+## [4.1.0] - 2020-06-12
+
+This should probably be a path instead of a minor version. There are no breaking changes just a small bug fix.
+
+### Added
+- Behind the Scenes: Added CI
+
+### Changed
+- Under the hood: Bumped electron to 9.0.3
+
+### Fixed
+- Bug preventing Windows Launch
+
+## [4.0.0] - 2020-06-07
 ### Added
 - Added the image of the message sender to the notification
 
