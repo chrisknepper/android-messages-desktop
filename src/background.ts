@@ -148,13 +148,6 @@ if (!isFirstInstance) {
       trayMenuItem.checked = settingsManager.startInTray;
       enableTrayIconMenuItem.checked = trayManager.enabled;
 
-      if (IS_WINDOWS) {
-        const trayClickShortcutMenuItem = menuInstance.getMenuItemById(
-          "trayClickShortcutMenuItem"
-        );
-        trayClickShortcutMenuItem.enabled = trayManager.enabled;
-      }
-
       notificationSoundEnabledMenuItem.checked =
         settingsManager.notificationSound;
       pressEnterToSendMenuItem.checked = settingsManager.enterToSend;

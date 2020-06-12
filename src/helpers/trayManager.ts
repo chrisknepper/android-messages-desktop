@@ -99,17 +99,11 @@ export class TrayManager {
     const liveStartInTrayMenuItemRef = Menu.getApplicationMenu()?.getMenuItemById(
       "startInTrayMenuItem"
     );
-    const livetrayClickShortcutMenuItemRef = Menu.getApplicationMenu()?.getMenuItemById(
-      "trayClickShortcutMenuItem"
-    );
 
     if (newValue) {
       if (!IS_MAC && liveStartInTrayMenuItemRef != null) {
         // Must get a live reference to the menu item when updating their properties from outside of them.
         liveStartInTrayMenuItemRef.enabled = true;
-      }
-      if (IS_WINDOWS && livetrayClickShortcutMenuItemRef != null) {
-        livetrayClickShortcutMenuItemRef.enabled = true;
       }
       if (!this.tray) {
         this.startIfEnabled();
@@ -130,9 +124,6 @@ export class TrayManager {
         settings.set("startInTrayPref", false);
         liveStartInTrayMenuItemRef.enabled = false;
         liveStartInTrayMenuItemRef.checked = false;
-      }
-      if (IS_WINDOWS && livetrayClickShortcutMenuItemRef != null) {
-        livetrayClickShortcutMenuItemRef.enabled = false;
       }
       if (IS_LINUX) {
         // On Linux, the call to tray.destroy doesn't seem to work, causing multiple instances of the tray icon.
