@@ -9,14 +9,14 @@ const submenu: MenuItemConstructorOptions[] = [
     label: "Learn More",
     click: async (): Promise<void> =>
       await shell.openExternal(
-        "https://github.com/chrisknepper/android-messages-desktop/"
+        "https://github.com/orangedrangon/android-messages-desktop/"
       ),
   },
   {
     label: "Changelog",
     click: async (): Promise<void> =>
       await shell.openExternal(
-        "https://github.com/chrisknepper/android-messages-desktop/blob/master/CHANGELOG.md"
+        "https://github.com/orangedrangon/android-messages-desktop/blob/master/CHANGELOG.md"
       ),
   },
 ];
