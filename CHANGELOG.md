@@ -2,7 +2,7 @@
 
 ## [4.1.0] - 2020-06-12
 
-This should probably be a path instead of a minor version. There are no breaking changes just a small bug fix.
+This should probably be a patch instead of a minor version. There are no breaking changes just a small bug fix.
 
 ### Added
 - Behind the Scenes: Added CI
