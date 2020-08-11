@@ -20,11 +20,11 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "autoHideMenuBarMenuItem",
       label: "Auto Hide Menu Bar",
       type: "checkbox",
-      click: (item: MenuItem, window: BrowserWindow): void => {
+      click: (item: MenuItem, window?: BrowserWindow): void => {
         const autoHideMenuPref = !settings.get("autoHideMenuPref");
         settings.set("autoHideMenuPref", autoHideMenuPref);
         item.checked = autoHideMenuPref;
-        window.setAutoHideMenuBar(autoHideMenuPref);
+        window?.setAutoHideMenuBar(autoHideMenuPref);
       },
     },
     {
