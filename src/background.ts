@@ -221,6 +221,12 @@ if (!isFirstInstance) {
             }
           }
 
+	  if (IS_LINUX) {
+            if (!mainWindow.isFocused()) {
+              mainWindow.flashFrame(true);
+            }
+          }
+
           trayManager?.toggleOverlay(true);
 
           customNotification.once("click", () => {
