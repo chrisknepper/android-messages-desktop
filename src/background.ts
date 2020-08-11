@@ -3,10 +3,7 @@ import {
   Event as ElectronEvent,
   ipcMain,
   Menu,
-  nativeImage,
   nativeTheme,
-  Notification,
-  NotificationConstructorOptions,
   shell,
 } from "electron";
 import settings from "electron-settings";
@@ -16,12 +13,10 @@ import path from "path";
 import {
   BASE_APP_PATH,
   EVENT_BRIDGE_INIT,
-  EVENT_NOTIFICATION_REFLECT_READY,
   EVENT_REFLECT_DISK_CACHE,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_SPELL_ADD_CUSTOM_WORD,
   EVENT_UPDATE_USER_SETTING,
-  EVENT_WEBVIEW_NOTIFICATION,
   IMG_CACHE_PATH,
   IS_DEV,
   IS_LINUX,
@@ -40,7 +35,6 @@ import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
 
 const state = {
-  unreadNotificationCount: 0,
   bridgeInitDone: false,
 };
 
@@ -181,67 +175,10 @@ if (!isFirstInstance) {
     trayManager.startIfEnabled();
 
     mainWindow.on("focus", () => {
-      if (IS_MAC) {
-        state.unreadNotificationCount = 0;
-        app.dock.setBadge("");
-      }
-
       if (IS_WINDOWS && trayManager?.overlayVisible) {
         trayManager.toggleOverlay(false);
       }
     });
-
-    ipcMain.on(
-      EVENT_WEBVIEW_NOTIFICATION,
-      (
-        event,
-        { title, options }: { title: string; options?: NotificationOptions }
-      ) => {
-        if (options) {
-          const notificationOpts: NotificationConstructorOptions = settingsManager.hideNotificationContent
-            ? {
-                title: "Android Messages Desktop",
-                body: "New Message",
-              }
-            : {
-                title,
-                body: options.body || "",
-                icon:
-                  options.image != null
-                    ? nativeImage.createFromDataURL(options.image)
-                    : path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
-              };
-          notificationOpts.silent = !settingsManager.notificationSound;
-          const customNotification = new Notification(notificationOpts);
-
-          if (IS_MAC) {
-            if (!mainWindow.isFocused()) {
-              state.unreadNotificationCount += 1;
-              app.dock.setBadge(state.unreadNotificationCount.toString());
-            }
-          }
-
-          if (IS_LINUX) {
-            if (!mainWindow.isFocused()) {
-              mainWindow.flashFrame(true);
-            }
-          }
-
-          trayManager?.toggleOverlay(true);
-
-          customNotification.once("click", () => {
-            mainWindow.show();
-          });
-
-          // Allows us to marry our custom notification and its behavior with the helpful behavior
-          // (conversation highlighting) that Google provides. See the webview bridge for details.
-          global.currentNotification = customNotification;
-          event.sender.send(EVENT_NOTIFICATION_REFLECT_READY, true);
-
-          customNotification.show();
-        }
-      }
-    );
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
       if (state.bridgeInitDone) {

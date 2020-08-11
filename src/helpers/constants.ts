@@ -43,9 +43,6 @@ export const SETTING_START_IN_TRAY = "startInTrayPref";
 export const SETTING_AUTOHIDE_MENU = "autoHideMenuPref";
 
 // Events
-export const EVENT_WEBVIEW_NOTIFICATION = "messages-webview-notification";
-export const EVENT_NOTIFICATION_REFLECT_READY =
-  "messages-webview-reflect-ready";
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";
 export const EVENT_SPELL_ADD_CUSTOM_WORD = "messages-spelling-add-custom-word";
 export const EVENT_SPELLING_REFLECT_READY = "messages-spelling-reflect-ready";
