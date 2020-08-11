@@ -1,25 +1,31 @@
 import {
   ipcRenderer,
-  Notification as ElectronNotification,
   remote,
+  NativeImage,
+  NotificationConstructorOptions,
 } from "electron";
 import {
   attachSpellCheckProvider,
   SpellCheckerProvider,
 } from "electron-hunspell";
 import fs from "fs";
+import path from "path";
 import { CacheManager } from "./helpers/cacheManager";
 import {
   EVENT_BRIDGE_INIT,
-  EVENT_NOTIFICATION_REFLECT_READY,
   EVENT_REFLECT_DISK_CACHE,
   EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
-  EVENT_WEBVIEW_NOTIFICATION,
+  SETTING_HIDE_NOTIFICATION,
+  RESOURCES_PATH,
+  SETTING_NOTIFICATION_SOUND,
 } from "./helpers/constants";
 import { Dictionary } from "./helpers/dictionaryManager";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
+import settings from "electron-settings";
+
+const { Notification: ElectronNotification, app, nativeImage } = remote;
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -120,8 +126,6 @@ ipcRenderer.once(
   }
 );
 
-const OriginalBrowserNotification = Notification;
-
 /**
  * Override the webview's window's instance of the Notification class and forward their data to the
  * main process. This is Necessary to generate and send a custom notification via Electron instead
@@ -135,93 +139,55 @@ const OriginalBrowserNotification = Notification;
  */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Notification = function (title: string, options?: NotificationOptions) {
-  if (options != null && cacheManager != null) {
+window.Notification = function (title: string, options: NotificationOptions) {
+  let icon: NativeImage | undefined;
+  if (cacheManager != null) {
     const potentialImg = cacheManager.getProfileImg(title);
     if (potentialImg != null) {
       if (typeof potentialImg === "string") {
-        options.image = potentialImg;
+        icon = nativeImage.createFromDataURL(potentialImg);
       } else {
         potentialImg();
       }
     }
   }
-  const notificationToSend = new OriginalBrowserNotification(title, options); // Still send the webview notification event so the rest of this code runs (and the ipc event fires)
 
-  /**
-   * Google's own notifications have a click event listener which takes care of highlighting
-   * the conversation a notification belongs to, but this click listener does not carry over
-   * when we block Google's and create our own Electron notification.
-   *
-   * What I would like to do here is just pass the listener function over IPC and call it in
-   * the main process.
-   *
-   * However, Electron does not support sending functions or otherwise non-JSON data across IPC.
-   * To solve this and be able to have both our click event listener (so we can show the app
-   * window) and Google's (so the converstaion gets selected/highlighted), when the main process
-   yncronously receives the notification data, it asyncronously sends a message back at which
-   * time we can reliably get a reference to the Electron notification and attach Google's click
-   * event listener.
-   */
+  const hideContent = settings.get(SETTING_HIDE_NOTIFICATION, false) as boolean;
 
-  /**
-   * I do not understand exactly what is going on here and will leave it for the time being
-   * TODO: understand what is going on and make it better
-   */
+  const notificationOpts: NotificationConstructorOptions = hideContent
+    ? {
+        title: "New Message",
+        body: "Click to open",
+        icon: path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
+      }
+    : {
+        title,
+        icon,
+        body: options.body || "",
+      };
 
-  type Type = "click" | "close" | "error" | "show";
-  type Listener = (ev: NotificationEventMap[Type]) => unknown;
-  type Options = undefined | boolean | AddEventListenerOptions;
-  let originalClickListener: Listener | undefined;
+  notificationOpts.silent = settings.get(
+    SETTING_NOTIFICATION_SOUND,
+    true
+  ) as boolean;
 
-  const originalAddEventListener = notificationToSend.addEventListener;
-  // Seems silly to have these be correct as there is no way to mess it up
-  notificationToSend.addEventListener = (
-    type: Type,
-    listener: Listener,
-    options?: Options
-  ) => {
-    if (type === "click") {
-      originalClickListener = listener;
-    } else {
-      // Let all other event listeners be called, though they shouldn't have any effect
-      // because the original notification is blocked in the renderer process.
-      originalAddEventListener.call(
-        notificationToSend,
-        type,
-        listener,
-        options
-      );
-    }
-  };
-
-  /**
-   *
-   * This is ugly and I am not positive it is necessary
-   * In the future I aim to make it so we do not need to pass the notification around as a global variable
-   * I have ideas to do so which include but are not limited to listening for an event dispatched from the main process
-   * when the notification is clicked and calling the listener instead of adding it directly
-   *
-   */
-
-  ipcRenderer.once(EVENT_NOTIFICATION_REFLECT_READY, () => {
-    const theHookedUpNotification: ElectronNotification = remote.getGlobal(
-      "currentNotification"
-    );
-    if (originalClickListener != null) {
-      theHookedUpNotification.once("click", originalClickListener);
-    }
+  const notification = new ElectronNotification(notificationOpts);
+  notification.addListener("click", () => {
+    app.mainWindow?.show();
+    document.dispatchEvent(new Event("focus"));
   });
-
-  ipcRenderer.send(EVENT_WEBVIEW_NOTIFICATION, {
-    title,
-    options,
-  });
-
-  return notificationToSend;
+  // Mock the api for adding event listeners for a normal Browser notification
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  notification.addEventListener = notification.addListener;
+  notification.show();
+  if (!app.mainWindow?.isFocused()) {
+    app.mainWindow?.flashFrame(true);
+  }
+  return notification;
 };
-Notification.prototype = OriginalBrowserNotification.prototype;
+// THIS IS NEEDED FOR GOOGLE TO ISSUE NOTIFICATIONS
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Notification.permission = OriginalBrowserNotification.permission;
-Notification.requestPermission = OriginalBrowserNotification.requestPermission;
+Notification.permission = "granted";
+Notification.requestPermission = async () => "granted";
