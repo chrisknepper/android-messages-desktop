@@ -23,9 +23,6 @@ module.exports = {
   portable: {
     artifactName: "${productName}v${version}-${os}-${arch}.portable.${ext}",
   },
-  snap: {
-    publish: ["github"],
-  },
   nsis: {
     allowToChangeInstallationDirectory: true,
     oneClick: false,
