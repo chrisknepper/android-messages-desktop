@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.2.0] - 2020-08-11
+
+Era of polish. Unless good ideas come in this application is essentially feature complete. Only refinements are needed from here on out.
+
+### Added
+- Unread notification indicator on both linux and windows that actually works
+- Window goes flashy when a notification comes in (open to making this a setting if requested)
+
+### Fixed
+- Bug causing duplicating notifications
+
 ## [4.1.0] - 2020-06-12
 
 This should probably be a patch instead of a minor version. There are no breaking changes just a small bug fix.
