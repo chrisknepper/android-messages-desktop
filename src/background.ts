@@ -6,7 +6,6 @@ import {
   nativeTheme,
   shell,
 } from "electron";
-import settings from "electron-settings";
 import { autoUpdater } from "electron-updater";
 import jetpack from "fs-jetpack";
 import path from "path";
@@ -14,8 +13,6 @@ import {
   BASE_APP_PATH,
   EVENT_BRIDGE_INIT,
   EVENT_REFLECT_DISK_CACHE,
-  EVENT_SPELLING_REFLECT_READY,
-  EVENT_SPELL_ADD_CUSTOM_WORD,
   EVENT_UPDATE_USER_SETTING,
   IMG_CACHE_PATH,
   IS_DEV,
@@ -23,10 +20,8 @@ import {
   IS_MAC,
   IS_WINDOWS,
   RESOURCES_PATH,
-  SETTING_CUSTOM_WORDS,
   SETTING_TRAY_ENABLED,
 } from "./helpers/constants";
-import { getDictionary } from "./helpers/dictionaryManager";
 import { SettingsManager } from "./helpers/settingsManager";
 import { TrayManager } from "./helpers/trayManager";
 import { CustomBrowserWindow } from "./helpers/window";
@@ -205,43 +200,6 @@ if (!isFirstInstance) {
           cache[key] = path.resolve(IMG_CACHE_PATH(), file);
         }
         event.sender.send(EVENT_REFLECT_DISK_CACHE, { cache, basePath });
-      }
-
-      const locale = app.getLocale();
-
-      // Spellchecking is supported for the current language
-      const spellCheckFiles = await getDictionary(locale);
-      const customWords = settings.get(SETTING_CUSTOM_WORDS, {}) as CustomWords;
-
-      // We send an event with the language key and array of custom words to the webview bridge which contains the
-      // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
-      // between electron processes is hacky at best and impossible at worst.
-
-      event.sender.send(EVENT_SPELLING_REFLECT_READY, {
-        locale,
-        spellCheckFiles,
-        customWords,
-      });
-    });
-
-    ipcMain.on(EVENT_SPELL_ADD_CUSTOM_WORD, (_event, msg) => {
-      // Add custom words picked by the user to a persistent data store because they must be added to
-      // the instance of Hunspell on each launch of the app/loading of the dictionary.
-      const { newCustomWord } = msg;
-      const currentLanguage = app.getLocale();
-      const existingCustomWords = settings.get(
-        SETTING_CUSTOM_WORDS,
-        {}
-      ) as CustomWords;
-      if (!(currentLanguage in existingCustomWords)) {
-        existingCustomWords[currentLanguage] = [];
-      }
-      if (
-        newCustomWord &&
-        !existingCustomWords[currentLanguage].includes(newCustomWord)
-      ) {
-        existingCustomWords[currentLanguage].push(newCustomWord);
-        settings.set(SETTING_CUSTOM_WORDS, existingCustomWords);
       }
     });
 

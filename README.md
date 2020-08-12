@@ -21,6 +21,3 @@ Head over to the [latest releases](https://github.com/OrangeDrangon/android-mess
 **Important Note 1:** We currently have builds for Windows and macOS, and Linux. I test releases on Arch Linux. I would love help testing in additional places.
 
 **Important Note 2:** Neither the MacOS nor the Windows binaries are signed right now. I am willing to add this but I do not have the certificates required at this time.
-
-# Spellchecking
-Implemented via the amazing [`electron-hunspell`](https://github.com/kwonoj/electron-hunspell) library with dictionaries provided by the excellent [`dictionaries`](https://github.com/wooorm/dictionaries) project. Language files are downloaded when the app opens and the language used is based on the language set in your operating system. If you switch your system language and restart the app, the spellchecking should occur in the new language as long as it is in the [list of supported languages](https://github.com/wooorm/dictionaries#table-of-dictionaries).
