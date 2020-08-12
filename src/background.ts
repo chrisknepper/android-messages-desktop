@@ -166,14 +166,9 @@ if (!isFirstInstance) {
 
     // Quick and dirty way for renderer process to access mainWindow for communication
     app.mainWindow = mainWindow;
+    app.trayManager = trayManager;
 
     trayManager.startIfEnabled();
-
-    mainWindow.on("focus", () => {
-      if (IS_WINDOWS && trayManager?.overlayVisible) {
-        trayManager.toggleOverlay(false);
-      }
-    });
 
     ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
       if (state.bridgeInitDone) {

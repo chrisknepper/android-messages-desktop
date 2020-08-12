@@ -1,4 +1,5 @@
 import { CustomBrowserWindow } from "./helpers/window";
+import { TrayManager } from "./helpers/trayManager";
 
 declare global {
   interface Window {
@@ -8,6 +9,7 @@ declare global {
   namespace Electron {
     interface App {
       mainWindow?: CustomBrowserWindow;
+      trayManager?: TrayManager;
     }
   }
 }
