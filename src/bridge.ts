@@ -25,26 +25,43 @@ remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
 let cacheManager: CacheManager | undefined;
 
-window.addEventListener("load", () => {
-  // Conditionally let the main process know the page is (essentially) done loading.
-  // This should defer spellchecker downloading in a way that avoids blocking the page UI :D
+function createUnreadListener() {
+  const unreadObserver = (
+    _mutationList: MutationRecord[],
+    _observer: MutationObserver
+  ) => {
+    if (document.querySelector(".unread") != null) {
+      app.trayManager?.setUnreadIcon(true);
+    } else {
+      app.trayManager?.setUnreadIcon(false);
+    }
+  };
+  const observer = new MutationObserver(unreadObserver);
+  const node = document.querySelector("mws-conversations-list");
+  if (node) {
+    observer.observe(node, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+}
 
-  // Without observing the DOM, we don't have a reliable way to let the main process know once
-  // (and only once) that the main part of the app (not the QR code screen) has loaded, which is
-  // when we need to init the spellchecker
-  const onMutation = (
+window.addEventListener("load", () => {
+  const onInit = (
     _mutationsList: MutationRecord[],
     observer: MutationObserver
   ) => {
     if (document.querySelector("mw-main-nav")) {
       // we're definitely logged-in if this is in the DOM
       ipcRenderer.send(EVENT_BRIDGE_INIT);
+      createUnreadListener();
       observer.disconnect();
     }
     // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
   };
 
-  const observer = new MutationObserver(onMutation);
+  const observer = new MutationObserver(onInit);
   observer.observe(document.body, {
     childList: true,
     attributes: true,

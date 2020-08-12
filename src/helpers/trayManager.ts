@@ -14,7 +14,6 @@ export class TrayManager {
   public enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX) as boolean;
   public iconPath = this.getIconPath();
   public overlayIconPath = this.getOverlayIconPath();
-  public overlayVisible = false;
 
   public tray: Tray | null = null;
 
@@ -37,7 +36,9 @@ export class TrayManager {
 
   private getOverlayIconPath(): string | null {
     if (IS_WINDOWS) {
-      return path.resolve(RESOURCES_PATH, "tray", "tray_with_badge.ico");
+      return path.resolve(RESOURCES_PATH, "tray", "unread_icon.ico");
+    } else if (IS_LINUX) {
+      return path.resolve(RESOURCES_PATH, "tray", "unread_icon.png");
     }
     return null;
   }
@@ -134,19 +135,13 @@ export class TrayManager {
     }
   }
 
-  public toggleOverlay(toggle: boolean): void {
-    if (
-      IS_WINDOWS &&
-      this.tray &&
-      toggle !== this.overlayVisible &&
-      this.overlayIconPath != null
-    ) {
+  public setUnreadIcon(toggle: boolean): void {
+    if (this.tray && this.overlayIconPath != null) {
       if (toggle) {
         this.tray.setImage(this.overlayIconPath);
       } else {
         this.tray.setImage(this.iconPath);
       }
-      this.overlayVisible = toggle;
     }
   }
 }
