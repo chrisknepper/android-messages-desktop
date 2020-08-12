@@ -1650,13 +1650,6 @@ electron-builder@22.8.0:
     update-notifier "^4.1.0"
     yargs "^15.3.1"
 
-electron-hunspell@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/electron-hunspell/-/electron-hunspell-1.1.2.tgz#58b64fc09ad3d8e99ea74846f333c4efedc4fa03"
-  integrity sha512-Wrue7/aOlOEabhMm4GQSfvGADKHzCDkuYIEOINSEwMjHrvwTj7e1gI1kIO5wc+JdSL1uhFjwROfrqiLmnxqIKg==
-  dependencies:
-    hunspell-asm "^4.0.2"
-
 electron-publish@22.8.0:
   version "22.8.0"
   resolved "https://registry.yarnpkg.com/electron-publish/-/electron-publish-22.8.0.tgz#7f410fe043abc5d3d896c4ee9eea7a43ea352c7d"
@@ -1728,15 +1721,6 @@ emojis-list@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-3.0.0.tgz#5570662046ad29e2e916e71aae260abdff4f6a78"
   integrity sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==
-
-emscripten-wasm-loader@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/emscripten-wasm-loader/-/emscripten-wasm-loader-3.0.3.tgz#60d4f33dd62fc41cf6d98fbca94b24bc246f133b"
-  integrity sha512-fyq2maBt5LOou27LEBlL5H6G04BxgSamXkvmMsAuIT6rd8ioH4BxNQhuyl6jVPeODh6U8Wk1BoFZxzHpg3o8wA==
-  dependencies:
-    getroot "^1.0.0"
-    nanoid "^2.0.3"
-    unixify "^1.0.0"
 
 encodeurl@^1.0.2:
   version "1.0.2"
@@ -2296,13 +2280,6 @@ get-value@^2.0.3, get-value@^2.0.6:
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
   integrity sha1-3BXKHGcjh8p2vTesCjlbogQqLCg=
 
-getroot@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/getroot/-/getroot-1.0.0.tgz#ac4635c5fa4037741d6ead61ccc16367439efcbe"
-  integrity sha512-W9Q31kOv921dQuZBeAbK4R/dAPbC0WkhZD3alLcdVwjSkEtS1aX8twrzG3I5yo0sQ88M/d4JOqVbRiCuI/XPNA==
-  dependencies:
-    tslib "^1.7.1"
-
 glob-parent@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"
@@ -2596,14 +2573,6 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
-
-hunspell-asm@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/hunspell-asm/-/hunspell-asm-4.0.2.tgz#20c50ea50a52467534a809b3095a064231e7171e"
-  integrity sha512-u3ZuEYKGYnLZlIs+k5S+KdY+Q57mYD46fTwZJCiSXdES+fhxcLNF5mJ0nxjqrPAgE/8Kow6XLxRdRd/HDUPQZg==
-  dependencies:
-    emscripten-wasm-loader "^3.0.3"
-    nanoid "^2.1.5"
 
 iconv-lite@^0.6.2:
   version "0.6.2"
@@ -3337,11 +3306,6 @@ nan@^2.12.1:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
-
-nanoid@^2.0.3, nanoid@^2.1.5:
-  version "2.1.11"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.11.tgz#ec24b8a758d591561531b4176a01e3ab4f0f0280"
-  integrity sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -4780,7 +4744,7 @@ ts-node@^8.10.2:
     source-map-support "^0.5.17"
     yn "3.1.1"
 
-tslib@^1.10.0, tslib@^1.7.1, tslib@^1.8.1, tslib@^1.9.0:
+tslib@^1.10.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.13.0.tgz#c881e13cc7015894ed914862d276436fa9a47043"
   integrity sha512-i/6DQjL8Xf3be4K/E6Wgpekn5Qasl1usyw++dAA35Ue5orEn65VIxOA+YvNNl9HV3qv70T7CNwjODHZrLwvd1Q==
@@ -4881,13 +4845,6 @@ universalify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-1.0.0.tgz#b61a1da173e8435b2fe3c67d29b9adf8594bd16d"
   integrity sha512-rb6X1W158d7pRQBg5gkR8uPaSfiids68LTJQYOtEUhoJUWBdaQHsuT/EUduxXYxcrt4r5PJ4fuHW1MHT6p0qug==
-
-unixify@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/unixify/-/unixify-1.0.0.tgz#3a641c8c2ffbce4da683a5c70f03a462940c2090"
-  integrity sha1-OmQcjC/7zk2mg6XHDwOkYpQMIJA=
-  dependencies:
-    normalize-path "^2.1.1"
 
 unset-value@^1.0.0:
   version "1.0.0"

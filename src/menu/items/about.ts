@@ -9,7 +9,6 @@ const localeStyle =
 const disclaimerText =
   "<br><br>Not affiliated with Google in any way.<br>Android is a trademark of Google LLC.";
 const licenseText = `<br><br>${productName} is released under the MIT License.`;
-const dictionaryLicenseText = `<br><br>Spelling dictionaries are released under various licenses including MIT, BSD, and GNU GPL. <a class="link" href="https://github.com/wooorm/dictionaries#table-of-dictionaries" style="text-decoration: none">See dictionary license details</a>.`;
 
 let languageCode = "";
 let descriptionWithLocale = "";
@@ -24,7 +23,7 @@ export const aboutMenuItem: MenuItemConstructorOptions = {
   click: () => {
     openAboutWindow({
       icon_path: path.resolve(RESOURCES_PATH, "icons", "512x512.png"),
-      copyright: `<div style="text-align: center">Copyright (c) 2020 Kyle Rosenberg${disclaimerText}${licenseText}${dictionaryLicenseText}</div>`,
+      copyright: `<div style="text-align: center">Copyright (c) 2020 Kyle Rosenberg${disclaimerText}${licenseText}</div>`,
       product_name: productName,
       description: descriptionWithLocale,
       open_devtools: IS_DEV,

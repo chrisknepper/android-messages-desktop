@@ -4,23 +4,16 @@ import {
   NativeImage,
   NotificationConstructorOptions,
 } from "electron";
-import {
-  attachSpellCheckProvider,
-  SpellCheckerProvider,
-} from "electron-hunspell";
-import fs from "fs";
 import path from "path";
 import { CacheManager } from "./helpers/cacheManager";
 import {
   EVENT_BRIDGE_INIT,
   EVENT_REFLECT_DISK_CACHE,
-  EVENT_SPELLING_REFLECT_READY,
   EVENT_UPDATE_USER_SETTING,
   SETTING_HIDE_NOTIFICATION,
   RESOURCES_PATH,
   SETTING_NOTIFICATION_SOUND,
 } from "./helpers/constants";
-import { Dictionary } from "./helpers/dictionaryManager";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
 import settings from "electron-settings";
@@ -57,42 +50,6 @@ window.addEventListener("load", () => {
     attributes: true,
   });
 });
-
-interface EventSpellingReadyParams {
-  locale: string;
-  spellCheckFiles: Dictionary;
-  customWords: Record<string, string[]>;
-}
-
-// The main process, once receiving EVENT_BRIDGE_INIT, determines whether the user's current language allows for spellchecking
-// and if so, (down)loads the necessary files, then sends an event to which the following listener responds and
-// loads the spellchecker, if needed.
-ipcRenderer.once(
-  EVENT_SPELLING_REFLECT_READY,
-  async (
-    _event,
-    { locale, spellCheckFiles, customWords }: EventSpellingReadyParams
-  ) => {
-    const provider = new SpellCheckerProvider();
-    window.spellCheckHandler = provider;
-    await provider.initialize();
-
-    await provider.loadDictionary(
-      locale,
-      fs.readFileSync(spellCheckFiles.dic),
-      fs.readFileSync(spellCheckFiles.aff)
-    );
-
-    const attached = await attachSpellCheckProvider(provider);
-    attached.switchLanguage(locale);
-
-    if (locale in customWords) {
-      for (const word of customWords[locale]) {
-        window.spellCheckHandler.addWord(locale, word);
-      }
-    }
-  }
-);
 
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
   if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
