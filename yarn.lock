@@ -79,12 +79,10 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
-"@types/dom-to-image@^2.6.1":
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/@types/dom-to-image/-/dom-to-image-2.6.1.tgz#2b30a7080448b3b9265683886ca429bc6ae6112f"
-  integrity sha512-pTaEZxf1sZVRE5FDji9kmdiZLr2a4JLR1IQvJtuIsDXmq0Tv+lLpZqxXf/7wzMMIicMImXrrAZUEgf1XJpzksg==
-  dependencies:
-    "@types/node" "*"
+"@types/dom-to-image@^2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@types/dom-to-image/-/dom-to-image-2.6.2.tgz#f6cc93cd5e84565a3666851fa5472fe8779b49d2"
+  integrity sha512-Yxbwmz/glNwRIXfBI8efG2bgIxrFAKV1MdfpqbUDq25ULMot7U7FYXPiso5G8DlBExSP+AakuG0mNus9yw4RZQ==
 
 "@types/electron-settings@^3.1.1":
   version "3.1.1"
