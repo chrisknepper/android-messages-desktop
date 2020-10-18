@@ -54,7 +54,7 @@
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^4.5.0",
     "png2icons": "^2.0.1",
-    "prettier": "^2.1.0",
+    "prettier": "^2.1.2",
     "source-map-support": "^0.5.19",
     "style-loader": "^1.2.1",
     "ts-loader": "^8.0.3",
