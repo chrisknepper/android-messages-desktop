@@ -10,8 +10,8 @@ import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../helpers/constants";
 import { separator } from "./items/separator";
 
 export const settingsMenu: MenuItemConstructorOptions = {
-  label: IS_MAC ? "Preferences" : "Settings",
-  accelerator: "Alt+S",
+  label: IS_MAC ? "&Preferences" : "&Settings",
+  accelerator: IS_MAC ? "Alt+P" : "Alt+S",
   submenu: [
     {
       // This option doesn't apply to Mac, so this hides it but keeps the order of menu items
@@ -24,6 +24,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
         const autoHideMenuPref = !settings.get("autoHideMenuPref");
         settings.set("autoHideMenuPref", autoHideMenuPref);
         item.checked = autoHideMenuPref;
+        window?.setMenuBarVisibility(!autoHideMenuPref);
         window?.setAutoHideMenuBar(autoHideMenuPref);
       },
     },
