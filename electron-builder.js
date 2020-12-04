@@ -12,6 +12,9 @@ module.exports = {
     target: ["AppImage", "snap", "deb", "pacman", "rpm", "freebsd", "zip"],
     executableName: "AndroidMessages",
     category: "Internet",
+    desktop: {
+      StartupWMClass: "android-messages-desktop",
+    },
   },
   win: {
     target: ["nsis", "portable"],
