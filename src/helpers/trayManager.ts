@@ -65,8 +65,7 @@ export class TrayManager {
     }
   }
 
-  private handleTrayClick(event: Electron.KeyboardEvent) {
-    event.preventDefault();
+  private handleTrayClick(_event: Electron.KeyboardEvent) {
     app.mainWindow?.show();
   }
 

@@ -33,8 +33,6 @@ const state = {
   bridgeInitDone: false,
 };
 
-type CustomWords = Record<string, string[]>;
-
 let mainWindow: CustomBrowserWindow;
 
 /**
@@ -129,20 +127,24 @@ if (!isFirstInstance) {
 
       if (!IS_MAC) {
         // Sets checked status based on user prefs
-        menuInstance.getMenuItemById("autoHideMenuBarMenuItem").checked =
-          settingsManager.autoHideMenu;
-        trayMenuItem.enabled = trayManager.enabled;
+        (menuInstance.getMenuItemById(
+          "autoHideMenuBarMenuItem"
+        ) as Electron.MenuItem).checked = settingsManager.autoHideMenu;
+        (trayMenuItem as Electron.MenuItem).enabled = trayManager.enabled;
       }
 
-      trayMenuItem.checked = settingsManager.startInTray;
-      enableTrayIconMenuItem.checked = trayManager.enabled;
+      (trayMenuItem as Electron.MenuItem).checked = settingsManager.startInTray;
+      (enableTrayIconMenuItem as Electron.MenuItem).checked =
+        trayManager.enabled;
 
-      notificationSoundEnabledMenuItem.checked =
+      (notificationSoundEnabledMenuItem as Electron.MenuItem).checked =
         settingsManager.notificationSound;
-      pressEnterToSendMenuItem.checked = settingsManager.enterToSend;
-      hideNotificationContentMenuItem.checked =
+      (pressEnterToSendMenuItem as Electron.MenuItem).checked =
+        settingsManager.enterToSend;
+      (hideNotificationContentMenuItem as Electron.MenuItem).checked =
         settingsManager.hideNotificationContent;
-      useSystemDarkModeMenuItem.checked = settingsManager.systemDarkMode;
+      (useSystemDarkModeMenuItem as Electron.MenuItem).checked =
+        settingsManager.systemDarkMode;
     }
 
     autoUpdater.checkForUpdatesAndNotify();
