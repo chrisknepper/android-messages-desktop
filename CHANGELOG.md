@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.3.0] - 2020-12-04
+Google broke some things and there was some other stuff that has always been broken.
+
+Expect a major change under the hood SoonTM with numerous enhancements and quality of life improvements as requested
+by the community.
+
+## Fixed
+- Bug with behavior of autohid menu when setting is toggled
+- Bug breaking icons in notifications
+- Bug with groupchat icons in notifications
+- Cleaned out old dependencies that were no longer needed
+
 ## [4.2.0] - 2020-08-11
 
 Era of polish. Unless good ideas come in this application is essentially feature complete. Only refinements are needed from here on out.
