@@ -1,6 +1,5 @@
 import { Configuration } from "webpack";
 import nodeExternals from "webpack-node-externals";
-import FriendlyErrors from "friendly-errors-webpack-plugin";
 import HTMLWebpackPlguin from "html-webpack-plugin";
 import process from "process";
 import path from "path";
@@ -32,7 +31,6 @@ const base: Configuration = {
     extensions: [".ts", ".js", ".css"],
   },
   plugins: [
-    new FriendlyErrors(),
     new HTMLWebpackPlguin({
       template: "./src/index.html",
       inject: false,
