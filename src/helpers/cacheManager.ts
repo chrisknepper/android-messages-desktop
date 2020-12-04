@@ -1,15 +1,7 @@
-import domtoimg from "dom-to-image";
-import jetpack from "fs-jetpack";
-import path from "path";
-
-type CachedImage = string | undefined | (() => Promise<void>);
+type CachedImage = string | undefined;
 
 export class CacheManager {
   private imgCache: Map<string, string> = new Map();
-  constructor(
-    private basePath: string,
-    private diskCache: Map<string, string>
-  ) {}
   /**
    *
    * Attempts to split the title of the notification in a way that yeilds a cache hit
@@ -45,66 +37,21 @@ export class CacheManager {
    * Looks for the existence of an image on the provided profile node returned from the getProfileNodeIfEvists private.
    *
    * @param {HTMLElement} profileNode the node to traverse the children of
-   * @returns {(HTMLImageElement | undefined)} the img tag of the node
+   * @returns {(HTMLCanvasElement | undefined)} the img tag of the node
    */
-  private getImgNodeIfExists(
+  private getCanvasNodeIfExists(
     profileNode: HTMLElement
-  ): HTMLImageElement | undefined {
-    return profileNode.querySelector("img") || undefined;
+  ): HTMLCanvasElement | undefined {
+    return profileNode.querySelector("canvas") || undefined;
   }
 
   /**
    *
-   * Checks if there is a disk cache of the rendered img at the cache key provided and gets it.
+   * First checks cache. If it is not in the cache trys to get the canvas node and turn it into a data:url
+   * I am not sure the cache is necessary anymore but there are rumors that canvas.toDataUrl is slow.
    *
-   * @param {string} cacheKey cache index to check
-   * @returns {(string | undefined)} the contents of the cache
+   * @param title title of the notification as passed to the window.Notification
    */
-  private getDiskCacheIfExists(cacheKey: string): string | undefined {
-    const cachePath = this.diskCache.get(cacheKey);
-    if (cachePath != null && jetpack.file(cachePath)) {
-      return jetpack.read(cachePath);
-    }
-    return undefined;
-  }
-
-  /**
-   *
-   * Finds the node to render to generate an img on the provided profile node returned from the getProfileNodeIfEvists private.
-   *
-   * @param {HTMLElement} profileNode the node to traverse the children of
-   * @returns {(HTMLDivElement | undefined)} node to generate image of
-   */
-  private getNodeToRenderIfExists(
-    profileNode: HTMLElement
-  ): HTMLDivElement | undefined {
-    return (
-      profileNode.querySelector<HTMLDivElement>("div.non-image-avatar") ||
-      undefined
-    );
-  }
-
-  /**
-   *
-   * Creates the private that will async render and save / cache the node
-   *
-   * @param {HTMLElement} nodeToRender node to render
-   * @param {string} cacheKey name in caches
-   * @returns {() => Promise<void>} private that will do the rendering
-   */
-  private createNodeRenderer(
-    nodeToRender: HTMLElement,
-    cacheKey: string
-  ): () => Promise<void> {
-    return async () => {
-      const rendered = await domtoimg.toPng(nodeToRender);
-      const cachePath = path.join(this.basePath, `${cacheKey}.txt`);
-      await jetpack.writeAsync(cachePath, rendered);
-
-      this.imgCache.set(cacheKey, rendered);
-    };
-  }
-
   public getProfileImg(title: string): CachedImage {
     const cacheKey = this.getCacheKey(title);
     if (this.imgCache.has(cacheKey)) {
@@ -112,19 +59,10 @@ export class CacheManager {
     }
     const profileNode = this.getProfileNodeIfExists(cacheKey);
     if (profileNode != null) {
-      const imgTag = this.getImgNodeIfExists(profileNode);
-      if (imgTag != null) {
-        this.imgCache.set(cacheKey, imgTag.src);
-        return imgTag.src;
-      }
-      const diskCache = this.getDiskCacheIfExists(cacheKey);
-      if (diskCache != null) {
-        this.imgCache.set(cacheKey, diskCache);
-        return diskCache;
-      }
-      const nodeToRender = this.getNodeToRenderIfExists(profileNode);
-      if (nodeToRender != null) {
-        return this.createNodeRenderer(nodeToRender, cacheKey);
+      const canvasTag = this.getCanvasNodeIfExists(profileNode);
+      if (canvasTag != null) {
+        this.imgCache.set(cacheKey, canvasTag.toDataURL());
+        return canvasTag.toDataURL();
       }
     }
     return undefined;

@@ -7,14 +7,11 @@ import {
   shell,
 } from "electron";
 import { autoUpdater } from "electron-updater";
-import jetpack from "fs-jetpack";
 import path from "path";
 import {
   BASE_APP_PATH,
   EVENT_BRIDGE_INIT,
-  EVENT_REFLECT_DISK_CACHE,
   EVENT_UPDATE_USER_SETTING,
-  IMG_CACHE_PATH,
   IS_DEV,
   IS_LINUX,
   IS_MAC,
@@ -172,7 +169,7 @@ if (!isFirstInstance) {
 
     trayManager.startIfEnabled();
 
-    ipcMain.on(EVENT_BRIDGE_INIT, async (event) => {
+    ipcMain.on(EVENT_BRIDGE_INIT, async (_event) => {
       if (state.bridgeInitDone) {
         return;
       }
@@ -187,17 +184,6 @@ if (!isFirstInstance) {
           ? nativeTheme.shouldUseDarkColors
           : null,
       });
-      const basePath = IMG_CACHE_PATH();
-      const imgDir = jetpack.dir(IMG_CACHE_PATH());
-      const contents = await imgDir.listAsync(".");
-      if (contents) {
-        const cache: Record<string, string> = {};
-        for (const file of contents) {
-          const key = file.substr(0, file.length - 4);
-          cache[key] = path.resolve(IMG_CACHE_PATH(), file);
-        }
-        event.sender.send(EVENT_REFLECT_DISK_CACHE, { cache, basePath });
-      }
     });
 
     let quitViaContext = false;

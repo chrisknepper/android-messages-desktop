@@ -8,7 +8,6 @@ import path from "path";
 import { CacheManager } from "./helpers/cacheManager";
 import {
   EVENT_BRIDGE_INIT,
-  EVENT_REFLECT_DISK_CACHE,
   EVENT_UPDATE_USER_SETTING,
   SETTING_HIDE_NOTIFICATION,
   RESOURCES_PATH,
@@ -23,7 +22,7 @@ const { Notification: ElectronNotification, app, nativeImage } = remote;
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
-let cacheManager: CacheManager | undefined;
+const cacheManager = new CacheManager();
 
 function createUnreadListener() {
   const unreadObserver = (
@@ -84,23 +83,6 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
 });
 
 /**
- *
- * Recieves the paths for all the disk cahed images along with the base path for adding new files to the cache
- * This is because this part of electron cannot use path.resolve and the constant relies on that in a function form due to
- * reasons documented elsewhere
- *
- */
-ipcRenderer.once(
-  EVENT_REFLECT_DISK_CACHE,
-  (
-    _event,
-    { cache, basePath }: { basePath: string; cache: Record<string, string> }
-  ): void => {
-    cacheManager = new CacheManager(basePath, new Map(Object.entries(cache)));
-  }
-);
-
-/**
  * Override the webview's window's instance of the Notification class and forward their data to the
  * main process. This is Necessary to generate and send a custom notification via Electron instead
  * of just forwarding the webview (Google) ones.
@@ -115,15 +97,9 @@ ipcRenderer.once(
 // @ts-ignore
 window.Notification = function (title: string, options: NotificationOptions) {
   let icon: NativeImage | undefined;
-  if (cacheManager != null) {
-    const potentialImg = cacheManager.getProfileImg(title);
-    if (potentialImg != null) {
-      if (typeof potentialImg === "string") {
-        icon = nativeImage.createFromDataURL(potentialImg);
-      } else {
-        potentialImg();
-      }
-    }
+  const potentialImg = cacheManager.getProfileImg(title);
+  if (potentialImg != null) {
+    icon = nativeImage.createFromDataURL(potentialImg);
   }
 
   const hideContent = settings.get(SETTING_HIDE_NOTIFICATION, false) as boolean;

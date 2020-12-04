@@ -1,6 +1,5 @@
 import process from "process";
 import path from "path";
-import { app } from "electron";
 
 export const osMap = {
   win32: "Windows",
@@ -26,9 +25,6 @@ export const IS_LINUX = OS_NAME === "linux";
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
-export const USER_DATA_PATH = (): string => app.getPath("appData"); // This has to be a function call because app.ready callback must be fired before this path can be used
-export const IMG_CACHE_PATH = (): string =>
-  path.resolve(USER_DATA_PATH(), "userimgs");
 
 // Settings
 export const SETTING_TRAY_ENABLED = "trayEnabledPref";
@@ -43,4 +39,3 @@ export const SETTING_AUTOHIDE_MENU = "autoHideMenuPref";
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";
 export const EVENT_UPDATE_USER_SETTING = "messages-update-user-setting";
-export const EVENT_REFLECT_DISK_CACHE = "reflext-disk-cache";
