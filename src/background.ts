@@ -151,7 +151,6 @@ if (!isFirstInstance) {
       height: 800,
       autoHideMenuBar: settingsManager.autoHideMenu,
       show: !settingsManager.startInTray, //Starts in tray if set
-      titleBarStyle: IS_MAC ? "hiddenInset" : "default", //Turn on hidden frame on a Mac
       icon: IS_LINUX
         ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
         : undefined,
