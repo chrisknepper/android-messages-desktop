@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.1] - 2020-12-14
+MacOS can move the window!
+
+## Fixed
+- Monthlong bug where you cant move the window with a one line change :)
+
 ## [4.3.0] - 2020-12-04
 Google broke some things and there was some other stuff that has always been broken.
 
