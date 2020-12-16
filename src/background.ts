@@ -160,6 +160,11 @@ if (!isFirstInstance) {
         enableRemoteModule: true,
       },
     });
+
+    // set user agent to potentially make google fi work
+    mainWindow.webContents.userAgent =
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
+
     mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "index.html"));
 
     // Quick and dirty way for renderer process to access mainWindow for communication
