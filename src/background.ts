@@ -162,8 +162,18 @@ if (!isFirstInstance) {
     });
 
     // set user agent to potentially make google fi work
-    mainWindow.webContents.userAgent =
+    const userAgent =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
+
+    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+      {
+        urls: ["https://accounts.google.com/*"],
+      },
+      ({ requestHeaders }, callback) =>
+        callback({
+          requestHeaders: { ...requestHeaders, "User-Agent": userAgent },
+        })
+    );
 
     mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "index.html"));
 
