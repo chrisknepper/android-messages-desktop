@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.4.0] - 2020-12-19
+
+Google Fi integration
+
+## Added
+
+- google fi integration
+
 ## [4.3.1] - 2020-12-14
 
 MacOS can move the window!
