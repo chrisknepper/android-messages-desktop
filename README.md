@@ -28,3 +28,15 @@ I test releases on Arch Linux. I would love help testing in additional places.
 **Important Note 2:** Neither the MacOS nor the Windows binaries are signed
 right now. I am willing to add this but I do not have the certificates required
 at this time.
+
+# Contributions
+
+The code is pretty ugly but feel free to take a look.
+
+Steps to contribute:
+Fork
+Clone
+Edit
+`yarn install` for dependencies
+`yarn start` to build and run assuming you have electron installed.
+Open a pull request when you think it is ready
