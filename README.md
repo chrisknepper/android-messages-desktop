@@ -34,9 +34,9 @@ at this time.
 The code is pretty ugly but feel free to take a look.
 
 Steps to contribute:
-Fork
-Clone
-Edit
-`yarn install` for dependencies
-`yarn start` to build and run assuming you have electron installed.
-Open a pull request when you think it is ready
+1. Fork
+2. Clone
+3. Edit
+4. `yarn install` for dependencies
+5. `yarn start` to build and run assuming you have electron installed.
+6. Open a pull request when you think it is ready
