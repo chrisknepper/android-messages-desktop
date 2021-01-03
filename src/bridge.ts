@@ -36,12 +36,12 @@ function createUnreadListener() {
     }
   };
   const observer = new MutationObserver(unreadObserver);
-  const node = document.querySelector("mws-conversations-list");
+  const node = document.querySelector("main");
   if (node) {
     observer.observe(node, {
       subtree: true,
       attributes: true,
-      attributeFilter: ["class"],
+      attributeFilter: ["data-e2e-is-unread"],
     });
   }
 }
