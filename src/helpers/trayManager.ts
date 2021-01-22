@@ -136,6 +136,7 @@ export class TrayManager {
 
   public setUnreadIcon(toggle: boolean): void {
     if (this.tray && this.overlayIconPath != null) {
+      this.tray.setToolTip("Android Messages");
       if (toggle) {
         this.tray.setImage(this.overlayIconPath);
       } else {
