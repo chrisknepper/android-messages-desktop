@@ -1,11 +1,5 @@
-import {
-  ipcRenderer,
-  remote,
-  NativeImage,
-  NotificationConstructorOptions,
-} from "electron";
+import { ipcRenderer, remote, NotificationConstructorOptions } from "electron";
 import path from "path";
-import { CacheManager } from "./helpers/cacheManager";
 import {
   EVENT_BRIDGE_INIT,
   EVENT_UPDATE_USER_SETTING,
@@ -16,13 +10,12 @@ import {
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
 import settings from "electron-settings";
+import { getProfileImg } from "./helpers/profileImage";
 
-const { Notification: ElectronNotification, app, nativeImage } = remote;
+const { Notification: ElectronNotification, app } = remote;
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
-
-const cacheManager = new CacheManager();
 
 function createUnreadListener() {
   const unreadObserver = (
@@ -96,11 +89,7 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 window.Notification = function (title: string, options: NotificationOptions) {
-  let icon: NativeImage | undefined;
-  const potentialImg = cacheManager.getProfileImg(title);
-  if (potentialImg != null) {
-    icon = nativeImage.createFromDataURL(potentialImg);
-  }
+  const icon = getProfileImg(title);
 
   const hideContent = settings.get(SETTING_HIDE_NOTIFICATION, false) as boolean;
 

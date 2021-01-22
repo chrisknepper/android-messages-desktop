@@ -191,8 +191,7 @@ if (!isFirstInstance) {
       state.bridgeInitDone = true;
 
       // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
-			if (!settingsManager.startInTray)
-				mainWindow.show();
+      if (!settingsManager.startInTray) mainWindow.show();
 
       // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
       // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
