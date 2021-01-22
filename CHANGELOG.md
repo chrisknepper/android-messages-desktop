@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.1] - 2021-01-22
+
+Everything should be fixed
+
 ## [4.5.0] - 2021-01-22
 
 Bug fixes galor
