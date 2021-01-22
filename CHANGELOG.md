@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.5.0] - 2021-01-22
+
+Bug fixes galor
+
+## Fixed
+- Bug with unread messages dot
+- Bug with notifications not being sent until a conversation is opened
+- Bug with image cache existing causing problems on slow networks
+
+## Added
+- Tooltip on tray icon
+- Images are saved with date as filename
+
 ## [4.4.0] - 2020-12-19
 
 Google Fi integration
