@@ -6,6 +6,7 @@ import {
   SETTING_HIDE_NOTIFICATION,
   RESOURCES_PATH,
   SETTING_NOTIFICATION_SOUND,
+  SETTING_START_IN_TRAY,
 } from "./helpers/constants";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
