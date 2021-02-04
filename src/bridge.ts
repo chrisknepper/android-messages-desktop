@@ -58,6 +58,9 @@ window.addEventListener("load", () => {
     childList: true,
     attributes: true,
   });
+
+  // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
+  if (!settings.get(SETTING_START_IN_TRAY)) app.mainWindow?.show();
 });
 
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
