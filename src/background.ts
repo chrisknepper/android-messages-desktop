@@ -252,5 +252,17 @@ if (!isFirstInstance) {
         });
       }
     });
-  });
+
+    // block Google collecting data
+    mainWindow.webContents.session.webRequest.onBeforeRequest(
+      {
+        urls: ["https://messages.google.com/web/jserror?*", "https://play.google.com/log?*"]
+      },
+      (details, callback) =>
+      {
+        callback({cancel: true});
+      }
+    );
+
+  });//onready
 }
