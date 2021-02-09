@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.3] - 2021-02-09
+
+Make the app load again
+
 ## [4.5.1] - 2021-01-22
 
 Everything should be fixed
