@@ -71,34 +71,37 @@ export const popupContextMenu = async (
           {
             label: `Save ${mediaType} As...`,
             click: () => {
-              const link = document.createElement('a'),
-                    d = new Date(),
-                    download = (url:string) =>
-                    {
-                      link.href = url;
-                      link.download = "IMG_" + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    },
-                    pad = (t:number) => ("0" + t).substr(-2);
+              const link = document.createElement("a"),
+                d = new Date(),
+                download = (url: string) => {
+                  link.href = url;
+                  link.download =
+                    "IMG_" +
+                    d.getFullYear() +
+                    pad(d.getMonth() + 1) +
+                    pad(d.getDate()) +
+                    "_" +
+                    pad(d.getHours()) +
+                    pad(d.getMinutes()) +
+                    pad(d.getSeconds());
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                },
+                pad = (t: number) => ("0" + t).substr(-2);
 
-              if (params.srcURL.match(/^blob:/i))
-              {
+              if (params.srcURL.match(/^blob:/i)) {
                 download(params.srcURL);
-              }
-              else
-              {
+              } else {
                 //using AJAX to prevent non-blob images from being opened instead of downloaded (i.e preview of web links)
                 const xhr = new XMLHttpRequest();
                 xhr.open("GET", params.srcURL, true);
                 xhr.responseType = "blob";
-                xhr.onload = function()
-                {
-                	const url = window.URL.createObjectURL(this.response);
+                xhr.onload = function () {
+                  const url = window.URL.createObjectURL(this.response);
                   download(url);
                   window.URL.revokeObjectURL(url);
-                }
+                };
                 xhr.send();
               }
             },
