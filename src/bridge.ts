@@ -6,6 +6,7 @@ import {
   SETTING_HIDE_NOTIFICATION,
   RESOURCES_PATH,
   SETTING_NOTIFICATION_SOUND,
+  SETTING_START_IN_TRAY,
 } from "./helpers/constants";
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
@@ -58,6 +59,9 @@ window.addEventListener("load", () => {
     childList: true,
     attributes: true,
   });
+
+  // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
+  if (!settings.get(SETTING_START_IN_TRAY)) app.mainWindow?.show();
 });
 
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
