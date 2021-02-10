@@ -12,9 +12,6 @@ androidMessagesWebview.addEventListener("dom-ready", () => {
   if (IS_DEV) {
     androidMessagesWebview.openDevTools();
   }
-});
-
-androidMessagesWebview.addEventListener("dom-ready", () => {
   app.mainWindow?.on("focus", () => {
     // Dispatches a focus event for QOL allowing the webview to put our cursor where it belongs
     androidMessagesWebview.dispatchEvent(new Event("focus"));
