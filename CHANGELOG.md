@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.5.4] - 2021-02-09
+
+## Fixed
+- Issue perventing window from showing when a phone is not paired
+- Redundant event listener
+
 ## [4.5.3] - 2021-02-09
 
 Make the app load again
