@@ -256,7 +256,7 @@ if (!isFirstInstance) {
     // block Google collecting data
     mainWindow.webContents.session.webRequest.onBeforeRequest(
       {
-        urls: ["https://messages.google.com/web/jserror?*", "https://play.google.com/log?*"]
+        urls: ["https://messages.google.com/web/jserror?*", "https://play.google.com/log?*", "https://www.google-analytics.com/analytics.js"]
       },
       (details, callback) =>
       {
