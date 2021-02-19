@@ -4,7 +4,7 @@ import { EVENT_BRIDGE_INIT, RESOURCES_PATH } from "./helpers/constants";
 import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
 
-const { Notification: ElectronNotification, app } = remote;
+const { Notification: ElectronNotification, app, dialog } = remote;
 
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
@@ -54,6 +54,26 @@ window.addEventListener("load", () => {
   // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
   if (!app.settings?.startInTrayEnabled.value) {
     app.mainWindow?.show();
+  }
+
+  if (!app.settings?.seenResetSettingsWarning.value) {
+    const message = `
+The settings for this app have been reset.
+
+This is a one time occurance and is the result of behind the scenes work to clean up the code.
+
+You may notice two missing settings:
+
+  - Enter to Send: Moved to the 3 dots menu
+  - Use System Theme: Removed for the time being in favor of manual operation
+    `;
+    dialog.showMessageBox({
+      type: "info",
+      buttons: ["OK"],
+      title: "Settings Reset",
+      message,
+    });
+    app.settings?.seenResetSettingsWarning.next(true);
   }
 });
 

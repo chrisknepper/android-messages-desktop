@@ -40,6 +40,10 @@ export const seenMinimizeToTrayWarning = createSetting(
   "seenMinimizeToTrayWarning",
   false
 );
+export const seenResetSettingsWarning = createSetting(
+  "seenResetSettingsWarning",
+  false
+);
 
 export interface Settings {
   trayEnabled: Setting;
@@ -49,6 +53,7 @@ export interface Settings {
   startInTrayEnabled: Setting;
   autoHideMenuEnabled: Setting;
   seenMinimizeToTrayWarning: Setting;
+  seenResetSettingsWarning: Setting;
 }
 
 export const settings: Settings = {
@@ -59,6 +64,7 @@ export const settings: Settings = {
   startInTrayEnabled,
   autoHideMenuEnabled,
   seenMinimizeToTrayWarning,
+  seenResetSettingsWarning,
 };
 
 if (!jetpack.exists(SETTINGS_FILE)) {
