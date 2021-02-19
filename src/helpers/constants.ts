@@ -28,10 +28,9 @@ export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
 // needs to be a function because app is not initialized yet otherwise?
 export const SETTINGS_FILE = (): string =>
-  path.resolve(
-    app.getPath("userData"),
-    `settings${IS_DEV ? "-development" : ""}.json`
-  );
+  !IS_DEV
+    ? path.resolve(app.getPath("userData"), `settings.json`)
+    : path.resolve(BASE_APP_PATH, "settings.json");
 
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";
