@@ -45,7 +45,6 @@ export const seenMinimizeToTrayWarning = createSetting(
 export interface Settings {
   trayEnabled: Setting;
   notificationSoundEnabled: Setting;
-  enterToSendEnabled: Setting;
   hideNotificationContentEnabled: Setting;
   respectSystemDarkModeEnabled: Setting;
   startInTrayEnabled: Setting;
@@ -56,7 +55,6 @@ export interface Settings {
 export const settings: Settings = {
   trayEnabled,
   notificationSoundEnabled,
-  enterToSendEnabled,
   hideNotificationContentEnabled,
   respectSystemDarkModeEnabled,
   startInTrayEnabled,

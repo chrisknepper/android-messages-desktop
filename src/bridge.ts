@@ -1,8 +1,6 @@
 import { ipcRenderer, remote, NotificationConstructorOptions } from "electron";
 import path from "path";
 import { EVENT_BRIDGE_INIT, RESOURCES_PATH } from "./helpers/constants";
-// TODO: fix that
-import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
 
