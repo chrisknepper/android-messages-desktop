@@ -25,6 +25,7 @@ export const IS_LINUX = OS_NAME === "linux";
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
+export const SETTINGS_FILE = path.resolve(BASE_APP_PATH, "settings.json");
 
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";

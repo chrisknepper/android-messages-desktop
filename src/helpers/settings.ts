@@ -1,10 +1,9 @@
 import { BehaviorSubject } from "rxjs";
 import jetpack from "fs-jetpack";
-
-const settingsFile = "settings.json";
+import { SETTINGS_FILE } from "./constants";
 
 function getSetting(key: string): boolean | undefined {
-  return (jetpack.read(settingsFile, "json") || {})[key];
+  return (jetpack.read(SETTINGS_FILE, "json") || {})[key];
 }
 
 type Setting = BehaviorSubject<boolean>;
@@ -65,14 +64,14 @@ export const settings: Settings = {
   seenMinimizeToTrayWarning,
 };
 
-if (!jetpack.exists(settingsFile)) {
-  jetpack.write(settingsFile, {});
+if (!jetpack.exists(SETTINGS_FILE)) {
+  jetpack.write(SETTINGS_FILE, {});
 }
 
 Object.entries(settings).forEach(([name, setting]) => {
   setting.subscribe((val: boolean) => {
-    const data = jetpack.read(settingsFile, "json") || {};
+    const data = jetpack.read(SETTINGS_FILE, "json") || {};
     data[name] = val;
-    jetpack.write(settingsFile, data);
+    jetpack.write(SETTINGS_FILE, data);
   });
 });

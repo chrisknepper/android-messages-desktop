@@ -2,9 +2,9 @@
   "trayEnabled": true,
   "notificationSoundEnabled": false,
   "enterToSendEnabled": true,
-  "hideNotificationContentEnabled": true,
+  "hideNotificationContentEnabled": false,
   "respectSystemDarkModeEnabled": true,
   "startInTrayEnabled": false,
-  "autoHideMenuEnabled": true,
+  "autoHideMenuEnabled": false,
   "seenMinimizeToTrayWarning": false
 }

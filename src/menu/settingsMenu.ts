@@ -1,11 +1,10 @@
 import {
   BrowserWindow,
-  dialog,
   Menu,
   MenuItem,
   MenuItemConstructorOptions,
 } from "electron";
-import { IS_LINUX, IS_MAC } from "../helpers/constants";
+import { IS_MAC } from "../helpers/constants";
 import {
   autoHideMenuEnabled,
   hideNotificationContentEnabled,
@@ -38,32 +37,15 @@ export const settingsMenu: MenuItemConstructorOptions = {
       label: IS_MAC ? "Enable Menu Bar Icon" : "Enable Tray Icon",
       type: "checkbox",
       checked: trayEnabled.value,
-      click: async (item: MenuItem): Promise<void> => {
-        let confirmClose = true;
-        if (IS_LINUX && !trayEnabled.value) {
-          const dialogAnswer = await dialog.showMessageBox({
-            type: "question",
-            buttons: ["Restart", "Cancel"],
-            title: "App Restart Required",
-            message:
-              "Changing this setting requires Android Messages to be restarted.\n\nUnsent text messages may be deleted. Click Restart to apply this setting change and restart Android Messages.",
-          });
-          if (dialogAnswer.response === 1) {
-            confirmClose = false;
-            item.checked = true; // Don't incorrectly flip checkmark if user canceled the dialog
-          }
-        }
-
-        if (confirmClose) {
-          trayEnabled.next(item.checked);
-        }
-      },
+      click: async (item: MenuItem): Promise<void> =>
+        trayEnabled.next(item.checked),
     },
     {
       id: "startInTrayMenuItem",
       label: IS_MAC ? "Start Hidden" : "Start In Tray",
       type: "checkbox",
       checked: startInTrayEnabled.value,
+      enabled: trayEnabled.value,
       click: (item: MenuItem): void => startInTrayEnabled.next(item.checked),
     },
   ],
