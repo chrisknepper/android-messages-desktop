@@ -1,9 +1,7 @@
 import { MenuItemConstructorOptions } from "electron";
-import { autoUpdater } from "electron-updater";
+import { checkForUpdate } from "../../helpers/autoUpdate";
 
 export const checkForUpdatesMenuItem: MenuItemConstructorOptions = {
   label: "Check for Updates",
-  click: (): void => {
-    autoUpdater.checkForUpdatesAndNotify();
-  },
+  click: checkForUpdate,
 };
