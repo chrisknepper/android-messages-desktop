@@ -1,5 +1,6 @@
 import process from "process";
 import path from "path";
+import { app } from "electron";
 
 export const osMap = {
   win32: "Windows",
@@ -25,7 +26,12 @@ export const IS_LINUX = OS_NAME === "linux";
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
-export const SETTINGS_FILE = path.resolve(RESOURCES_PATH, "settings.json");
+// needs to be a function because app is not initialized yet otherwise?
+export const SETTINGS_FILE = (): string =>
+  path.resolve(
+    app.getPath("userData"),
+    `settings${IS_DEV ? "-development" : ""}.json`
+  );
 
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";

@@ -3,7 +3,7 @@ import jetpack from "fs-jetpack";
 import { SETTINGS_FILE } from "./constants";
 
 function getSetting(key: string): boolean | undefined {
-  return (jetpack.read(SETTINGS_FILE, "json") || {})[key];
+  return (jetpack.read(SETTINGS_FILE(), "json") || {})[key];
 }
 
 type Setting = BehaviorSubject<boolean>;
@@ -67,14 +67,14 @@ export const settings: Settings = {
   seenResetSettingsWarning,
 };
 
-if (!jetpack.exists(SETTINGS_FILE)) {
-  jetpack.write(SETTINGS_FILE, {});
+if (!jetpack.exists(SETTINGS_FILE())) {
+  jetpack.write(SETTINGS_FILE(), {});
 }
 
 Object.entries(settings).forEach(([name, setting]) => {
   setting.subscribe((val: boolean) => {
-    const data = jetpack.read(SETTINGS_FILE, "json") || {};
+    const data = jetpack.read(SETTINGS_FILE(), "json") || {};
     data[name] = val;
-    jetpack.write(SETTINGS_FILE, data);
+    jetpack.write(SETTINGS_FILE(), data);
   });
 });
