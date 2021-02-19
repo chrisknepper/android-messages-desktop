@@ -28,7 +28,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
       checked: autoHideMenuEnabled.value,
       click: (item: MenuItem, window?: BrowserWindow): void => {
         autoHideMenuEnabled.next(item.checked);
-        window?.setMenuBarVisibility(autoHideMenuEnabled.value);
+        window?.setMenuBarVisibility(!autoHideMenuEnabled.value);
         window?.setAutoHideMenuBar(autoHideMenuEnabled.value);
       },
     },
