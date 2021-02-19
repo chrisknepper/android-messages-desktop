@@ -46,6 +46,7 @@ export class TrayManager {
         this.tray = new Tray(this.iconPath);
         const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
         this.tray.setContextMenu(trayContextMenu);
+        this.tray.setToolTip("Android Messages");
         this.setupEventListeners();
       }
     }
