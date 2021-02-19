@@ -86,7 +86,7 @@ if (!isFirstInstance) {
       width: 1100,
       height: 800,
       autoHideMenuBar: autoHideMenuEnabled.value,
-      show: true, //don't show window just yet (issue #229)
+      show: false, //don't show window just yet (issue #229)
       icon: IS_LINUX
         ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
         : undefined,
