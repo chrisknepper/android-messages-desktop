@@ -1,5 +1,6 @@
 import { CustomBrowserWindow } from "./helpers/window";
 import { TrayManager } from "./helpers/trayManager";
+import { Settings as AppSettings } from "./helpers/settings";
 
 declare global {
   interface Window {
@@ -10,6 +11,7 @@ declare global {
     interface App {
       mainWindow?: CustomBrowserWindow;
       trayManager?: TrayManager;
+      settings?: AppSettings;
     }
   }
 }

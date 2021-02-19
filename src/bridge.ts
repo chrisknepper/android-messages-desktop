@@ -1,16 +1,9 @@
 import { ipcRenderer, remote, NotificationConstructorOptions } from "electron";
 import path from "path";
-import {
-  EVENT_BRIDGE_INIT,
-  EVENT_UPDATE_USER_SETTING,
-  SETTING_HIDE_NOTIFICATION,
-  RESOURCES_PATH,
-  SETTING_NOTIFICATION_SOUND,
-  SETTING_START_IN_TRAY,
-} from "./helpers/constants";
+import { EVENT_BRIDGE_INIT, RESOURCES_PATH } from "./helpers/constants";
+// TODO: fix that
 import { handleEnterPrefToggle } from "./helpers/inputManager";
 import { popupContextMenu } from "./menu/contextMenu";
-import settings from "electron-settings";
 import { getProfileImg } from "./helpers/profileImage";
 
 const { Notification: ElectronNotification, app } = remote;
@@ -61,21 +54,8 @@ window.addEventListener("load", () => {
   });
 
   // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
-  if (!settings.get(SETTING_START_IN_TRAY)) app.mainWindow?.show();
-});
-
-ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
-  if ("useDarkMode" in settingsList && settingsList.useDarkMode !== null) {
-    if (settingsList.useDarkMode) {
-      // Props to Google for making the web app use dark mode entirely based on this class
-      // and for making the class name semantic!
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
-  }
-  if ("enterToSend" in settingsList) {
-    handleEnterPrefToggle(settingsList.enterToSend);
+  if (!app.settings?.startInTrayEnabled.value) {
+    app.mainWindow?.show();
   }
 });
 
@@ -95,9 +75,8 @@ ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
 window.Notification = function (title: string, options: NotificationOptions) {
   const icon = getProfileImg(title);
 
-  const hideContent = settings.get(SETTING_HIDE_NOTIFICATION, false) as boolean;
-
-  const notificationOpts: NotificationConstructorOptions = hideContent
+  const notificationOpts: NotificationConstructorOptions = app.settings
+    ?.hideNotificationContentEnabled.value
     ? {
         title: "New Message",
         body: "Click to open",
@@ -109,10 +88,7 @@ window.Notification = function (title: string, options: NotificationOptions) {
         body: options.body || "",
       };
 
-  notificationOpts.silent = settings.get(
-    SETTING_NOTIFICATION_SOUND,
-    true
-  ) as boolean;
+  notificationOpts.silent = !app.settings?.notificationSoundEnabled.value;
 
   const notification = new ElectronNotification(notificationOpts);
   notification.addListener("click", () => {

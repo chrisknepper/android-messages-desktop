@@ -1,17 +1,14 @@
 import { app, Menu, Tray } from "electron";
-import settings from "electron-settings";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
+import { IS_LINUX, IS_MAC, IS_WINDOWS, RESOURCES_PATH } from "./constants";
 import {
-  IS_LINUX,
-  IS_MAC,
-  IS_WINDOWS,
-  RESOURCES_PATH,
-  SETTING_TRAY_ENABLED,
-} from "./constants";
+  seenMinimizeToTrayWarning,
+  startInTrayEnabled,
+  trayEnabled,
+} from "./settings";
 
 export class TrayManager {
-  public enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX) as boolean;
   public iconPath = this.getIconPath();
   public overlayIconPath = this.getOverlayIconPath();
 
@@ -44,7 +41,7 @@ export class TrayManager {
   }
 
   public startIfEnabled(): void {
-    if (this.enabled) {
+    if (trayEnabled.value) {
       this.tray = new Tray(this.iconPath);
       const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
       this.tray.setContextMenu(trayContextMenu);
@@ -78,24 +75,20 @@ export class TrayManager {
   }
 
   public showMinimizeToTrayWarning(): void {
-    if (IS_WINDOWS && this.enabled) {
-      const seenMinimizeToTrayWarning = settings.get(
-        "seenMinimizeToTrayWarningPref",
-        false
-      ) as boolean;
-      if (!seenMinimizeToTrayWarning && this.tray != null) {
+    if (IS_WINDOWS && trayEnabled.value) {
+      if (!seenMinimizeToTrayWarning.value && this.tray != null) {
         this.tray.displayBalloon({
           title: "Android Messages",
           content:
             "Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.",
         });
-        settings.set("seenMinimizeToTrayWarningPref", true);
+        seenMinimizeToTrayWarning.next(true);
       }
     }
   }
 
   public handleTrayEnabledToggle(newValue: boolean): void {
-    this.enabled = newValue;
+    trayEnabled.next(newValue);
     const liveStartInTrayMenuItemRef = Menu.getApplicationMenu()?.getMenuItemById(
       "startInTrayMenuItem"
     );
@@ -121,7 +114,7 @@ export class TrayManager {
       if (!IS_MAC && liveStartInTrayMenuItemRef != null) {
         // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
         // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
-        settings.set("startInTrayPref", false);
+        startInTrayEnabled.next(false);
         liveStartInTrayMenuItemRef.enabled = false;
         liveStartInTrayMenuItemRef.checked = false;
       }

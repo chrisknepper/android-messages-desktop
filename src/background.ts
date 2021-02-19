@@ -1,25 +1,23 @@
-import {
-  app,
-  Event as ElectronEvent,
-  ipcMain,
-  Menu,
-  nativeTheme,
-  shell,
-} from "electron";
+import { app, Event as ElectronEvent, ipcMain, Menu, shell } from "electron";
 import { autoUpdater } from "electron-updater";
 import path from "path";
 import {
   BASE_APP_PATH,
   EVENT_BRIDGE_INIT,
-  EVENT_UPDATE_USER_SETTING,
   IS_DEV,
   IS_LINUX,
   IS_MAC,
   IS_WINDOWS,
   RESOURCES_PATH,
-  SETTING_TRAY_ENABLED,
 } from "./helpers/constants";
-import { SettingsManager } from "./helpers/settingsManager";
+import {
+  autoHideMenuEnabled,
+  enterToSendEnabled,
+  notificationSoundEnabled,
+  settings,
+  startInTrayEnabled,
+  trayEnabled,
+} from "./helpers/settings";
 import { TrayManager } from "./helpers/trayManager";
 import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
@@ -77,15 +75,9 @@ if (!isFirstInstance) {
   }
 
   let trayManager: TrayManager;
-  let settingsManager: SettingsManager;
 
   app.on("ready", () => {
     trayManager = new TrayManager();
-    settingsManager = new SettingsManager();
-    settingsManager.addWatcher(
-      SETTING_TRAY_ENABLED,
-      trayManager.handleTrayEnabledToggle
-    );
 
     setApplicationMenu();
     const menuInstance = Menu.getApplicationMenu();
@@ -95,14 +87,6 @@ if (!isFirstInstance) {
         mainWindow.show();
       });
     }
-
-    nativeTheme.on("updated", () => {
-      if (settingsManager.systemDarkMode) {
-        mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
-          useDarkMode: nativeTheme.shouldUseDarkColors,
-        });
-      }
-    });
 
     if (menuInstance != null) {
       const trayMenuItem = menuInstance.getMenuItemById("startInTrayMenuItem");
@@ -118,30 +102,24 @@ if (!isFirstInstance) {
       const hideNotificationContentMenuItem = menuInstance.getMenuItemById(
         "hideNotificationContentMenuItem"
       );
-      const useSystemDarkModeMenuItem = menuInstance.getMenuItemById(
-        "useSystemDarkModeMenuItem"
-      );
 
-      if (!IS_MAC) {
-        // Sets checked status based on user prefs
-        (menuInstance.getMenuItemById(
-          "autoHideMenuBarMenuItem"
-        ) as Electron.MenuItem).checked = settingsManager.autoHideMenu;
-        (trayMenuItem as Electron.MenuItem).enabled = trayManager.enabled;
-      }
+      // if (!IS_MAC) {
+      //   // Sets checked status based on user prefs
+      //   (menuInstance.getMenuItemById(
+      //     "autoHideMenuBarMenuItem"
+      //   ) as Electron.MenuItem).checked = autoHideMenuEnabled.value;
+      //   (trayMenuItem as Electron.MenuItem).enabled = trayEnabled.value;
+      // }
 
-      (trayMenuItem as Electron.MenuItem).checked = settingsManager.startInTray;
-      (enableTrayIconMenuItem as Electron.MenuItem).checked =
-        trayManager.enabled;
+      // (trayMenuItem as Electron.MenuItem).checked = startInTrayEnabled.value;
+      // (enableTrayIconMenuItem as Electron.MenuItem).checked = trayEnabled.value;
 
-      (notificationSoundEnabledMenuItem as Electron.MenuItem).checked =
-        settingsManager.notificationSound;
-      (pressEnterToSendMenuItem as Electron.MenuItem).checked =
-        settingsManager.enterToSend;
-      (hideNotificationContentMenuItem as Electron.MenuItem).checked =
-        settingsManager.hideNotificationContent;
-      (useSystemDarkModeMenuItem as Electron.MenuItem).checked =
-        settingsManager.systemDarkMode;
+      // (notificationSoundEnabledMenuItem as Electron.MenuItem).checked =
+      //   notificationSoundEnabled.value;
+      // (pressEnterToSendMenuItem as Electron.MenuItem).checked =
+      //   enterToSendEnabled.value;
+      // (hideNotificationContentMenuItem as Electron.MenuItem).checked =
+      //   notificationSoundEnabled.value;
     }
 
     autoUpdater.checkForUpdatesAndNotify();
@@ -149,7 +127,7 @@ if (!isFirstInstance) {
     mainWindow = new CustomBrowserWindow("main", {
       width: 1100,
       height: 800,
-      autoHideMenuBar: settingsManager.autoHideMenu,
+      autoHideMenuBar: autoHideMenuEnabled.value,
       show: false, //don't show window just yet (issue #229)
       icon: IS_LINUX
         ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
@@ -180,6 +158,7 @@ if (!isFirstInstance) {
     // Quick and dirty way for renderer process to access mainWindow for communication
     app.mainWindow = mainWindow;
     app.trayManager = trayManager;
+    app.settings = settings;
 
     trayManager.startIfEnabled();
 
@@ -189,16 +168,6 @@ if (!isFirstInstance) {
       }
 
       state.bridgeInitDone = true;
-
-      // We have to send un-solicited events (i.e. an event not the result of an event sent to this process) to the webview bridge
-      // via the renderer process. I'm not sure of a way to get a reference to the androidMessagesWebview inside the renderer from
-      // here. There may be a legit way to do it, or we can do it a dirty way like how we pass this process to the renderer.
-      mainWindow.webContents.send(EVENT_UPDATE_USER_SETTING, {
-        enterToSend: settingsManager.enterToSend,
-        useDarkMode: settingsManager.systemDarkMode
-          ? nativeTheme.shouldUseDarkColors
-          : null,
-      });
     });
 
     let quitViaContext = false;
@@ -210,7 +179,7 @@ if (!isFirstInstance) {
       if (IS_MAC) {
         return quitViaContext;
       } else {
-        if (trayManager?.enabled) {
+        if (trayEnabled.value) {
           return quitViaContext;
         }
         return true;

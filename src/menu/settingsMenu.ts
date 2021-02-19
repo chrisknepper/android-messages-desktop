@@ -5,8 +5,14 @@ import {
   MenuItem,
   MenuItemConstructorOptions,
 } from "electron";
-import settings from "electron-settings";
-import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../helpers/constants";
+import { IS_LINUX, IS_MAC } from "../helpers/constants";
+import {
+  autoHideMenuEnabled,
+  hideNotificationContentEnabled,
+  notificationSoundEnabled,
+  startInTrayEnabled,
+  trayEnabled,
+} from "../helpers/settings";
 import { separator } from "./items/separator";
 
 export const settingsMenu: MenuItemConstructorOptions = {
@@ -21,11 +27,9 @@ export const settingsMenu: MenuItemConstructorOptions = {
       label: "Auto Hide Menu Bar",
       type: "checkbox",
       click: (item: MenuItem, window?: BrowserWindow): void => {
-        const autoHideMenuPref = !settings.get("autoHideMenuPref");
-        settings.set("autoHideMenuPref", autoHideMenuPref);
-        item.checked = autoHideMenuPref;
-        window?.setMenuBarVisibility(!autoHideMenuPref);
-        window?.setAutoHideMenuBar(autoHideMenuPref);
+        autoHideMenuEnabled.next(item.checked);
+        window?.setMenuBarVisibility(autoHideMenuEnabled.value);
+        window?.setAutoHideMenuBar(autoHideMenuEnabled.value);
       },
     },
     {
@@ -33,9 +37,8 @@ export const settingsMenu: MenuItemConstructorOptions = {
       label: IS_MAC ? "Enable Menu Bar Icon" : "Enable Tray Icon",
       type: "checkbox",
       click: async (item: MenuItem): Promise<void> => {
-        const trayEnabledPref = !settings.get(SETTING_TRAY_ENABLED);
         let confirmClose = true;
-        if (IS_LINUX && !trayEnabledPref) {
+        if (IS_LINUX && !trayEnabled.value) {
           const dialogAnswer = await dialog.showMessageBox({
             type: "question",
             buttons: ["Restart", "Cancel"],
@@ -50,8 +53,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
         }
 
         if (confirmClose) {
-          settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
-          item.checked = trayEnabledPref;
+          trayEnabled.next(item.checked);
         }
       },
     },
@@ -59,11 +61,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "startInTrayMenuItem",
       label: IS_MAC ? "Start Hidden" : "Start In Tray",
       type: "checkbox",
-      click: (item: MenuItem): void => {
-        const startInTrayPref = !settings.get("startInTrayPref");
-        settings.set("startInTrayPref", startInTrayPref);
-        item.checked = startInTrayPref;
-      },
+      click: (item: MenuItem): void => startInTrayEnabled.next(item.checked),
     },
   ],
 };
@@ -78,36 +76,14 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "notificationSoundEnabledMenuItem",
       label: "Play Notification Sound",
       type: "checkbox",
-      click: (item) => {
-        settings.set("notificationSoundEnabledPref", item.checked);
-      },
-    },
-    separator,
-    {
-      id: "pressEnterToSendMenuItem",
-      label: "Press Enter to Send Message",
-      type: "checkbox",
-      click: (item) => {
-        settings.set("pressEnterToSendPref", item.checked);
-      },
+      click: (item) => notificationSoundEnabled.next(item.checked),
     },
     separator,
     {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
-      click: (item) => {
-        settings.set("hideNotificationContentPref", item.checked);
-      },
-    },
-    separator,
-    {
-      id: "useSystemDarkModeMenuItem",
-      label: "Use System Dark Mode Setting",
-      type: "checkbox",
-      click: (item) => {
-        settings.set("useSystemDarkModePref", item.checked);
-      },
+      click: (item) => hideNotificationContentEnabled.next(item.checked),
     }
   );
 }
