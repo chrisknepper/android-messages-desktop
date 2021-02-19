@@ -10,14 +10,7 @@ import {
   IS_WINDOWS,
   RESOURCES_PATH,
 } from "./helpers/constants";
-import {
-  autoHideMenuEnabled,
-  enterToSendEnabled,
-  notificationSoundEnabled,
-  settings,
-  startInTrayEnabled,
-  trayEnabled,
-} from "./helpers/settings";
+import { autoHideMenuEnabled, settings, trayEnabled } from "./helpers/settings";
 import { TrayManager } from "./helpers/trayManager";
 import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
@@ -80,46 +73,11 @@ if (!isFirstInstance) {
     trayManager = new TrayManager();
 
     setApplicationMenu();
-    const menuInstance = Menu.getApplicationMenu();
 
     if (IS_MAC) {
       app.on("activate", () => {
         mainWindow.show();
       });
-    }
-
-    if (menuInstance != null) {
-      const trayMenuItem = menuInstance.getMenuItemById("startInTrayMenuItem");
-      const enableTrayIconMenuItem = menuInstance.getMenuItemById(
-        "enableTrayIconMenuItem"
-      );
-      const notificationSoundEnabledMenuItem = menuInstance.getMenuItemById(
-        "notificationSoundEnabledMenuItem"
-      );
-      const pressEnterToSendMenuItem = menuInstance.getMenuItemById(
-        "pressEnterToSendMenuItem"
-      );
-      const hideNotificationContentMenuItem = menuInstance.getMenuItemById(
-        "hideNotificationContentMenuItem"
-      );
-
-      // if (!IS_MAC) {
-      //   // Sets checked status based on user prefs
-      //   (menuInstance.getMenuItemById(
-      //     "autoHideMenuBarMenuItem"
-      //   ) as Electron.MenuItem).checked = autoHideMenuEnabled.value;
-      //   (trayMenuItem as Electron.MenuItem).enabled = trayEnabled.value;
-      // }
-
-      // (trayMenuItem as Electron.MenuItem).checked = startInTrayEnabled.value;
-      // (enableTrayIconMenuItem as Electron.MenuItem).checked = trayEnabled.value;
-
-      // (notificationSoundEnabledMenuItem as Electron.MenuItem).checked =
-      //   notificationSoundEnabled.value;
-      // (pressEnterToSendMenuItem as Electron.MenuItem).checked =
-      //   enterToSendEnabled.value;
-      // (hideNotificationContentMenuItem as Electron.MenuItem).checked =
-      //   notificationSoundEnabled.value;
     }
 
     autoUpdater.checkForUpdatesAndNotify();

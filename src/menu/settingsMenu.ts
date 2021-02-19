@@ -26,6 +26,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "autoHideMenuBarMenuItem",
       label: "Auto Hide Menu Bar",
       type: "checkbox",
+      checked: autoHideMenuEnabled.value,
       click: (item: MenuItem, window?: BrowserWindow): void => {
         autoHideMenuEnabled.next(item.checked);
         window?.setMenuBarVisibility(autoHideMenuEnabled.value);
@@ -36,6 +37,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "enableTrayIconMenuItem",
       label: IS_MAC ? "Enable Menu Bar Icon" : "Enable Tray Icon",
       type: "checkbox",
+      checked: trayEnabled.value,
       click: async (item: MenuItem): Promise<void> => {
         let confirmClose = true;
         if (IS_LINUX && !trayEnabled.value) {
@@ -61,6 +63,7 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "startInTrayMenuItem",
       label: IS_MAC ? "Start Hidden" : "Start In Tray",
       type: "checkbox",
+      checked: startInTrayEnabled.value,
       click: (item: MenuItem): void => startInTrayEnabled.next(item.checked),
     },
   ],
@@ -76,6 +79,7 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "notificationSoundEnabledMenuItem",
       label: "Play Notification Sound",
       type: "checkbox",
+      checked: notificationSoundEnabled.value,
       click: (item) => notificationSoundEnabled.next(item.checked),
     },
     separator,
@@ -83,6 +87,7 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
+      checked: notificationSoundEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
     }
   );
