@@ -7,7 +7,6 @@ import {
 import { IS_MAC } from "../helpers/constants";
 import {
   autoHideMenuEnabled,
-  enterToSendEnabled,
   hideNotificationContentEnabled,
   notificationSoundEnabled,
   startInTrayEnabled,

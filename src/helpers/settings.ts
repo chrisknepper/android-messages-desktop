@@ -26,7 +26,6 @@ export const notificationSoundEnabled = createSetting(
   "notificationSoundEnabled",
   false
 );
-export const enterToSendEnabled = createSetting("enterToSendEnabled", true);
 export const hideNotificationContentEnabled = createSetting(
   "hideNotificationContentEnabled",
   false
