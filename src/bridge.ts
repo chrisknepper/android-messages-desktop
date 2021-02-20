@@ -1,6 +1,6 @@
 import { ipcRenderer, remote, NotificationConstructorOptions } from "electron";
 import path from "path";
-import { EVENT_BRIDGE_INIT, RESOURCES_PATH } from "./helpers/constants";
+import { EVENT_BRIDGE_INIT, IS_DEV, RESOURCES_PATH } from "./helpers/constants";
 import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
 
@@ -56,7 +56,9 @@ window.addEventListener("load", () => {
     app.mainWindow?.show();
   }
 
-  if (!app.settings?.seenResetSettingsWarning.value) {
+  // Note: this hides this during dev
+  // remove the condition for testing
+  if (!IS_DEV && !app.settings?.seenResetSettingsWarning.value) {
     const message = `
 The settings for this app have been reset.
 
