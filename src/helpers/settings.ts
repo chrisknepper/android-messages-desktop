@@ -84,10 +84,14 @@ if (!jetpack.exists(SETTINGS_FILE())) {
   jetpack.write(SETTINGS_FILE(), {});
 }
 
-Object.entries(settings).forEach(([name, setting]) => {
-  setting.subscribe((val: boolean) => {
-    const data = jetpack.read(SETTINGS_FILE(), "json") || {};
-    data[name] = val;
-    jetpack.write(SETTINGS_FILE(), data);
+Object.entries(settings).forEach(([_n, s]) => {
+  s.subscribe(() => {
+    // create a settings object unwrapped from the subjects
+    const seriazableSettings: Record<string, validJson> = {};
+    Object.entries(settings).forEach(([name, setting]) => {
+      seriazableSettings[name] = setting.value;
+    });
+    // write all the settings to the file from memory to avoid weird read write race conditions
+    jetpack.write(SETTINGS_FILE(), seriazableSettings);
   });
 });
