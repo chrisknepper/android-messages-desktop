@@ -48,7 +48,7 @@ export interface JsonSettings {
 }
 
 // wraps json settings in the setting type for export
-type Settings = {
+export type Settings = {
   [P in keyof JsonSettings]: Setting<JsonSettings[P]>;
 };
 
