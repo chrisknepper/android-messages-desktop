@@ -24,7 +24,7 @@
     "build:dev": "webpack --mode=development",
     "icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
     "lint": "eslint --fix --ext .ts,.js ./src",
-    "package": "electron-builder --config electron-builder.js"
+    "package": "yarn electron-builder --config electron-builder.js"
   },
   "dependencies": {
     "about-window": "1.13.4",
