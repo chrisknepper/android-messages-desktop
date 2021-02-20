@@ -1,9 +1,8 @@
-import { app, Event as ElectronEvent, ipcMain, Menu, shell } from "electron";
+import { app, Event as ElectronEvent, Menu, shell } from "electron";
 import { autoUpdater } from "electron-updater";
 import path from "path";
 import {
   BASE_APP_PATH,
-  EVENT_BRIDGE_INIT,
   IS_DEV,
   IS_LINUX,
   IS_MAC,
@@ -24,10 +23,6 @@ const {
   savedWindowSize,
   savedWindowPosition,
 } = settings;
-
-const state = {
-  bridgeInitDone: false,
-};
 
 let mainWindow: CustomBrowserWindow;
 
@@ -135,14 +130,6 @@ if (!isFirstInstance) {
 
     trayManager.startIfEnabled();
 
-    ipcMain.on(EVENT_BRIDGE_INIT, async (_event) => {
-      if (state.bridgeInitDone) {
-        return;
-      }
-
-      state.bridgeInitDone = true;
-    });
-
     let quitViaContext = false;
     app.on("before-quit", () => {
       quitViaContext = true;
@@ -179,18 +166,6 @@ if (!isFirstInstance) {
         contents.on("new-window", (e, url) => {
           e.preventDefault();
           shell.openExternal(url);
-        });
-
-        contents.on("destroyed", () => {
-          // we will need to re-init on reload
-          state.bridgeInitDone = false;
-        });
-
-        contents.on("will-navigate", (e, url) => {
-          if (url === "https://messages.google.com/web/authentication") {
-            // we were logged out, let's display a notification to the user about this in the future
-            state.bridgeInitDone = false;
-          }
         });
       }
     });

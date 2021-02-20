@@ -1,6 +1,6 @@
-import { ipcRenderer, remote, NotificationConstructorOptions } from "electron";
+import { remote, NotificationConstructorOptions } from "electron";
 import path from "path";
-import { EVENT_BRIDGE_INIT, IS_DEV, RESOURCES_PATH } from "./helpers/constants";
+import { IS_DEV, RESOURCES_PATH } from "./helpers/constants";
 import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
 
@@ -37,8 +37,6 @@ window.addEventListener("load", () => {
     observer: MutationObserver
   ) => {
     if (document.querySelector("mw-main-nav")) {
-      // we're definitely logged-in if this is in the DOM
-      ipcRenderer.send(EVENT_BRIDGE_INIT);
       createUnreadListener();
       observer.disconnect();
     }
