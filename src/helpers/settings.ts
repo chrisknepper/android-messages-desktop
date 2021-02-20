@@ -2,11 +2,14 @@ import { BehaviorSubject } from "rxjs";
 import jetpack from "fs-jetpack";
 import { SETTINGS_FILE } from "./constants";
 
-function getSetting(key: string): boolean | undefined {
+export type BoolSetting = BehaviorSubject<boolean>;
+export type StringSetting = BehaviorSubject<string>;
+export type NumSetting = BehaviorSubject<number>;
+
+function getSetting(key: string): unknown | undefined {
   return (jetpack.read(SETTINGS_FILE(), "json") || {})[key];
 }
 
-type Setting = BehaviorSubject<boolean>;
 /**
  *
  * initial must be a json serializable type
@@ -14,10 +17,10 @@ type Setting = BehaviorSubject<boolean>;
  * @param key name of setting
  * @param initial initial value if unset
  */
-function createSetting(key: string, initial: boolean): Setting {
+function createSetting<T>(key: string, initial: T): BehaviorSubject<T> {
   const savedVal = getSetting(key);
   const val = savedVal != null ? savedVal : initial;
-  return new BehaviorSubject(val);
+  return new BehaviorSubject(val) as BehaviorSubject<T>;
 }
 
 export const trayEnabled = createSetting("trayEnabled", false);
@@ -46,14 +49,14 @@ export const seenResetSettingsWarning = createSetting(
 );
 
 export interface Settings {
-  trayEnabled: Setting;
-  notificationSoundEnabled: Setting;
-  hideNotificationContentEnabled: Setting;
-  respectSystemDarkModeEnabled: Setting;
-  startInTrayEnabled: Setting;
-  autoHideMenuEnabled: Setting;
-  seenMinimizeToTrayWarning: Setting;
-  seenResetSettingsWarning: Setting;
+  trayEnabled: BoolSetting;
+  notificationSoundEnabled: BoolSetting;
+  hideNotificationContentEnabled: BoolSetting;
+  respectSystemDarkModeEnabled: BoolSetting;
+  startInTrayEnabled: BoolSetting;
+  autoHideMenuEnabled: BoolSetting;
+  seenMinimizeToTrayWarning: BoolSetting;
+  seenResetSettingsWarning: BoolSetting;
 }
 
 export const settings: Settings = {
