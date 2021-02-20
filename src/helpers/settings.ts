@@ -96,16 +96,19 @@ export const settings: Settings = settingsToExport as Settings;
 
 // loop through and add all the event listeners
 // has to be done in this step because settings needs to exist
-for (const name in defaultSettings) {
+for (const name in settings) {
   const key = name as keyof Settings;
-  const setting = settings[key];
-  setting.subscribe(() => {
-    // create a settings object unwrapped from the subjects
-    const seriazableSettings: Record<string, validJson> = {};
-    Object.entries(settings).forEach(([name, setting]) => {
-      seriazableSettings[name] = setting.value;
-    });
-    // write all the settings to the file from memory to avoid weird read write race conditions
-    jetpack.write(SETTINGS_FILE(), seriazableSettings);
+  // cast to unknown type to quell the compiler
+  const setting = settings[key] as BehaviorSubject<unknown>;
+  setting.subscribe({
+    next: () => {
+      // create a settings object unwrapped from the subjects
+      const seriazableSettings: Record<string, validJson> = {};
+      Object.entries(settings).forEach(([name, setting]) => {
+        seriazableSettings[name] = setting.value;
+      });
+      // write all the settings to the file from memory to avoid weird read write race conditions
+      jetpack.write(SETTINGS_FILE(), seriazableSettings);
+    },
   });
 }
