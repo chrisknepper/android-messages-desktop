@@ -35,7 +35,6 @@ function createSetting<T>(key: string, initial: T): BehaviorSubject<T> {
 
 export interface JsonSettings {
   trayEnabled: boolean;
-  notificationSoundEnabled: boolean;
   hideNotificationContentEnabled: boolean;
   respectSystemDarkModeEnabled: boolean;
   startInTrayEnabled: boolean;
@@ -65,7 +64,6 @@ type WindowPosition = {
 // default settings for the app
 const defaultSettings: JsonSettings = {
   trayEnabled: false,
-  notificationSoundEnabled: false,
   hideNotificationContentEnabled: false,
   respectSystemDarkModeEnabled: true,
   startInTrayEnabled: false,
