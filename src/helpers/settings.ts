@@ -2,13 +2,17 @@ import { BehaviorSubject } from "rxjs";
 import jetpack from "fs-jetpack";
 import { SETTINGS_FILE } from "./constants";
 
+// base types in json
 type primative = null | boolean | number | string;
-
+// expression of json arrays
+type jsonArr = validJson[];
+// recursive interface with all valid expressions of json inside of an object
 interface json {
-  [key: string]: json | primative | primative[];
+  [key: string]: json | primative | jsonArr;
 }
 
-type validJson = primative | primative[] | json;
+// a complete expression of json including root arrays, primatives, and objects
+type validJson = primative | jsonArr | json;
 
 export type Setting<T extends validJson> = BehaviorSubject<T>;
 
