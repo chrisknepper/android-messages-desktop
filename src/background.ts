@@ -1,6 +1,6 @@
 import { app, Event as ElectronEvent, Menu, shell } from "electron";
-import { autoUpdater } from "electron-updater";
 import path from "path";
+import { checkForUpdate } from "./helpers/autoUpdate";
 import {
   BASE_APP_PATH,
   IS_DEV,
@@ -22,6 +22,7 @@ const {
   trayEnabled,
   savedWindowSize,
   savedWindowPosition,
+  checkForUpdateOnLaunchEnabled,
 } = settings;
 
 let mainWindow: CustomBrowserWindow;
@@ -83,7 +84,9 @@ if (!isFirstInstance) {
       });
     }
 
-    autoUpdater.checkForUpdatesAndNotify();
+    if (checkForUpdateOnLaunchEnabled.value) {
+      checkForUpdate(true);
+    }
 
     // destructure from the settings
     const { width, height } = savedWindowSize.value;

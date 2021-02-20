@@ -44,6 +44,7 @@ export interface JsonSettings {
   seenResetSettingsWarning: boolean;
   savedWindowSize: WindowSize;
   savedWindowPosition: WindowPosition | null;
+  checkForUpdateOnLaunchEnabled: boolean;
 }
 
 // wraps json settings in the setting type for export
@@ -73,6 +74,7 @@ const defaultSettings: JsonSettings = {
   seenResetSettingsWarning: false,
   savedWindowSize: { width: 1100, height: 800 },
   savedWindowPosition: null,
+  checkForUpdateOnLaunchEnabled: true,
 };
 
 // create default settings file if it doesnt exist

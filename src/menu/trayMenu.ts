@@ -1,5 +1,6 @@
 import { app, MenuItemConstructorOptions } from "electron";
 import { IS_MAC } from "../helpers/constants";
+import { separator } from "./items/separator";
 
 export const trayMenuTemplate: MenuItemConstructorOptions[] = [
   {
@@ -19,9 +20,7 @@ export const trayMenuTemplate: MenuItemConstructorOptions[] = [
       }
     },
   },
-  {
-    type: "separator",
-  },
+  separator,
   {
     label: "Quit Android Messages",
     click: (): void => {
