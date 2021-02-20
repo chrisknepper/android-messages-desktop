@@ -13,7 +13,6 @@ const {
   autoHideMenuEnabled,
   trayEnabled,
   startInTrayEnabled,
-  notificationSoundEnabled,
   hideNotificationContentEnabled,
   checkForUpdateOnLaunchEnabled,
 } = settings;
