@@ -13,7 +13,6 @@ const {
   autoHideMenuEnabled,
   trayEnabled,
   startInTrayEnabled,
-  notificationSoundEnabled,
   hideNotificationContentEnabled,
   checkForUpdateOnLaunchEnabled,
 } = settings;
@@ -62,18 +61,10 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
   settingsMenu.submenu.push(
     separator,
     {
-      id: "notificationSoundEnabledMenuItem",
-      label: "Play Notification Sound",
-      type: "checkbox",
-      checked: notificationSoundEnabled.value,
-      click: (item) => notificationSoundEnabled.next(item.checked),
-    },
-    separator,
-    {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
-      checked: notificationSoundEnabled.value,
+      checked: hideNotificationContentEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
     },
     separator,

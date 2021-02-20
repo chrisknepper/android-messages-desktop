@@ -62,9 +62,10 @@ The settings for this app have been reset.
 
 This is a one time occurance and is the result of behind the scenes work to clean up the code.
 
-You may notice two missing settings:
+You may notice three missing settings:
 
   - Enter to Send: Moved to the 3 dots menu
+  - Notification Sound: Moved to the 3 dots menu
   - Use System Theme: Removed for the time being in favor of manual operation
     `;
     dialog.showMessageBox({
@@ -106,7 +107,8 @@ window.Notification = function (title: string, options: NotificationOptions) {
         body: options.body || "",
       };
 
-  notificationOpts.silent = !app.settings?.notificationSoundEnabled.value;
+  // let google handle making the noise
+  notificationOpts.silent = true;
 
   const notification = new ElectronNotification(notificationOpts);
   notification.addListener("click", () => {
