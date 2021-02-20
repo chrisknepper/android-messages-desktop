@@ -1,5 +1,5 @@
-import { ipcRenderer, remote, WebviewTag } from "electron";
-import { EVENT_UPDATE_USER_SETTING, IS_MAC, IS_DEV } from "./helpers/constants";
+import { remote, WebviewTag } from "electron";
+import { IS_MAC, IS_DEV } from "./helpers/constants";
 import "./stylesheets/main.css";
 
 const app = remote.app;
@@ -21,9 +21,4 @@ androidMessagesWebview.addEventListener("dom-ready", () => {
       ".main-nav-header .logo {text-align:center; transform: translateX(10px)}"
     );
   }
-});
-
-// Forward event from main process to webview bridge
-ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (_event, settingsList) => {
-  androidMessagesWebview.send(EVENT_UPDATE_USER_SETTING, settingsList);
 });

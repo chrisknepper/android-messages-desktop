@@ -1,26 +1,22 @@
 import { app, Menu, Tray } from "electron";
-import settings from "electron-settings";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
-import {
-  IS_LINUX,
-  IS_MAC,
-  IS_WINDOWS,
-  RESOURCES_PATH,
-  SETTING_TRAY_ENABLED,
-} from "./constants";
+import { IS_LINUX, IS_MAC, IS_WINDOWS, RESOURCES_PATH } from "./constants";
+import { settings } from "./settings";
+
+// bring the settings into scoped
+const { trayEnabled, startInTrayEnabled, seenMinimizeToTrayWarning } = settings;
 
 export class TrayManager {
-  public enabled = settings.get(SETTING_TRAY_ENABLED, !IS_LINUX) as boolean;
+  public enabled = trayEnabled.value;
   public iconPath = this.getIconPath();
   public overlayIconPath = this.getOverlayIconPath();
 
   public tray: Tray | null = null;
 
   constructor() {
-    this.handleTrayEnabledToggle = this.handleTrayEnabledToggle.bind(this);
+    trayEnabled.subscribe((val) => this.handleTrayEnabledToggle(val));
   }
-
   private getIconPath(): string {
     if (IS_WINDOWS) {
       // Re-use regular app .ico for the tray icon on Windows.
@@ -44,11 +40,14 @@ export class TrayManager {
   }
 
   public startIfEnabled(): void {
-    if (this.enabled) {
-      this.tray = new Tray(this.iconPath);
-      const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-      this.tray.setContextMenu(trayContextMenu);
-      this.setupEventListeners();
+    if (!this.tray) {
+      if (this.enabled) {
+        this.tray = new Tray(this.iconPath);
+        const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+        this.tray.setContextMenu(trayContextMenu);
+        this.tray.setToolTip("Android Messages");
+        this.setupEventListeners();
+      }
     }
   }
 
@@ -78,18 +77,14 @@ export class TrayManager {
   }
 
   public showMinimizeToTrayWarning(): void {
-    if (IS_WINDOWS && this.enabled) {
-      const seenMinimizeToTrayWarning = settings.get(
-        "seenMinimizeToTrayWarningPref",
-        false
-      ) as boolean;
-      if (!seenMinimizeToTrayWarning && this.tray != null) {
+    if (IS_WINDOWS && trayEnabled.value) {
+      if (!seenMinimizeToTrayWarning.value && this.tray != null) {
         this.tray.displayBalloon({
           title: "Android Messages",
           content:
             "Android Messages is still running in the background. To close it, use the File menu or right-click on the tray icon.",
         });
-        settings.set("seenMinimizeToTrayWarningPref", true);
+        seenMinimizeToTrayWarning.next(true);
       }
     }
   }
@@ -101,42 +96,28 @@ export class TrayManager {
     );
 
     if (newValue) {
-      if (!IS_MAC && liveStartInTrayMenuItemRef != null) {
-        // Must get a live reference to the menu item when updating their properties from outside of them.
+      this.startIfEnabled();
+      if (liveStartInTrayMenuItemRef != null) {
         liveStartInTrayMenuItemRef.enabled = true;
-      }
-      if (!this.tray) {
-        this.startIfEnabled();
       }
     }
     if (!newValue) {
-      if (this.tray) {
-        this.destroy();
-        if (!IS_MAC) {
-          if (!app.mainWindow?.isVisible()) {
-            app.mainWindow?.show();
-          }
-        }
-      }
-      if (!IS_MAC && liveStartInTrayMenuItemRef != null) {
-        // If the app has no tray icon, it can be difficult or impossible to re-gain access to the window, so disallow
-        // starting hidden, except on Mac, where the app window can still be un-hidden via the dock.
-        settings.set("startInTrayPref", false);
+      this.destroy();
+      startInTrayEnabled.next(false);
+
+      if (liveStartInTrayMenuItemRef != null) {
         liveStartInTrayMenuItemRef.enabled = false;
         liveStartInTrayMenuItemRef.checked = false;
       }
-      if (IS_LINUX) {
-        // On Linux, the call to tray.destroy doesn't seem to work, causing multiple instances of the tray icon.
-        // Work around this by quickly restarting the app.
-        app.relaunch();
-        app.exit(0);
+
+      if (!app.mainWindow?.isVisible()) {
+        app.mainWindow?.show();
       }
     }
   }
 
   public setUnreadIcon(toggle: boolean): void {
     if (this.tray && this.overlayIconPath != null) {
-      this.tray.setToolTip("Android Messages");
       if (toggle) {
         this.tray.setImage(this.overlayIconPath);
       } else {

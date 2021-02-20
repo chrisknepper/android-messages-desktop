@@ -1,13 +1,21 @@
 import {
   BrowserWindow,
-  dialog,
   Menu,
   MenuItem,
   MenuItemConstructorOptions,
 } from "electron";
-import settings from "electron-settings";
-import { IS_LINUX, IS_MAC, SETTING_TRAY_ENABLED } from "../helpers/constants";
+import { IS_MAC } from "../helpers/constants";
+import { settings } from "../helpers/settings";
 import { separator } from "./items/separator";
+
+// bring the settings into scope
+const {
+  autoHideMenuEnabled,
+  trayEnabled,
+  startInTrayEnabled,
+  notificationSoundEnabled,
+  hideNotificationContentEnabled,
+} = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "&Preferences" : "&Settings",
@@ -20,50 +28,28 @@ export const settingsMenu: MenuItemConstructorOptions = {
       id: "autoHideMenuBarMenuItem",
       label: "Auto Hide Menu Bar",
       type: "checkbox",
+      checked: autoHideMenuEnabled.value,
       click: (item: MenuItem, window?: BrowserWindow): void => {
-        const autoHideMenuPref = !settings.get("autoHideMenuPref");
-        settings.set("autoHideMenuPref", autoHideMenuPref);
-        item.checked = autoHideMenuPref;
-        window?.setMenuBarVisibility(!autoHideMenuPref);
-        window?.setAutoHideMenuBar(autoHideMenuPref);
+        autoHideMenuEnabled.next(item.checked);
+        window?.setMenuBarVisibility(!autoHideMenuEnabled.value);
+        window?.setAutoHideMenuBar(autoHideMenuEnabled.value);
       },
     },
     {
       id: "enableTrayIconMenuItem",
       label: IS_MAC ? "Enable Menu Bar Icon" : "Enable Tray Icon",
       type: "checkbox",
-      click: async (item: MenuItem): Promise<void> => {
-        const trayEnabledPref = !settings.get(SETTING_TRAY_ENABLED);
-        let confirmClose = true;
-        if (IS_LINUX && !trayEnabledPref) {
-          const dialogAnswer = await dialog.showMessageBox({
-            type: "question",
-            buttons: ["Restart", "Cancel"],
-            title: "App Restart Required",
-            message:
-              "Changing this setting requires Android Messages to be restarted.\n\nUnsent text messages may be deleted. Click Restart to apply this setting change and restart Android Messages.",
-          });
-          if (dialogAnswer.response === 1) {
-            confirmClose = false;
-            item.checked = true; // Don't incorrectly flip checkmark if user canceled the dialog
-          }
-        }
-
-        if (confirmClose) {
-          settings.set(SETTING_TRAY_ENABLED, trayEnabledPref);
-          item.checked = trayEnabledPref;
-        }
-      },
+      checked: trayEnabled.value,
+      click: async (item: MenuItem): Promise<void> =>
+        trayEnabled.next(item.checked),
     },
     {
       id: "startInTrayMenuItem",
       label: IS_MAC ? "Start Hidden" : "Start In Tray",
       type: "checkbox",
-      click: (item: MenuItem): void => {
-        const startInTrayPref = !settings.get("startInTrayPref");
-        settings.set("startInTrayPref", startInTrayPref);
-        item.checked = startInTrayPref;
-      },
+      checked: startInTrayEnabled.value,
+      enabled: trayEnabled.value,
+      click: (item: MenuItem): void => startInTrayEnabled.next(item.checked),
     },
   ],
 };
@@ -78,36 +64,16 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "notificationSoundEnabledMenuItem",
       label: "Play Notification Sound",
       type: "checkbox",
-      click: (item) => {
-        settings.set("notificationSoundEnabledPref", item.checked);
-      },
-    },
-    separator,
-    {
-      id: "pressEnterToSendMenuItem",
-      label: "Press Enter to Send Message",
-      type: "checkbox",
-      click: (item) => {
-        settings.set("pressEnterToSendPref", item.checked);
-      },
+      checked: notificationSoundEnabled.value,
+      click: (item) => notificationSoundEnabled.next(item.checked),
     },
     separator,
     {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
-      click: (item) => {
-        settings.set("hideNotificationContentPref", item.checked);
-      },
-    },
-    separator,
-    {
-      id: "useSystemDarkModeMenuItem",
-      label: "Use System Dark Mode Setting",
-      type: "checkbox",
-      click: (item) => {
-        settings.set("useSystemDarkModePref", item.checked);
-      },
+      checked: notificationSoundEnabled.value,
+      click: (item) => hideNotificationContentEnabled.next(item.checked),
     }
   );
 }

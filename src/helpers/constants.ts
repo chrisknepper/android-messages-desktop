@@ -1,5 +1,6 @@
 import process from "process";
 import path from "path";
+import { app } from "electron";
 
 export const osMap = {
   win32: "Windows",
@@ -25,17 +26,11 @@ export const IS_LINUX = OS_NAME === "linux";
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const BASE_APP_PATH = path.resolve(__dirname, "..");
 export const RESOURCES_PATH = path.resolve(BASE_APP_PATH, "resources");
-
-// Settings
-export const SETTING_TRAY_ENABLED = "trayEnabledPref";
-export const SETTING_CUSTOM_WORDS = "savedCustomDictionaryWords";
-export const SETTING_NOTIFICATION_SOUND = "notificationSoundEnabledPref";
-export const SETTING_ENTER_TO_SEND = "pressEnterToSendPref";
-export const SETTING_HIDE_NOTIFICATION = "hideNotificationContentPref";
-export const SETTING_SYSTEM_DARK_MODE = "useSystemDarkModePref";
-export const SETTING_START_IN_TRAY = "startInTrayPref";
-export const SETTING_AUTOHIDE_MENU = "autoHideMenuPref";
+// needs to be a function because app is not initialized yet otherwise?
+export const SETTINGS_FILE = (): string =>
+  !IS_DEV
+    ? path.resolve(app.getPath("userData"), `settings.json`)
+    : path.resolve(BASE_APP_PATH, "settings.json");
 
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";
-export const EVENT_UPDATE_USER_SETTING = "messages-update-user-setting";
