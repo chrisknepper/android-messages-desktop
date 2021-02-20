@@ -2,7 +2,15 @@ import { BehaviorSubject } from "rxjs";
 import jetpack from "fs-jetpack";
 import { SETTINGS_FILE } from "./constants";
 
-export type Setting<T> = BehaviorSubject<T>;
+type primative = null | boolean | number | string;
+
+interface json {
+  [key: string]: json | primative | primative[];
+}
+
+export type Setting<
+  T extends primative | primative[] | json
+> = BehaviorSubject<T>;
 
 function getSetting(key: string): unknown | undefined {
   return (jetpack.read(SETTINGS_FILE(), "json") || {})[key];
