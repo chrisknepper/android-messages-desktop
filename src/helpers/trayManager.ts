@@ -11,6 +11,7 @@ export class TrayManager {
   public enabled = trayEnabled.value;
   public iconPath = this.getIconPath();
   public overlayIconPath = this.getOverlayIconPath();
+  private lastIcon = this.iconPath;
 
   public tray: Tray | null = null;
 
@@ -42,7 +43,7 @@ export class TrayManager {
   public startIfEnabled(): void {
     if (!this.tray) {
       if (this.enabled) {
-        this.tray = new Tray(this.iconPath);
+        this.tray = new Tray(this.lastIcon);
         const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
         this.tray.setContextMenu(trayContextMenu);
         this.tray.setToolTip("Android Messages");
@@ -117,12 +118,15 @@ export class TrayManager {
   }
 
   public setUnreadIcon(toggle: boolean): void {
-    if (this.tray && this.overlayIconPath != null) {
+    if (this.overlayIconPath != null) {
       if (toggle) {
-        this.tray.setImage(this.overlayIconPath);
+        this.lastIcon = this.overlayIconPath;
       } else {
-        this.tray.setImage(this.iconPath);
+        this.lastIcon = this.iconPath;
       }
+    }
+    if (this.tray) {
+      this.tray.setImage(this.lastIcon);
     }
   }
 }
