@@ -100,15 +100,13 @@ for (const name in settings) {
   const key = name as keyof Settings;
   // cast to unknown type to quell the compiler
   const setting = settings[key] as BehaviorSubject<unknown>;
-  setting.subscribe({
-    next: () => {
-      // create a settings object unwrapped from the subjects
-      const seriazableSettings: Record<string, validJson> = {};
-      Object.entries(settings).forEach(([name, setting]) => {
-        seriazableSettings[name] = setting.value;
-      });
-      // write all the settings to the file from memory to avoid weird read write race conditions
-      jetpack.write(SETTINGS_FILE(), seriazableSettings);
-    },
+  setting.subscribe(() => {
+    // create a settings object unwrapped from the subjects
+    const seriazableSettings: Record<string, validJson> = {};
+    Object.entries(settings).forEach(([name, setting]) => {
+      seriazableSettings[name] = setting.value;
+    });
+    // write all the settings to the file from memory to avoid weird read write race conditions
+    jetpack.write(SETTINGS_FILE(), seriazableSettings);
   });
 }
