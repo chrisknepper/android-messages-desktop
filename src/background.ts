@@ -22,6 +22,7 @@ const {
   trayEnabled,
   savedWindowSize,
   savedWindowPosition,
+  checkForUpdateOnLaunchEnabled,
 } = settings;
 
 let mainWindow: CustomBrowserWindow;
@@ -83,7 +84,9 @@ if (!isFirstInstance) {
       });
     }
 
-    checkForUpdate(true);
+    if (checkForUpdateOnLaunchEnabled.value) {
+      checkForUpdate(true);
+    }
 
     // destructure from the settings
     const { width, height } = savedWindowSize.value;

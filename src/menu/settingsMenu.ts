@@ -15,6 +15,7 @@ const {
   startInTrayEnabled,
   notificationSoundEnabled,
   hideNotificationContentEnabled,
+  checkForUpdateOnLaunchEnabled,
 } = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
@@ -74,6 +75,14 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       type: "checkbox",
       checked: notificationSoundEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
+    },
+    separator,
+    {
+      id: "checkForUpdateOnLaunchEnabledMenuItem",
+      label: "Check for Update on Launch",
+      type: "checkbox",
+      checked: checkForUpdateOnLaunchEnabled.value,
+      click: (item) => checkForUpdateOnLaunchEnabled.next(item.checked),
     }
   );
 }
