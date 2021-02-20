@@ -1,8 +1,16 @@
 import { app, Menu, Tray } from "electron";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
-import { IS_LINUX, IS_MAC, IS_WINDOWS, RESOURCES_PATH } from "./constants";
+import {
+  IS_DEV,
+  IS_LINUX,
+  IS_MAC,
+  IS_WINDOWS,
+  RESOURCES_PATH,
+  UUID_NAMESPACE,
+} from "./constants";
 import { settings } from "./settings";
+import { v5 as uuidv5 } from "uuid";
 
 // bring the settings into scoped
 const { trayEnabled, startInTrayEnabled, seenMinimizeToTrayWarning } = settings;
@@ -43,7 +51,18 @@ export class TrayManager {
   public startIfEnabled(): void {
     if (!this.tray) {
       if (this.enabled) {
-        this.tray = new Tray(this.lastIcon);
+        // if the os is windows generate guid otherwise it is undefined
+        const guid = IS_WINDOWS
+          ? uuidv5(
+              `android-messages-desktop${
+                // if is dev add an identifier
+                IS_DEV ? "-development" : ""
+                // append the app path incase that changes for some reason
+              }-${app.getAppPath()}`,
+              UUID_NAMESPACE
+            )
+          : undefined;
+        this.tray = new Tray(this.lastIcon, guid);
         const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
         this.tray.setContextMenu(trayContextMenu);
         this.tray.setToolTip("Android Messages");
