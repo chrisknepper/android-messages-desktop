@@ -62,14 +62,6 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
   settingsMenu.submenu.push(
     separator,
     {
-      id: "notificationSoundEnabledMenuItem",
-      label: "Play Notification Sound",
-      type: "checkbox",
-      checked: notificationSoundEnabled.value,
-      click: (item) => notificationSoundEnabled.next(item.checked),
-    },
-    separator,
-    {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
