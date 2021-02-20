@@ -2,9 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import jetpack from "fs-jetpack";
 import { SETTINGS_FILE } from "./constants";
 
-export type BoolSetting = BehaviorSubject<boolean>;
-export type StringSetting = BehaviorSubject<string>;
-export type NumSetting = BehaviorSubject<number>;
+export type Setting<T> = BehaviorSubject<T>;
 
 function getSetting(key: string): unknown | undefined {
   return (jetpack.read(SETTINGS_FILE(), "json") || {})[key];
@@ -49,14 +47,14 @@ export const seenResetSettingsWarning = createSetting(
 );
 
 export interface Settings {
-  trayEnabled: BoolSetting;
-  notificationSoundEnabled: BoolSetting;
-  hideNotificationContentEnabled: BoolSetting;
-  respectSystemDarkModeEnabled: BoolSetting;
-  startInTrayEnabled: BoolSetting;
-  autoHideMenuEnabled: BoolSetting;
-  seenMinimizeToTrayWarning: BoolSetting;
-  seenResetSettingsWarning: BoolSetting;
+  trayEnabled: Setting<boolean>;
+  notificationSoundEnabled: Setting<boolean>;
+  hideNotificationContentEnabled: Setting<boolean>;
+  respectSystemDarkModeEnabled: Setting<boolean>;
+  startInTrayEnabled: Setting<boolean>;
+  autoHideMenuEnabled: Setting<boolean>;
+  seenMinimizeToTrayWarning: Setting<boolean>;
+  seenResetSettingsWarning: Setting<boolean>;
 }
 
 export const settings: Settings = {
