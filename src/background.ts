@@ -83,7 +83,7 @@ if (!isFirstInstance) {
       });
     }
 
-    checkForUpdate();
+    checkForUpdate(true);
 
     // destructure from the settings
     const { width, height } = savedWindowSize.value;

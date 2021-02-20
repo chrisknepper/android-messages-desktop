@@ -1,5 +1,7 @@
 import { autoUpdater } from "electron-updater";
-import { IS_MAC } from "./constants";
+import { app, Notification } from "electron";
+import path from "path";
+import { RESOURCES_PATH } from "./constants";
 
 function setUpdaterSettings(): void {
   autoUpdater.autoDownload = false;
@@ -9,16 +11,23 @@ function setUpdaterSettings(): void {
 /**
  * Returns true if there is an update.
  */
-export async function checkForUpdate(): Promise<boolean> {
+export async function checkForUpdate(
+  showNotification: boolean
+): Promise<boolean> {
   setUpdaterSettings();
-  return (
-    (await autoUpdater.checkForUpdatesAndNotify({
+  const results = await autoUpdater.checkForUpdates();
+  const isUpdate = results.updateInfo.version != app.getVersion();
+  if (isUpdate && showNotification) {
+    const notification = new Notification({
       title: "Update Available",
-      body: `There is an update available. It will not install until you click the button in the ${
-        IS_MAC ? "app" : "file"
-      } menu.`,
-    })) != null
-  );
+      body:
+        'There is an update available. Click "Install Update"' +
+        " in the file or app menu.",
+      icon: path.resolve(RESOURCES_PATH, "icons", "64x64.png"),
+    });
+    notification.show();
+  }
+  return isUpdate;
 }
 
 /**
@@ -26,7 +35,7 @@ export async function checkForUpdate(): Promise<boolean> {
  */
 export async function installUpdate(): Promise<void> {
   setUpdaterSettings();
-  if (await checkForUpdate()) {
+  if (await checkForUpdate(false)) {
     await autoUpdater.downloadUpdate();
     autoUpdater.quitAndInstall();
   }
