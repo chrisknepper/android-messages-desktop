@@ -10,12 +10,15 @@ import {
   IS_WINDOWS,
   RESOURCES_PATH,
 } from "./helpers/constants";
-import { autoHideMenuEnabled, settings, trayEnabled } from "./helpers/settings";
+import { settings } from "./helpers/settings";
 import { TrayManager } from "./helpers/trayManager";
 import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
 import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
+
+// bring the settings into scope
+const { autoHideMenuEnabled, trayEnabled } = settings;
 
 const state = {
   bridgeInitDone: false,

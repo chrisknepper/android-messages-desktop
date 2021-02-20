@@ -33,59 +33,59 @@ function createSetting<T>(key: string, initial: T): BehaviorSubject<T> {
   return new BehaviorSubject(val) as BehaviorSubject<T>;
 }
 
-export const trayEnabled = createSetting("trayEnabled", false);
-
-export const notificationSoundEnabled = createSetting(
-  "notificationSoundEnabled",
-  false
-);
-export const hideNotificationContentEnabled = createSetting(
-  "hideNotificationContentEnabled",
-  false
-);
-export const respectSystemDarkModeEnabled = createSetting(
-  "respectSystemDarkModeEnabled",
-  true
-);
-export const startInTrayEnabled = createSetting("startInTrayEnabled", false);
-export const autoHideMenuEnabled = createSetting("autoHideMenuEnabled", false);
-export const seenMinimizeToTrayWarning = createSetting(
-  "seenMinimizeToTrayWarning",
-  false
-);
-export const seenResetSettingsWarning = createSetting(
-  "seenResetSettingsWarning",
-  false
-);
-
-export interface Settings {
-  trayEnabled: Setting<boolean>;
-  notificationSoundEnabled: Setting<boolean>;
-  hideNotificationContentEnabled: Setting<boolean>;
-  respectSystemDarkModeEnabled: Setting<boolean>;
-  startInTrayEnabled: Setting<boolean>;
-  autoHideMenuEnabled: Setting<boolean>;
-  seenMinimizeToTrayWarning: Setting<boolean>;
-  seenResetSettingsWarning: Setting<boolean>;
+export interface JsonSettings {
+  trayEnabled: boolean;
+  notificationSoundEnabled: boolean;
+  hideNotificationContentEnabled: boolean;
+  respectSystemDarkModeEnabled: boolean;
+  startInTrayEnabled: boolean;
+  autoHideMenuEnabled: boolean;
+  seenMinimizeToTrayWarning: boolean;
+  seenResetSettingsWarning: boolean;
 }
 
-export const settings: Settings = {
-  trayEnabled,
-  notificationSoundEnabled,
-  hideNotificationContentEnabled,
-  respectSystemDarkModeEnabled,
-  startInTrayEnabled,
-  autoHideMenuEnabled,
-  seenMinimizeToTrayWarning,
-  seenResetSettingsWarning,
+// wraps json settings in the setting type for export
+type Settings = {
+  [P in keyof JsonSettings]: Setting<JsonSettings[P]>;
 };
 
+// default settings for the app
+const defaultSettings: JsonSettings = {
+  trayEnabled: false,
+  notificationSoundEnabled: false,
+  hideNotificationContentEnabled: false,
+  respectSystemDarkModeEnabled: true,
+  startInTrayEnabled: false,
+  autoHideMenuEnabled: false,
+  seenMinimizeToTrayWarning: false,
+  seenResetSettingsWarning: false,
+};
+
+// create default settings file if it doesnt exist
 if (!jetpack.exists(SETTINGS_FILE())) {
-  jetpack.write(SETTINGS_FILE(), {});
+  jetpack.write(SETTINGS_FILE(), defaultSettings);
 }
 
-Object.entries(settings).forEach(([_n, s]) => {
-  s.subscribe(() => {
+// temporary settings object during creation
+const settingsToExport: Partial<Settings> = {};
+
+// loop through and create all the settings
+for (const name in defaultSettings) {
+  const key = name as keyof Settings;
+  const setting = createSetting(name, defaultSettings[key]);
+  settingsToExport[key] = setting;
+}
+
+// We know this is safe because we are enumerating all of the settings in default settings
+// furthermore the `Settings` type is derived from the default settings type
+export const settings: Settings = settingsToExport as Settings;
+
+// loop through and add all the event listeners
+// has to be done in this step because settings needs to exist
+for (const name in defaultSettings) {
+  const key = name as keyof Settings;
+  const setting = settings[key];
+  setting.subscribe(() => {
     // create a settings object unwrapped from the subjects
     const seriazableSettings: Record<string, validJson> = {};
     Object.entries(settings).forEach(([name, setting]) => {
@@ -94,4 +94,4 @@ Object.entries(settings).forEach(([_n, s]) => {
     // write all the settings to the file from memory to avoid weird read write race conditions
     jetpack.write(SETTINGS_FILE(), seriazableSettings);
   });
-});
+}

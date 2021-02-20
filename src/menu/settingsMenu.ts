@@ -5,14 +5,17 @@ import {
   MenuItemConstructorOptions,
 } from "electron";
 import { IS_MAC } from "../helpers/constants";
-import {
-  autoHideMenuEnabled,
-  hideNotificationContentEnabled,
-  notificationSoundEnabled,
-  startInTrayEnabled,
-  trayEnabled,
-} from "../helpers/settings";
+import { settings } from "../helpers/settings";
 import { separator } from "./items/separator";
+
+// bring the settings into scope
+const {
+  autoHideMenuEnabled,
+  trayEnabled,
+  startInTrayEnabled,
+  notificationSoundEnabled,
+  hideNotificationContentEnabled,
+} = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "&Preferences" : "&Settings",

@@ -2,11 +2,10 @@ import { app, Menu, Tray } from "electron";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
 import { IS_LINUX, IS_MAC, IS_WINDOWS, RESOURCES_PATH } from "./constants";
-import {
-  seenMinimizeToTrayWarning,
-  startInTrayEnabled,
-  trayEnabled,
-} from "./settings";
+import { settings } from "./settings";
+
+// bring the settings into scoped
+const { trayEnabled, startInTrayEnabled, seenMinimizeToTrayWarning } = settings;
 
 export class TrayManager {
   public enabled = trayEnabled.value;
