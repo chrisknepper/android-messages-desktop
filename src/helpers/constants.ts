@@ -34,3 +34,9 @@ export const SETTINGS_FILE = (): string =>
 
 // Events
 export const EVENT_BRIDGE_INIT = "messages-bridge-init";
+
+// UUID
+/**
+ * An arbitrary v4 uuid generated on https://www.uuidgenerator.net/version4
+ */
+export const UUID_NAMESPACE = "ddf09da3-3df8-4417-ae3b-62d3ed4bfb72";
