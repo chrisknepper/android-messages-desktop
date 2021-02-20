@@ -1,6 +1,10 @@
 import { app, MenuItemConstructorOptions } from "electron";
 import { aboutMenuItem } from "./items/about";
-import { checkForUpdatesMenuItem } from "./items/checkForUpdates";
+import { separator } from "./items/separator";
+import {
+  checkForUpdatesMenuItem,
+  installUpdatesMenuItem,
+} from "./items/updates";
 import { settingsMenu } from "./settingsMenu";
 
 // This is the "Application" menu, which is only used on macOS
@@ -9,21 +13,16 @@ export const appMenuTemplate: MenuItemConstructorOptions = {
   submenu: [
     aboutMenuItem,
     checkForUpdatesMenuItem,
-    {
-      type: "separator",
-    },
+    installUpdatesMenuItem,
+    separator,
     settingsMenu,
-    {
-      type: "separator",
-    },
+    separator,
     {
       label: "Hide Android Messages Desktop",
       accelerator: "Command+H",
       click: (): void => app.hide(),
     },
-    {
-      type: "separator",
-    },
+    separator,
     {
       label: "Quit",
       accelerator: "Command+Q",

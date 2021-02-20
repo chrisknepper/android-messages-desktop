@@ -1,4 +1,5 @@
 import { autoUpdater } from "electron-updater";
+import { IS_MAC } from "./constants";
 
 function setUpdaterSettings(): void {
   autoUpdater.autoDownload = false;
@@ -13,7 +14,9 @@ export async function checkForUpdate(): Promise<boolean> {
   return (
     (await autoUpdater.checkForUpdatesAndNotify({
       title: "Update Available",
-      body: "There is an update available.",
+      body: `There is an update available. It will not install until you click the button in the ${
+        IS_MAC ? "app" : "file"
+      } menu.`,
     })) != null
   );
 }

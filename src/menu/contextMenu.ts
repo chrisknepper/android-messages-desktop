@@ -3,6 +3,7 @@ import {
   MenuItemConstructorOptions,
   remote,
 } from "electron";
+import { separator } from "./items/separator";
 
 const { Menu, app } = remote;
 
@@ -15,9 +16,7 @@ const standardMenuTemplate: MenuItemConstructorOptions[] = [
     label: "Copy",
     role: "copy",
   },
-  {
-    type: "separator",
-  },
+  separator,
   {
     label: "Select All",
     role: "selectAll",
@@ -33,9 +32,7 @@ const textMenuTemplate: MenuItemConstructorOptions[] = [
     label: "Redo",
     role: "redo",
   },
-  {
-    type: "separator",
-  },
+  separator,
   {
     label: "Cut",
     role: "cut",
@@ -48,9 +45,7 @@ const textMenuTemplate: MenuItemConstructorOptions[] = [
     label: "Paste",
     role: "paste",
   },
-  {
-    type: "separator",
-  },
+  separator,
   {
     label: "Select All",
     role: "selectAll",
