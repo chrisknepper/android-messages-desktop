@@ -64,7 +64,7 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "hideNotificationContentMenuItem",
       label: "Hide Notification Content",
       type: "checkbox",
-      checked: notificationSoundEnabled.value,
+      checked: hideNotificationContentEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
     },
     separator,
