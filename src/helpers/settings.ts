@@ -8,11 +8,11 @@ interface json {
   [key: string]: json | primative | primative[];
 }
 
-export type Setting<
-  T extends primative | primative[] | json
-> = BehaviorSubject<T>;
+type validJson = primative | primative[] | json;
 
-function getSetting(key: string): unknown | undefined {
+export type Setting<T extends validJson> = BehaviorSubject<T>;
+
+function getSetting(key: string): validJson | undefined {
   return (jetpack.read(SETTINGS_FILE(), "json") || {})[key];
 }
 
