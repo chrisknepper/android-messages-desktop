@@ -18,7 +18,12 @@ import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
 
 // bring the settings into scope
-const { autoHideMenuEnabled, trayEnabled } = settings;
+const {
+  autoHideMenuEnabled,
+  trayEnabled,
+  savedWindowSize,
+  savedWindowPosition,
+} = settings;
 
 const state = {
   bridgeInitDone: false,
@@ -85,9 +90,16 @@ if (!isFirstInstance) {
 
     autoUpdater.checkForUpdatesAndNotify();
 
+    // destructure from the settings
+    const { width, height } = savedWindowSize.value;
+    // provide empty object if savedWindowPosition is null
+    const { x, y } = savedWindowPosition.value || {};
+
     mainWindow = new CustomBrowserWindow("main", {
-      width: 1100,
-      height: 800,
+      width,
+      height,
+      x,
+      y,
       autoHideMenuBar: autoHideMenuEnabled.value,
       show: false, //don't show window just yet (issue #229)
       icon: IS_LINUX
@@ -148,6 +160,9 @@ if (!isFirstInstance) {
     };
 
     mainWindow.on("close", (event: ElectronEvent) => {
+      const { x, y, width, height } = mainWindow.getBounds();
+      savedWindowPosition.next({ x, y });
+      savedWindowSize.next({ width, height });
       if (!shouldExitOnMainWindowClosed()) {
         event.preventDefault();
         mainWindow.hide();
