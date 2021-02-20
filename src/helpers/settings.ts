@@ -42,11 +42,23 @@ export interface JsonSettings {
   autoHideMenuEnabled: boolean;
   seenMinimizeToTrayWarning: boolean;
   seenResetSettingsWarning: boolean;
+  savedWindowSize: WindowSize;
+  savedWindowPosition: WindowPosition | null;
 }
 
 // wraps json settings in the setting type for export
 type Settings = {
   [P in keyof JsonSettings]: Setting<JsonSettings[P]>;
+};
+
+type WindowSize = {
+  width: number;
+  height: number;
+};
+
+type WindowPosition = {
+  x: number;
+  y: number;
 };
 
 // default settings for the app
@@ -59,6 +71,8 @@ const defaultSettings: JsonSettings = {
   autoHideMenuEnabled: false,
   seenMinimizeToTrayWarning: false,
   seenResetSettingsWarning: false,
+  savedWindowSize: { width: 1100, height: 800 },
+  savedWindowPosition: null,
 };
 
 // create default settings file if it doesnt exist
@@ -67,7 +81,7 @@ if (!jetpack.exists(SETTINGS_FILE())) {
 }
 
 // temporary settings object during creation
-const settingsToExport: Partial<Settings> = {};
+const settingsToExport: any = {};
 
 // loop through and create all the settings
 for (const name in defaultSettings) {
@@ -82,9 +96,10 @@ export const settings: Settings = settingsToExport as Settings;
 
 // loop through and add all the event listeners
 // has to be done in this step because settings needs to exist
-for (const name in defaultSettings) {
+for (const name in settings) {
   const key = name as keyof Settings;
-  const setting = settings[key];
+  // cast to unknown type to quell the compiler
+  const setting = settings[key] as BehaviorSubject<unknown>;
   setting.subscribe(() => {
     // create a settings object unwrapped from the subjects
     const seriazableSettings: Record<string, validJson> = {};
