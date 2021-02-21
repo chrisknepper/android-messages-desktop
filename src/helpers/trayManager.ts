@@ -139,7 +139,7 @@ export class TrayManager {
     this.tray?.removeListener("double-click", this.handleTrayClick);
   }
 
-  private handleTrayClick(_event: Electron.KeyboardEvent) {
+  private handleTrayClick() {
     app.mainWindow?.show();
   }
 
