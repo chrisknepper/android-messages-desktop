@@ -83,16 +83,12 @@ export class TrayManager {
   }
 
   private setupEventListeners() {
-    if (this.tray != null) {
-      this.tray.on("click", this.handleTrayClick);
-    }
+    this.tray?.on("click", this.handleTrayClick);
   }
 
   private destroyEventListeners() {
-    if (this.tray != null) {
-      this.tray.removeListener("click", this.handleTrayClick);
-      this.tray.removeListener("double-click", this.handleTrayClick);
-    }
+    this.tray?.removeListener("click", this.handleTrayClick);
+    this.tray?.removeListener("double-click", this.handleTrayClick);
   }
 
   private handleTrayClick(_event: Electron.KeyboardEvent) {
@@ -100,11 +96,9 @@ export class TrayManager {
   }
 
   private destroy(): void {
-    if (this.tray) {
-      this.destroyEventListeners();
-      this.tray.destroy();
-      this.tray = null;
-    }
+    this.destroyEventListeners();
+    this.tray?.destroy();
+    this.tray = null;
   }
 
   public showMinimizeToTrayWarning(): void {
