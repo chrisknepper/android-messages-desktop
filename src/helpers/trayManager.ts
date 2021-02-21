@@ -3,7 +3,6 @@ import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
 import {
   IS_DEV,
-  IS_LINUX,
   IS_MAC,
   IS_WINDOWS,
   RESOURCES_PATH,
@@ -13,39 +12,24 @@ import { settings } from "./settings";
 import { v5 as uuidv5 } from "uuid";
 
 // bring the settings into scoped
-const { trayEnabled, startInTrayEnabled, seenMinimizeToTrayWarning } = settings;
+const {
+  trayEnabled,
+  startInTrayEnabled,
+  seenMinimizeToTrayWarning,
+  monochromeIconEnabled,
+} = settings;
 
 export class TrayManager {
   public enabled = trayEnabled.value;
-  public iconPath = this.getIconPath();
-  public overlayIconPath = this.getOverlayIconPath();
-  private lastIcon = this.iconPath;
+  private messagesAreUnread = false;
 
   public tray: Tray | null = null;
 
   constructor() {
     trayEnabled.subscribe((val) => this.handleTrayEnabledToggle(val));
-  }
-  private getIconPath(): string {
-    if (IS_WINDOWS) {
-      // Re-use regular app .ico for the tray icon on Windows.
-      return path.resolve(RESOURCES_PATH, "icon.ico");
-    } else {
-      // Mac tray icon filename MUST end in 'Template' and contain only black and transparent pixels.
-      // Otherwise, automatic inversion and dark mode appearance won't work.
-      // See: https://stackoverflow.com/questions/41664208/electron-tray-icon-change
-      const trayIconFileName = IS_MAC ? "icon_macTemplate.png" : "icon.png";
-      return path.resolve(RESOURCES_PATH, "tray", trayIconFileName);
-    }
-  }
-
-  private getOverlayIconPath(): string | null {
-    if (IS_WINDOWS) {
-      return path.resolve(RESOURCES_PATH, "tray", "unread_icon.ico");
-    } else if (IS_LINUX) {
-      return path.resolve(RESOURCES_PATH, "tray", "unread_icon.png");
-    }
-    return null;
+    monochromeIconEnabled.subscribe(() =>
+      this.tray?.setImage(this.getIconPath())
+    );
   }
 
   public startIfEnabled(): void {
@@ -62,13 +46,40 @@ export class TrayManager {
               UUID_NAMESPACE
             )
           : undefined;
-        this.tray = new Tray(this.lastIcon, guid);
+        this.tray = new Tray(this.getIconPath(), guid);
         const trayContextMenu = Menu.buildFromTemplate(trayMenuTemplate);
         this.tray.setContextMenu(trayContextMenu);
         this.tray.setToolTip("Android Messages");
         this.setupEventListeners();
       }
     }
+  }
+
+  /**
+   *
+   * Set the unread status of the tray
+   *
+   * @param val value to assugn to messagesAreUnread
+   */
+  public setUnread(val: boolean): void {
+    this.messagesAreUnread = val;
+    this.tray?.setImage(this.getIconPath());
+  }
+
+  /**
+   * Gets the icon path taking into account all possible states and situations.
+   */
+  private getIconPath(): string {
+    let filename: string;
+    if (IS_MAC) {
+      filename = "icon_macTemplate.png";
+    } else {
+      const unread = this.messagesAreUnread ? "unread_" : "";
+      const mono = monochromeIconEnabled.value ? "_mono" : "";
+      filename = `${unread}icon${mono}.png`;
+    }
+
+    return path.resolve(RESOURCES_PATH, "tray", filename);
   }
 
   private setupEventListeners() {
@@ -133,19 +144,6 @@ export class TrayManager {
       if (!app.mainWindow?.isVisible()) {
         app.mainWindow?.show();
       }
-    }
-  }
-
-  public setUnreadIcon(toggle: boolean): void {
-    if (this.overlayIconPath != null) {
-      if (toggle) {
-        this.lastIcon = this.overlayIconPath;
-      } else {
-        this.lastIcon = this.iconPath;
-      }
-    }
-    if (this.tray) {
-      this.tray.setImage(this.lastIcon);
     }
   }
 }
