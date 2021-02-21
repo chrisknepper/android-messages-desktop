@@ -1,4 +1,4 @@
-import { app, MenuItemConstructorOptions } from "electron";
+import { app, MenuItemConstructorOptions, nativeImage } from "electron";
 import { IS_MAC } from "../helpers/constants";
 import { separator } from "./items/separator";
 

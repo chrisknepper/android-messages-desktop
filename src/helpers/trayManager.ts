@@ -1,7 +1,14 @@
-import { app, Menu, Tray } from "electron";
+import {
+  app,
+  Menu,
+  MenuItemConstructorOptions,
+  nativeImage,
+  Tray,
+} from "electron";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
 import {
+  INITIAL_ICON_IMAGE,
   IS_DEV,
   IS_MAC,
   IS_WINDOWS,
@@ -10,6 +17,8 @@ import {
 } from "./constants";
 import { settings } from "./settings";
 import { v5 as uuidv5 } from "uuid";
+import { separator } from "../menu/items/separator";
+import jetpack from "fs-jetpack";
 
 // bring the settings into scoped
 const {
@@ -18,6 +27,13 @@ const {
   seenMinimizeToTrayWarning,
   monochromeIconEnabled,
 } = settings;
+
+interface Conversation {
+  name: string | null | undefined;
+  image: string | undefined;
+  recentMessage: string | null | undefined;
+  click: () => void;
+}
 
 export class TrayManager {
   public enabled = trayEnabled.value;
@@ -64,6 +80,36 @@ export class TrayManager {
   public setUnread(val: boolean): void {
     this.messagesAreUnread = val;
     this.tray?.setImage(this.getIconPath());
+  }
+
+  public setRecentConversations(data: Conversation[]): void {
+    const conversationMenuItems: MenuItemConstructorOptions[] = data.map(
+      ({ name, click, image, recentMessage }) => {
+        const icon =
+          image != null && image != INITIAL_ICON_IMAGE
+            ? nativeImage.createFromDataURL(image)
+            : undefined;
+
+        return {
+          label: name || "Name not Found",
+          sublabel: recentMessage || undefined,
+          icon,
+          click: () => {
+            if (!app.mainWindow?.isVisible()) {
+              app.mainWindow?.show();
+            }
+            click();
+          },
+        };
+      }
+    );
+    this.tray?.setContextMenu(
+      Menu.buildFromTemplate([
+        ...conversationMenuItems,
+        separator,
+        ...trayMenuTemplate,
+      ])
+    );
   }
 
   /**

@@ -9,7 +9,7 @@ const { Notification: ElectronNotification, app, dialog } = remote;
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
-function unreadObserver(_m: MutationRecord[], _o: MutationObserver) {
+function unreadObserver() {
   if (document.querySelector(".unread") != null) {
     app.trayManager?.setUnread(true);
   } else {
@@ -19,31 +19,72 @@ function unreadObserver(_m: MutationRecord[], _o: MutationObserver) {
 
 function createUnreadObserver() {
   const observer = new MutationObserver(unreadObserver);
-  const node = document.querySelector("main");
-  if (node) {
-    observer.observe(node, {
+  observer.observe(
+    (document.body.querySelector(
+      "mws-conversations-list"
+    ) as unknown) as Element,
+    {
       subtree: true,
       attributes: true,
       attributeFilter: ["data-e2e-is-unread"],
-    });
-  }
+    }
+  );
+  return observer;
+}
+
+function recentThreadObserver() {
+  const conversations = Array.from(
+    document.body.querySelectorAll("mws-conversation-list-item")
+  ).slice(0, 3);
+
+  const data = conversations.map((conversation) => {
+    const name = conversation.querySelector("a div.text-content h3.name span")
+      ?.textContent;
+    const canvas = conversation.querySelector(
+      "a div.avatar-container canvas"
+    ) as HTMLCanvasElement | null;
+
+    const image = canvas?.toDataURL();
+
+    const recentMessage = conversation.querySelector(
+      "a div.text-content div.snippet-text mws-conversation-snippet span"
+    )?.textContent;
+
+    const click = () => void conversation.querySelector("a")?.click();
+
+    return { name, image, recentMessage, click };
+  });
+  app.trayManager?.setRecentConversations(data);
+}
+
+function createRecentThreadObserver() {
+  const observer = new MutationObserver(recentThreadObserver);
+  observer.observe(
+    (document.body.querySelector(
+      "mws-conversations-list"
+    ) as unknown) as Element,
+    {
+      attributes: false,
+      subtree: true,
+      childList: true,
+    }
+  );
+  return observer;
 }
 
 window.addEventListener("load", () => {
-  const onInit = (
-    _mutationsList: MutationRecord[],
-    observer: MutationObserver
-  ) => {
-    if (document.querySelector("mw-main-nav")) {
+  const conversationListObserver = new MutationObserver(() => {
+    if (document.querySelector("mws-conversations-list") != null) {
       createUnreadObserver();
-      observer.disconnect();
+      createRecentThreadObserver();
+      conversationListObserver.disconnect();
     }
-  };
+  });
 
-  const observer = new MutationObserver(onInit);
-  observer.observe(document.body, {
+  conversationListObserver.observe(document.body, {
+    attributes: false,
+    subtree: true,
     childList: true,
-    attributes: true,
   });
 
   // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
