@@ -16,6 +16,7 @@ const {
   hideNotificationContentEnabled,
   checkForUpdateOnLaunchEnabled,
   monochromeIconEnabled,
+  showIconsInRecentConversationTrayEnabled,
 } = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
@@ -73,7 +74,16 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       id: "monochromeIconEnabled",
       label: "Use Monochrome Tray Icon",
       type: "checkbox",
+      checked: monochromeIconEnabled.value,
       click: (item) => monochromeIconEnabled.next(item.checked),
+    },
+    {
+      id: "showIconsInRecentConversationTrayEnabled",
+      label: "Show Icons in Tray Menu",
+      type: "checkbox",
+      checked: showIconsInRecentConversationTrayEnabled.value,
+      click: (item) =>
+        showIconsInRecentConversationTrayEnabled.next(item.checked),
     },
     separator,
     {

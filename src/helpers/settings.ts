@@ -45,6 +45,7 @@ export interface JsonSettings {
   savedWindowPosition: WindowPosition | null;
   checkForUpdateOnLaunchEnabled: boolean;
   monochromeIconEnabled: boolean;
+  showIconsInRecentConversationTrayEnabled: boolean;
 }
 
 // wraps json settings in the setting type for export
@@ -75,6 +76,7 @@ const defaultSettings: JsonSettings = {
   savedWindowPosition: null,
   checkForUpdateOnLaunchEnabled: true,
   monochromeIconEnabled: true,
+  showIconsInRecentConversationTrayEnabled: true,
 };
 
 // create default settings file if it doesnt exist

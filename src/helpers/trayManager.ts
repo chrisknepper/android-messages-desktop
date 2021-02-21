@@ -1,7 +1,14 @@
-import { app, Menu, Tray } from "electron";
+import {
+  app,
+  Menu,
+  MenuItemConstructorOptions,
+  nativeImage,
+  Tray,
+} from "electron";
 import path from "path";
 import { trayMenuTemplate } from "../menu/trayMenu";
 import {
+  INITIAL_ICON_IMAGE,
   IS_DEV,
   IS_MAC,
   IS_WINDOWS,
@@ -10,6 +17,7 @@ import {
 } from "./constants";
 import { settings } from "./settings";
 import { v5 as uuidv5 } from "uuid";
+import { separator } from "../menu/items/separator";
 
 // bring the settings into scoped
 const {
@@ -17,7 +25,15 @@ const {
   startInTrayEnabled,
   seenMinimizeToTrayWarning,
   monochromeIconEnabled,
+  showIconsInRecentConversationTrayEnabled,
 } = settings;
+
+interface Conversation {
+  name: string | null | undefined;
+  image: string | undefined;
+  recentMessage: string | null | undefined;
+  click: () => void;
+}
 
 export class TrayManager {
   public enabled = trayEnabled.value;
@@ -66,6 +82,38 @@ export class TrayManager {
     this.tray?.setImage(this.getIconPath());
   }
 
+  public setRecentConversations(data: Conversation[]): void {
+    const conversationMenuItems: MenuItemConstructorOptions[] = data.map(
+      ({ name, click, image, recentMessage }) => {
+        const icon =
+          image != null &&
+          image != INITIAL_ICON_IMAGE &&
+          showIconsInRecentConversationTrayEnabled.value
+            ? nativeImage.createFromDataURL(image)
+            : undefined;
+
+        return {
+          label: name || "Name not Found",
+          sublabel: recentMessage || undefined,
+          icon,
+          click: () => {
+            if (!app.mainWindow?.isVisible()) {
+              app.mainWindow?.show();
+            }
+            click();
+          },
+        };
+      }
+    );
+    this.tray?.setContextMenu(
+      Menu.buildFromTemplate([
+        ...conversationMenuItems,
+        separator,
+        ...trayMenuTemplate,
+      ])
+    );
+  }
+
   /**
    * Gets the icon path taking into account all possible states and situations.
    */
@@ -91,7 +139,7 @@ export class TrayManager {
     this.tray?.removeListener("double-click", this.handleTrayClick);
   }
 
-  private handleTrayClick(_event: Electron.KeyboardEvent) {
+  private handleTrayClick() {
     app.mainWindow?.show();
   }
 
