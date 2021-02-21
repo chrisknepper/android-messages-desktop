@@ -44,6 +44,7 @@ export interface JsonSettings {
   savedWindowSize: WindowSize;
   savedWindowPosition: WindowPosition | null;
   checkForUpdateOnLaunchEnabled: boolean;
+  monochromeIconEnabled: boolean;
 }
 
 // wraps json settings in the setting type for export
@@ -73,6 +74,7 @@ const defaultSettings: JsonSettings = {
   savedWindowSize: { width: 1100, height: 800 },
   savedWindowPosition: null,
   checkForUpdateOnLaunchEnabled: true,
+  monochromeIconEnabled: true,
 };
 
 // create default settings file if it doesnt exist

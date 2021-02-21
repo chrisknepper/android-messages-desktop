@@ -15,6 +15,7 @@ const {
   startInTrayEnabled,
   hideNotificationContentEnabled,
   checkForUpdateOnLaunchEnabled,
+  monochromeIconEnabled,
 } = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
@@ -66,6 +67,13 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
       type: "checkbox",
       checked: hideNotificationContentEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
+    },
+    separator,
+    {
+      id: "monochromeIconEnabled",
+      label: "Use Monochrome Tray Icon",
+      type: "checkbox",
+      click: (item) => monochromeIconEnabled.next(item.checked),
     },
     separator,
     {

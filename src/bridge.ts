@@ -15,9 +15,9 @@ function createUnreadListener() {
     _observer: MutationObserver
   ) => {
     if (document.querySelector(".unread") != null) {
-      app.trayManager?.setUnreadIcon(true);
+      app.trayManager?.setUnread(true);
     } else {
-      app.trayManager?.setUnreadIcon(false);
+      app.trayManager?.setUnread(false);
     }
   };
   const observer = new MutationObserver(unreadObserver);
