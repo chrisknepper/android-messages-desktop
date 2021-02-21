@@ -1,12 +1,12 @@
 {
   "name": "android-messages-desktop",
   "description": "Messages for web, as a desktop app",
-  "version": "4.5.4",
+  "version": "5.0.0",
   "author": {
     "name": "Kyle Rosenberg",
     "email": "kyle@ekrosenberg.com"
   },
-  "license": "SEE LICENSE IN LISCENSE",
+  "license": "SEOrangeDrangon-patch-1E LICENSE IN LISCENSE",
   "copyright": "Copyright 2020 Kyle Rosenberg",
   "homepage": "https://github.com/OrangeDrangon/android-messages-desktop",
   "repository": {
