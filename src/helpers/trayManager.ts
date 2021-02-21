@@ -164,27 +164,25 @@ export class TrayManager {
 
   public handleTrayEnabledToggle(newValue: boolean): void {
     this.enabled = newValue;
-    const liveStartInTrayMenuItemRef = Menu.getApplicationMenu()?.getMenuItemById(
-      "startInTrayMenuItem"
-    );
+    const menuItemIds = [
+      "startInTrayMenuItem",
+      "monochromeIconEnabledMenuItem",
+      "showIconsInRecentConversationTrayEnabledMenuItem",
+    ];
 
     if (newValue) {
       this.startIfEnabled();
-      if (liveStartInTrayMenuItemRef != null) {
-        liveStartInTrayMenuItemRef.enabled = true;
-      }
-    }
-    if (!newValue) {
+    } else {
       this.destroy();
-      startInTrayEnabled.next(false);
-
-      if (liveStartInTrayMenuItemRef != null) {
-        liveStartInTrayMenuItemRef.enabled = false;
-        liveStartInTrayMenuItemRef.checked = false;
-      }
-
       if (!app.mainWindow?.isVisible()) {
         app.mainWindow?.show();
+      }
+    }
+
+    for (const id of menuItemIds) {
+      const item = Menu.getApplicationMenu()?.getMenuItemById(id);
+      if (item != null) {
+        item.enabled = newValue;
       }
     }
   }

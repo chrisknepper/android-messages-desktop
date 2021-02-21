@@ -21,7 +21,6 @@ const {
 
 export const settingsMenu: MenuItemConstructorOptions = {
   label: IS_MAC ? "&Preferences" : "&Settings",
-  accelerator: IS_MAC ? "Alt+P" : "Alt+S",
   submenu: [
     {
       // This option doesn't apply to Mac, so this hides it but keeps the order of menu items
@@ -36,6 +35,10 @@ export const settingsMenu: MenuItemConstructorOptions = {
         window?.setMenuBarVisibility(!autoHideMenuEnabled.value);
         window?.setAutoHideMenuBar(autoHideMenuEnabled.value);
       },
+    },
+    {
+      ...separator,
+      visible: !IS_MAC,
     },
     {
       id: "enableTrayIconMenuItem",
@@ -53,14 +56,23 @@ export const settingsMenu: MenuItemConstructorOptions = {
       enabled: trayEnabled.value,
       click: (item: MenuItem): void => startInTrayEnabled.next(item.checked),
     },
-  ],
-};
-
-if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
-  // Electron doesn't seem to support the visible property for submenus, so push it instead of hiding it in non-Windows
-  // See: https://github.com/electron/electron/issues/8703
-
-  settingsMenu.submenu.push(
+    {
+      id: "monochromeIconEnabledMenuItem",
+      label: "Use Monochrome Tray Icon",
+      type: "checkbox",
+      checked: monochromeIconEnabled.value,
+      enabled: trayEnabled.value,
+      click: (item) => monochromeIconEnabled.next(item.checked),
+    },
+    {
+      id: "showIconsInRecentConversationTrayEnabledMenuItem",
+      label: "Show Icons in Tray Menu",
+      type: "checkbox",
+      checked: showIconsInRecentConversationTrayEnabled.value,
+      enabled: trayEnabled.value,
+      click: (item) =>
+        showIconsInRecentConversationTrayEnabled.next(item.checked),
+    },
     separator,
     {
       id: "hideNotificationContentMenuItem",
@@ -71,27 +83,11 @@ if (settingsMenu.submenu != null && !(settingsMenu.submenu instanceof Menu)) {
     },
     separator,
     {
-      id: "monochromeIconEnabled",
-      label: "Use Monochrome Tray Icon",
-      type: "checkbox",
-      checked: monochromeIconEnabled.value,
-      click: (item) => monochromeIconEnabled.next(item.checked),
-    },
-    {
-      id: "showIconsInRecentConversationTrayEnabled",
-      label: "Show Icons in Tray Menu",
-      type: "checkbox",
-      checked: showIconsInRecentConversationTrayEnabled.value,
-      click: (item) =>
-        showIconsInRecentConversationTrayEnabled.next(item.checked),
-    },
-    separator,
-    {
       id: "checkForUpdateOnLaunchEnabledMenuItem",
       label: "Check for Update on Launch",
       type: "checkbox",
       checked: checkForUpdateOnLaunchEnabled.value,
       click: (item) => checkForUpdateOnLaunchEnabled.next(item.checked),
-    }
-  );
-}
+    },
+  ],
+};

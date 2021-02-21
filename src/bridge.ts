@@ -95,7 +95,9 @@ window.addEventListener("load", () => {
   });
 
   // a work around issue #229 (https://github.com/OrangeDrangon/android-messages-desktop/issues/229)
-  if (!app.settings?.startInTrayEnabled.value) {
+  if (
+    !(app.settings?.startInTrayEnabled.value && app.settings?.trayEnabled.value)
+  ) {
     app.mainWindow?.show();
   }
 
