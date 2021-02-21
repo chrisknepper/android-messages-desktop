@@ -81,6 +81,9 @@ window.addEventListener("load", () => {
     if (document.querySelector("mws-conversations-list") != null) {
       createUnreadObserver();
       createRecentThreadObserver();
+      app.settings?.showIconsInRecentConversationTrayEnabled.subscribe(
+        recentThreadObserver
+      );
       conversationListObserver.disconnect();
     }
   });

@@ -25,6 +25,7 @@ const {
   startInTrayEnabled,
   seenMinimizeToTrayWarning,
   monochromeIconEnabled,
+  showIconsInRecentConversationTrayEnabled,
 } = settings;
 
 interface Conversation {
@@ -85,7 +86,9 @@ export class TrayManager {
     const conversationMenuItems: MenuItemConstructorOptions[] = data.map(
       ({ name, click, image, recentMessage }) => {
         const icon =
-          image != null && image != INITIAL_ICON_IMAGE
+          image != null &&
+          image != INITIAL_ICON_IMAGE &&
+          showIconsInRecentConversationTrayEnabled.value
             ? nativeImage.createFromDataURL(image)
             : undefined;
 
