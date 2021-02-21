@@ -54,7 +54,7 @@ export class TrayManager {
         // if the os is windows generate guid otherwise it is undefined
         const guid = IS_WINDOWS
           ? uuidv5(
-              `android-messages-desktop${
+              `${app.getName()}${
                 // if is dev add an identifier
                 IS_DEV ? "-development" : ""
                 // append the app path incase that changes for some reason
