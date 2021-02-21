@@ -9,17 +9,15 @@ const { Notification: ElectronNotification, app, dialog } = remote;
 // Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
 remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
-function createUnreadListener() {
-  const unreadObserver = (
-    _mutationList: MutationRecord[],
-    _observer: MutationObserver
-  ) => {
-    if (document.querySelector(".unread") != null) {
-      app.trayManager?.setUnread(true);
-    } else {
-      app.trayManager?.setUnread(false);
-    }
-  };
+function unreadObserver(_m: MutationRecord[], _o: MutationObserver) {
+  if (document.querySelector(".unread") != null) {
+    app.trayManager?.setUnread(true);
+  } else {
+    app.trayManager?.setUnread(false);
+  }
+}
+
+function createUnreadObserver() {
   const observer = new MutationObserver(unreadObserver);
   const node = document.querySelector("main");
   if (node) {
@@ -37,10 +35,9 @@ window.addEventListener("load", () => {
     observer: MutationObserver
   ) => {
     if (document.querySelector("mw-main-nav")) {
-      createUnreadListener();
+      createUnreadObserver();
       observer.disconnect();
     }
-    // In the future we could detect the "you've been signed in elsewhere" modal and notify the user here
   };
 
   const observer = new MutationObserver(onInit);
