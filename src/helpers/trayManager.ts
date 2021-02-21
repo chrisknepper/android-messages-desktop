@@ -18,7 +18,6 @@ import {
 import { settings } from "./settings";
 import { v5 as uuidv5 } from "uuid";
 import { separator } from "../menu/items/separator";
-import jetpack from "fs-jetpack";
 
 // bring the settings into scoped
 const {

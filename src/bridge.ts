@@ -1,6 +1,10 @@
 import { remote, NotificationConstructorOptions } from "electron";
 import path from "path";
-import { IS_DEV, RESOURCES_PATH } from "./helpers/constants";
+import {
+  IS_DEV,
+  RECENT_CONVERSATION_TRAY_COUNT,
+  RESOURCES_PATH,
+} from "./helpers/constants";
 import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
 
@@ -35,7 +39,7 @@ function createUnreadObserver() {
 function recentThreadObserver() {
   const conversations = Array.from(
     document.body.querySelectorAll("mws-conversation-list-item")
-  ).slice(0, 3);
+  ).slice(0, RECENT_CONVERSATION_TRAY_COUNT);
 
   const data = conversations.map((conversation) => {
     const name = conversation.querySelector("a div.text-content h3.name span")
