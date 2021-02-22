@@ -84,6 +84,7 @@ window.addEventListener("load", () => {
       app.settings?.showIconsInRecentConversationTrayEnabled.subscribe(
         recentThreadObserver
       );
+      app.settings?.trayEnabled.subscribe(recentThreadObserver);
       conversationListObserver.disconnect();
     }
   });
