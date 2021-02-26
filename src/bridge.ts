@@ -85,6 +85,7 @@ window.addEventListener("load", () => {
         recentThreadObserver
       );
       app.settings?.trayEnabled.subscribe(recentThreadObserver);
+      setTimeout(recentThreadObserver, 3000);
       conversationListObserver.disconnect();
     }
   });
