@@ -1,8 +1,29 @@
 # Changelog
 
+## [5.0.0] - 2021-02-26
+
+This is a release with a lot of changes under the hood along with a lot of interesting new feature for users.
+
+## Added
+
+- Recent contacts in the tray menu
+- Optional monochrome tray icon
+- Manual auto update triggering
+- Automatic update checking and user notification
+- Remember window position size and location from previous launch
+- Setting to control if the app checks for updates at launch
+
+## Changed
+
+- The settings manager has been gutted and all user setting have been reset. This is a one time occurance due to the annoyance with an npm package I was having.
+- Upscaled the mac tray icon template
+- The application now gives up on trying to control some settings google has toggle switches for
+- Application no longer requires restart to disable the tray icon on linux
+
 ## [4.5.4] - 2021-02-09
 
 ## Fixed
+
 - Issue perventing window from showing when a phone is not paired
 - Redundant event listener
 
@@ -19,11 +40,13 @@ Everything should be fixed
 Bug fixes galor
 
 ## Fixed
+
 - Bug with unread messages dot
 - Bug with notifications not being sent until a conversation is opened
 - Bug with image cache existing causing problems on slow networks
 
 ## Added
+
 - Tooltip on tray icon
 - Images are saved with date as filename
 
