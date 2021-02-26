@@ -49,6 +49,7 @@ export async function installUpdate(): Promise<void> {
     setUpdaterSettings();
     if (await checkForUpdate(false)) {
       await autoUpdater.downloadUpdate();
+      settings.isUpdate.next(false);
       autoUpdater.quitAndInstall();
     }
   }
