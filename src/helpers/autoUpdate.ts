@@ -1,7 +1,8 @@
 import { autoUpdater } from "electron-updater";
-import { app, Notification } from "electron";
+import { app, Menu, Notification } from "electron";
 import path from "path";
 import { IS_DEV, RESOURCES_PATH } from "./constants";
+import { settings } from "./settings";
 
 function setUpdaterSettings(): void {
   autoUpdater.autoDownload = false;
@@ -16,8 +17,9 @@ export async function checkForUpdate(
 ): Promise<boolean> {
   setUpdaterSettings();
   const results = await autoUpdater.checkForUpdates().catch(() => null);
+  let isUpdate = false;
   if (results != null) {
-    const isUpdate = results.updateInfo.version != app.getVersion();
+    isUpdate = results.updateInfo.version != app.getVersion();
     if (isUpdate && showNotification) {
       const notification = new Notification({
         title: "Update Available",
@@ -28,9 +30,13 @@ export async function checkForUpdate(
       });
       notification.show();
     }
-    return isUpdate;
   }
-  return false;
+  const installUpdateMenuItem = Menu.getApplicationMenu()?.getMenuItemById("installUpdateMenuItem");
+  if (installUpdateMenuItem != null) {
+    installUpdateMenuItem.visible = isUpdate;
+  }
+  settings.isUpdate.next(isUpdate);
+  return isUpdate;
 }
 
 /**

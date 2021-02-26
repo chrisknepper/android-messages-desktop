@@ -46,6 +46,7 @@ export interface JsonSettings {
   checkForUpdateOnLaunchEnabled: boolean;
   monochromeIconEnabled: boolean;
   showIconsInRecentConversationTrayEnabled: boolean;
+  isUpdate: boolean;
   showBridgeWebtoolsOnLaunch: boolean;
 }
 
@@ -78,6 +79,8 @@ const defaultSettings: JsonSettings = {
   checkForUpdateOnLaunchEnabled: true,
   monochromeIconEnabled: true,
   showIconsInRecentConversationTrayEnabled: true,
+  isUpdate: false,
+  showBridgeWebtoolsOnLaunch: true,
 };
 
 // create default settings file if it doesnt exist
