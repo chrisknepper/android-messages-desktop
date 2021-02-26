@@ -7,6 +7,6 @@ export const checkForUpdatesMenuItem: MenuItemConstructorOptions = {
 };
 
 export const installUpdatesMenuItem: MenuItemConstructorOptions = {
-  label: "Intall Updates",
+  label: "Install Updates",
   click: installUpdate,
 };
