@@ -1,6 +1,7 @@
 import { remote, NotificationConstructorOptions } from "electron";
 import path from "path";
 import {
+  INITIAL_ICON_IMAGE,
   IS_DEV,
   RECENT_CONVERSATION_TRAY_COUNT,
   RESOURCES_PATH,
@@ -85,7 +86,24 @@ window.addEventListener("load", () => {
         recentThreadObserver
       );
       app.settings?.trayEnabled.subscribe(recentThreadObserver);
-      setTimeout(recentThreadObserver, 3000);
+
+      // keep trying to get an image that isnt blank until they load
+      const interval = setInterval(() => {
+        const conversation = document.body.querySelector(
+          "mws-conversation-list-item"
+        );
+        if (conversation) {
+          const canvas = conversation.querySelector(
+            "a div.avatar-container canvas"
+          ) as HTMLCanvasElement | null;
+
+          if (canvas != null && canvas.toDataURL() != INITIAL_ICON_IMAGE) {
+            console.log(canvas.toDataURL());
+            recentThreadObserver();
+            clearInterval(interval);
+          }
+        }
+      }, 250);
       conversationListObserver.disconnect();
     }
   });
