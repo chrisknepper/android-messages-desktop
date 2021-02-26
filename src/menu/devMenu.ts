@@ -1,6 +1,9 @@
-import { app } from "electron";
+import { app, MenuItemConstructorOptions } from "electron";
+import { settings } from "../helpers/settings";
 
-export const devMenuTemplate = {
+const { showBridgeWebtoolsOnLaunch } = settings;
+
+export const devMenuTemplate: MenuItemConstructorOptions = {
   label: "&Development",
   submenu: [
     {
@@ -9,7 +12,13 @@ export const devMenuTemplate = {
       click: (): void => app.mainWindow?.webContents.reloadIgnoringCache(),
     },
     {
-      label: "Developer Tools",
+      label: "Bridge Dev Tools on Launch",
+      type: "checkbox",
+      checked: showBridgeWebtoolsOnLaunch.value,
+      click: (item) => showBridgeWebtoolsOnLaunch.next(item.checked),
+    },
+    {
+      label: "App Dev Tools",
       accelerator: "CmdOrCtrl+Shift+I",
       click: (): void => app.mainWindow?.webContents.openDevTools(),
     },

@@ -9,7 +9,7 @@ const androidMessagesWebview = document.getElementById(
 ) as WebviewTag;
 
 androidMessagesWebview.addEventListener("dom-ready", () => {
-  if (IS_DEV) {
+  if (IS_DEV && app.settings?.showBridgeWebtoolsOnLaunch.value) {
     androidMessagesWebview.openDevTools();
   }
   app.mainWindow?.on("focus", () => {

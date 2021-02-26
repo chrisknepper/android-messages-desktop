@@ -46,6 +46,7 @@ export interface JsonSettings {
   checkForUpdateOnLaunchEnabled: boolean;
   monochromeIconEnabled: boolean;
   showIconsInRecentConversationTrayEnabled: boolean;
+  showBridgeWebtoolsOnLaunch: boolean;
 }
 
 // wraps json settings in the setting type for export
