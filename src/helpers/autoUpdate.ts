@@ -19,7 +19,9 @@ export async function checkForUpdate(
   const results = await autoUpdater.checkForUpdates().catch(() => null);
   let isUpdate = false;
   if (results != null) {
-    isUpdate = results.updateInfo.version != app.getVersion();
+    console.log(results.updateInfo.version, app.getVersion(), results.updateInfo.version > app.getVersion());
+
+    isUpdate = results.updateInfo.version > app.getVersion();
     if (isUpdate && showNotification) {
       const notification = new Notification({
         title: "Update Available",
