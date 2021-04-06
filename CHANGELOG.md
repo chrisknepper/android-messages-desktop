@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.1.0] - 2021-02-26
+
+the release of changing things that are broken on macos. also updated color icons to match the monochrome ones.
+
+## Fixed
+
+- Downscaled the tray icon for macos
+- Build macos as a universal binary instead of x86_64
+
 ## [5.0.0] - 2021-02-26
 
 This is a release with a lot of changes under the hood along with a lot of interesting new feature for users.
