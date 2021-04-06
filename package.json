@@ -1,7 +1,7 @@
 {
   "name": "android-messages-desktop",
   "description": "Messages for web, as a desktop app",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "author": {
     "name": "Kyle Rosenberg",
     "email": "kyle@ekrosenberg.com"
@@ -22,7 +22,7 @@
     "dist": "yarn build && yarn package",
     "build": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
-    "icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
+    "icons": "png2icons resources/icons/1024x1024.png resources/icon -all -i",
     "lint": "eslint --fix --ext .ts,.js ./src",
     "package": "yarn electron-builder --config electron-builder.js"
   },

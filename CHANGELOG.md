@@ -1,6 +1,10 @@
 # Changelog
 
-## [5.1.0] - 2021-02-26
+## [5.1.1] - 2021-04-06
+
+High res ico file.
+
+## [5.1.0] - 2021-04-06
 
 the release of changing things that are broken on macos. also updated color icons to match the monochrome ones.
 
