@@ -1,41 +1,50 @@
-import './stylesheets/main.css';
+import "./stylesheets/main.css";
 
-import { ipcRenderer, remote } from 'electron';
-import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from './constants';
+import { ipcRenderer, remote } from "electron";
+import { EVENT_UPDATE_USER_SETTING, IS_DEV, IS_MAC } from "./constants";
 
 const state = {
-  loaded: false
+  loaded: false,
 };
 
 const app = remote.app;
 
-androidMessagesWebview.addEventListener('did-start-loading', () => {
+androidMessagesWebview.addEventListener("did-start-loading", () => {
   // Intercept request for notifications and accept it
-  androidMessagesWebview.getWebContents().session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const url = webContents.getURL();
 
-    if (permission === 'notifications') {
-      /*
-       * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
-       * which accepts the permission to send browser notifications on behalf of the user.
-       * This "notification" should fire before we start listening for notifications,
-       * and should not cause problems.
-       * TODO: Move this to a helper
-       * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
-       */
+  const webContents = remote.webContents.fromId(
+    androidMessagesWebview.getWebContentsId()
+  );
+  webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      const url = webContents.getURL();
 
-      return callback(false); // Prevent the webview's notification from coming through (we roll our own)
+      if (permission === "notifications") {
+        /*
+         * We always get a "notification" when the app starts due to calling setPermissionRequestHandler,
+         * which accepts the permission to send browser notifications on behalf of the user.
+         * This "notification" should fire before we start listening for notifications,
+         * and should not cause problems.
+         * TODO: Move this to a helper
+         * TODO: Provide visual indicators for Linux, could set window (taskbar) icon, may also do for Windows
+         */
+
+        return callback(false); // Prevent the webview's notification from coming through (we roll our own)
+      }
+
+      if (!url.startsWith("https://messages.google.com/web")) {
+        return callback(false); // Deny
+      }
     }
+  );
 
-    if (!url.startsWith('https://messages.google.com/web')) {
-      return callback(false); // Deny
-    }
-  });
-
-  androidMessagesWebview.getWebContents().session.webRequest.onHeadersReceived({
-    // Only run this code on requests for which the URL is in the following array.
-    // The SRC of the webview is the same context as the preload script.
-    urls: ['https://messages.google.com/web/'] }, (details, callback) => {
+  webContents.session.webRequest.onHeadersReceived(
+    {
+      // Only run this code on requests for which the URL is in the following array.
+      // The SRC of the webview is the same context as the preload script.
+      urls: ["https://messages.google.com/web/"],
+    },
+    (details, callback) => {
       /*
        * Google, prior to changing the URL of the app from messages.android.com to messages.google.com/web sends several directives in the
        * content-security-policy header which restrict what kind of JS can run and where it can originate. This can break our spell
@@ -52,60 +61,69 @@ androidMessagesWebview.addEventListener('did-start-loading', () => {
        * See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#Multiple_content_security_policies
        */
       const modifiedHeaders = {
-        ...details.responseHeaders
+        ...details.responseHeaders,
       };
 
       // Since the URL change, this header no longer seems to be sent, so this should allow spellchecking to work,
       // even if Google starts sending the header again.
-      if (typeof modifiedHeaders === 'object' && 'content-security-policy' in modifiedHeaders) {
-        const firstCSP = modifiedHeaders['content-security-policy'][0];
+      if (
+        typeof modifiedHeaders === "object" &&
+        "content-security-policy" in modifiedHeaders
+      ) {
+        const firstCSP = modifiedHeaders["content-security-policy"][0];
 
         if (firstCSP.includes("'unsafe-inline'")) {
-          modifiedHeaders['content-security-policy'][0] = firstCSP.replace("'unsafe-inline'", "'unsafe-eval' 'unsafe-inline'");
+          modifiedHeaders["content-security-policy"][0] = firstCSP.replace(
+            "'unsafe-inline'",
+            "'unsafe-eval' 'unsafe-inline'"
+          );
         }
       }
 
       callback({
-        responseHeaders: modifiedHeaders
+        responseHeaders: modifiedHeaders,
       });
-  });
+    }
+  );
 });
 
-androidMessagesWebview.addEventListener('did-finish-load', () => { // just before onLoad
-  console.log('finished loading');
-
+androidMessagesWebview.addEventListener("did-finish-load", () => {
+  // just before onLoad
+  console.log("finished loading");
 });
 
-androidMessagesWebview.addEventListener('did-stop-loading', () => { // coincident with onLoad, can fire multiple times
-  console.log('done loading');
+androidMessagesWebview.addEventListener("did-stop-loading", () => {
+  // coincident with onLoad, can fire multiple times
+  console.log("done loading");
   if (!state.loaded) {
     state.loaded = true;
-    loader.classList.add('hidden');
+    loader.classList.add("hidden");
     if (IS_DEV) {
-      androidMessagesWebview.getWebContents().openDevTools();
+      //webContents.openDevTools();
     }
-    app.mainWindow.on('focus', () => {
+    app.mainWindow.on("focus", () => {
       // Make sure the webview gets a focus event on its window/DOM when the app window does,
       // this makes automatic text input focus work.
-      androidMessagesWebview.dispatchEvent(new Event('focus'));
+      androidMessagesWebview.dispatchEvent(new Event("focus"));
     });
   }
-
 });
 
-androidMessagesWebview.addEventListener('dom-ready', () => {
-  console.log('dom ready');
+androidMessagesWebview.addEventListener("dom-ready", () => {
+  console.log("dom ready");
   //Notification.requestPermission(); // Could be necessary for initial notification, need to test
 
   // Make the title centered so that it won't get weirdly covered by the traffic light on mac
   // 10px should make it look roughly centered
   // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
   if (IS_MAC) {
-    androidMessagesWebview.insertCSS('.main-nav-header .logo {text-align:center; transform: translateX(10px)}');
+    androidMessagesWebview.insertCSS(
+      ".main-nav-header .logo {text-align:center; transform: translateX(10px)}"
+    );
   }
 });
 
 // Forward event from main process to webview bridge
 ipcRenderer.on(EVENT_UPDATE_USER_SETTING, (event, settingsList) => {
-  androidMessagesWebview.getWebContents().send(EVENT_UPDATE_USER_SETTING, settingsList);
+  webContents.send(EVENT_UPDATE_USER_SETTING, settingsList);
 });
