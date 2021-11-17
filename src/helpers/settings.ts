@@ -36,7 +36,6 @@ function createSetting<T>(key: string, initial: T): BehaviorSubject<T> {
 export interface JsonSettings {
   trayEnabled: boolean;
   hideNotificationContentEnabled: boolean;
-  respectSystemDarkModeEnabled: boolean;
   startInTrayEnabled: boolean;
   autoHideMenuEnabled: boolean;
   seenMinimizeToTrayWarning: boolean;
@@ -47,7 +46,6 @@ export interface JsonSettings {
   monochromeIconEnabled: boolean;
   showIconsInRecentConversationTrayEnabled: boolean;
   isUpdate: boolean;
-  showBridgeWebtoolsOnLaunch: boolean;
 }
 
 // wraps json settings in the setting type for export
@@ -69,7 +67,6 @@ type WindowPosition = {
 const defaultSettings: JsonSettings = {
   trayEnabled: false,
   hideNotificationContentEnabled: false,
-  respectSystemDarkModeEnabled: true,
   startInTrayEnabled: false,
   autoHideMenuEnabled: false,
   seenMinimizeToTrayWarning: false,
@@ -80,7 +77,6 @@ const defaultSettings: JsonSettings = {
   monochromeIconEnabled: true,
   showIconsInRecentConversationTrayEnabled: true,
   isUpdate: false,
-  showBridgeWebtoolsOnLaunch: true,
 };
 
 // create default settings file if it doesnt exist
