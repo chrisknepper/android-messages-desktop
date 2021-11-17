@@ -9,9 +9,9 @@ export const devMenuTemplate: MenuItemConstructorOptions = {
       click: (): void => app.mainWindow?.webContents.reloadIgnoringCache(),
     },
     {
-      label: "App Dev Tools",
+      label: "Development Tools",
       accelerator: "CmdOrCtrl+Shift+I",
-      click: (): void => app.mainWindow?.webContents.openDevTools(),
+      click: (): void => app.mainWindow?.webContents.toggleDevTools(),
     },
     {
       label: "Quit",
