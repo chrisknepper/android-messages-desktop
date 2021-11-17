@@ -6,7 +6,6 @@ import path from "path";
 import merge from "webpack-merge";
 
 const base: Configuration = {
-  target: "electron-renderer",
   mode: process.env.NODE_ENV === "development" ? "development" : "production",
   externals: [nodeExternals()],
   devtool: "source-map",
@@ -38,17 +37,34 @@ const base: Configuration = {
   ],
 };
 
-const app = merge(base, {
-  name: "app",
-  entry: {
-    background: "./src/background.ts",
-    app: "./src/app.ts",
-    bridge: "./src/bridge.ts",
-  },
+const main = merge(base, {
+  name: "background",
+  target: "electron-main",
+  entry: "./src/background.ts",
   output: {
-    filename: "[name].js",
+    filename: "background.js",
     path: path.resolve(__dirname, "app"),
   },
 });
 
-export default [app];
+const renderer = merge(base, {
+  name: "app",
+  target: "electron-renderer",
+  entry: "./src/app.ts",
+  output: {
+    filename: "app.js",
+    path: path.resolve(__dirname, "app"),
+  },
+});
+
+const preload = merge(base, {
+  name: "bridge",
+  target: "electron-preload",
+  entry: "./src/bridge.ts",
+  output: {
+    filename: "bridge.js",
+    path: path.resolve(__dirname, "app"),
+  },
+});
+
+export default [main, renderer, preload];
