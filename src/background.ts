@@ -105,8 +105,9 @@ if (!isFirstInstance) {
         : undefined,
       webPreferences: {
         nodeIntegration: true,
-        webviewTag: true,
+        contextIsolation: false,
         enableRemoteModule: true,
+        preload: path.resolve(app.getAppPath(), "bridge.js"),
       },
     });
 
