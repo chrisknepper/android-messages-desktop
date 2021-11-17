@@ -6,13 +6,10 @@ import {
   RECENT_CONVERSATION_TRAY_COUNT,
   RESOURCES_PATH,
 } from "./helpers/constants";
-import { popupContextMenu } from "./menu/contextMenu";
 import { getProfileImg } from "./helpers/profileImage";
+import { popupContextMenu } from "./menu/contextMenu";
 
 const { Notification: ElectronNotification, app, dialog } = remote;
-
-// Electron (or the build of Chromium it uses?) does not seem to have any default right-click menu, this adds our own.
-remote.getCurrentWebContents().addListener("context-menu", popupContextMenu);
 
 function unreadObserver() {
   if (document.querySelector(".unread") != null) {
@@ -78,6 +75,8 @@ function createRecentThreadObserver() {
 }
 
 window.addEventListener("load", () => {
+  remote.app.mainWindow?.webContents.on("context-menu", popupContextMenu);
+
   const conversationListObserver = new MutationObserver(() => {
     if (document.querySelector("mws-conversations-list") != null) {
       createUnreadObserver();
