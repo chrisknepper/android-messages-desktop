@@ -124,12 +124,12 @@ if (!isFirstInstance) {
         })
     );
 
-    mainWindow.loadFile(path.resolve(BASE_APP_PATH, "app", "index.html"));
-
     // Quick and dirty way for renderer process to access mainWindow for communication
     app.mainWindow = mainWindow;
     app.trayManager = trayManager;
     app.settings = settings;
+
+    mainWindow.loadURL("https://messages.google.com/web/");
 
     trayManager.startIfEnabled();
 
