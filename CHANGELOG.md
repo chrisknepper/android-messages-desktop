@@ -1,5 +1,8 @@
 # Changelog
 
+## [5.2.0] - 2021-11-16
+Google broke everything. Lets fix it.
+
 ## [5.1.1] - 2021-04-06
 
 High res ico file.
