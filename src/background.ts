@@ -163,15 +163,9 @@ if (!isFirstInstance) {
       }
     });
 
-    app.on("web-contents-created", (e, contents) => {
-      // Check for a webview
-      if (contents.getType() == "webview") {
-        // Listen for any new window events
-        contents.on("new-window", (e, url) => {
-          e.preventDefault();
-          shell.openExternal(url);
-        });
-      }
+    mainWindow.webContents.on("new-window", (e, url) => {
+      e.preventDefault();
+      shell.openExternal(url);
     });
 
     // block Google collecting data
