@@ -84,7 +84,7 @@ if (!isFirstInstance) {
       });
     }
 
-    if (checkForUpdateOnLaunchEnabled.value) {
+    if (checkForUpdateOnLaunchEnabled.value && !IS_DEV) {
       checkForUpdate(true);
     }
 
