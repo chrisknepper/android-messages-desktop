@@ -1,6 +1,5 @@
 import { Configuration } from "webpack";
 import nodeExternals from "webpack-node-externals";
-import HTMLWebpackPlguin from "html-webpack-plugin";
 import process from "process";
 import path from "path";
 import merge from "webpack-merge";
@@ -29,12 +28,6 @@ const base: Configuration = {
   resolve: {
     extensions: [".ts", ".js", ".css"],
   },
-  plugins: [
-    new HTMLWebpackPlguin({
-      template: "./src/index.html",
-      inject: false,
-    }),
-  ],
 };
 
 const main = merge(base, {
@@ -43,16 +36,6 @@ const main = merge(base, {
   entry: "./src/background.ts",
   output: {
     filename: "background.js",
-    path: path.resolve(__dirname, "app"),
-  },
-});
-
-const renderer = merge(base, {
-  name: "app",
-  target: "electron-renderer",
-  entry: "./src/app.ts",
-  output: {
-    filename: "app.js",
     path: path.resolve(__dirname, "app"),
   },
 });
@@ -67,4 +50,4 @@ const preload = merge(base, {
   },
 });
 
-export default [main, renderer, preload];
+export default [main, preload];
