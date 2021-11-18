@@ -55,7 +55,7 @@ export const popupContextMenu = (
   _event: Electron.Event,
   params: ContextMenuParams
 ) => {
-  let menu: any = Menu.buildFromTemplate([]);
+  let menu: any = Menu.buildFromTemplate(standardMenuTemplate);
   if (params.mediaType === "none" && params.isEditable) {
     const textMenuTemplateCopy = [...textMenuTemplate];
     if (params.misspelledWord) {
