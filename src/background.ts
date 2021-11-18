@@ -13,6 +13,7 @@ import { settings } from "./helpers/settings";
 import { TrayManager } from "./helpers/trayManager";
 import { CustomBrowserWindow } from "./helpers/window";
 import { baseMenuTemplate } from "./menu/baseMenu";
+import { popupContextMenu } from "./menu/contextMenu";
 import { devMenuTemplate } from "./menu/devMenu";
 import { helpMenuTemplate } from "./menu/helpMenu";
 
@@ -167,6 +168,8 @@ if (!isFirstInstance) {
       e.preventDefault();
       shell.openExternal(url);
     });
+
+    mainWindow.webContents.on("context-menu", popupContextMenu);
 
     // block Google collecting data
     mainWindow.webContents.session.webRequest.onBeforeRequest(

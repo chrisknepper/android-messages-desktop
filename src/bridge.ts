@@ -75,8 +75,6 @@ function createRecentThreadObserver() {
 }
 
 window.addEventListener("load", () => {
-  remote.app.mainWindow?.webContents.on("context-menu", popupContextMenu);
-
   const conversationListObserver = new MutationObserver(() => {
     if (document.querySelector("mws-conversations-list") != null) {
       createUnreadObserver();
