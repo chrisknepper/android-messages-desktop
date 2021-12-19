@@ -12,13 +12,6 @@ const submenu: MenuItemConstructorOptions[] = [
         "https://github.com/orangedrangon/android-messages-desktop/"
       ),
   },
-  {
-    label: "Changelog",
-    click: async (): Promise<void> =>
-      await shell.openExternal(
-        "https://github.com/orangedrangon/android-messages-desktop/blob/master/CHANGELOG.md"
-      ),
-  },
 ];
 
 if (IS_WINDOWS) {
