@@ -20,8 +20,8 @@
   "scripts": {
     "start": "yarn build:dev && cross-env NODE_ENV=development electron ./app/background.js",
     "dist": "yarn build && yarn package",
-    "build": "webpack --mode=production",
-    "build:dev": "webpack --mode=development",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production",
+    "build:dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development",
     "icons": "png2icons resources/icons/1024x1024.png resources/icon -all -i",
     "lint": "eslint --fix --ext .ts,.js ./src",
     "package": "yarn electron-builder --config electron-builder.js"
