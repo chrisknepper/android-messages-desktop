@@ -4,6 +4,7 @@ import {
   MenuItemConstructorOptions,
   app,
 } from "electron";
+import { getMainWindow } from "../helpers/getMainWindow";
 import { separator } from "./items/separator";
 
 // WARNING THIS IS THE ONLY PLACE LEFT WITH FORCE TYPECASTS TO ANY
@@ -64,7 +65,7 @@ export const popupContextMenu = (
         {
           label: "Add to Dictionary",
           click: () =>
-            app.mainWindow?.webContents.session.addWordToSpellCheckerDictionary(
+            getMainWindow()?.webContents.session.addWordToSpellCheckerDictionary(
               params.misspelledWord
             ),
         },
@@ -74,7 +75,7 @@ export const popupContextMenu = (
         textMenuTemplateCopy.unshift({
           label: suggestion,
           click: () =>
-            app.mainWindow?.webContents.replaceMisspelling(suggestion),
+            getMainWindow()?.webContents.replaceMisspelling(suggestion),
         });
       }
     }

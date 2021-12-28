@@ -1,12 +1,13 @@
-import { app, MenuItemConstructorOptions } from "electron";
+import { app, BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { IS_MAC } from "../helpers/constants";
+import { getMainWindow } from "../helpers/getMainWindow";
 import { separator } from "./items/separator";
 
 export const trayMenuTemplate: MenuItemConstructorOptions[] = [
   {
     label: "Show/Hide Android Messages",
     click: (): void => {
-      const mainWindow = app.mainWindow;
+      const mainWindow = getMainWindow();
       if (mainWindow != null) {
         if (mainWindow.isVisible()) {
           if (IS_MAC) {

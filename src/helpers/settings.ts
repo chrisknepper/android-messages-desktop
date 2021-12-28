@@ -39,7 +39,6 @@ export interface JsonSettings {
   startInTrayEnabled: boolean;
   autoHideMenuEnabled: boolean;
   seenMinimizeToTrayWarning: boolean;
-  seenResetSettingsWarning: boolean;
   savedWindowSize: WindowSize;
   savedWindowPosition: WindowPosition | null;
   checkForUpdateOnLaunchEnabled: boolean;
@@ -70,7 +69,6 @@ const defaultSettings: JsonSettings = {
   startInTrayEnabled: false,
   autoHideMenuEnabled: false,
   seenMinimizeToTrayWarning: false,
-  seenResetSettingsWarning: false,
   savedWindowSize: { width: 1100, height: 800 },
   savedWindowPosition: null,
   checkForUpdateOnLaunchEnabled: true,

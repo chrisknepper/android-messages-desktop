@@ -1,5 +1,7 @@
-import { app, Event as ElectronEvent, Menu, shell } from "electron";
+import { app, Event as ElectronEvent, ipcMain, Menu, shell } from "electron";
+import { BrowserWindow } from "electron/main";
 import path from "path";
+import process from "process";
 import { checkForUpdate } from "./helpers/autoUpdate";
 import {
   IS_DEV,
@@ -8,9 +10,9 @@ import {
   IS_WINDOWS,
   RESOURCES_PATH,
 } from "./helpers/constants";
+import { MenuManager } from "./helpers/menuManager";
 import { settings } from "./helpers/settings";
-import { TrayManager } from "./helpers/trayManager";
-import { CustomBrowserWindow } from "./helpers/window";
+import { Conversation, TrayManager } from "./helpers/trayManager";
 import { baseMenuTemplate } from "./menu/baseMenu";
 import { popupContextMenu } from "./menu/contextMenu";
 import { devMenuTemplate } from "./menu/devMenu";
@@ -25,7 +27,7 @@ const {
   checkForUpdateOnLaunchEnabled,
 } = settings;
 
-let mainWindow: CustomBrowserWindow;
+let mainWindow: BrowserWindow;
 let trayManager: TrayManager;
 
 app.on("second-instance", () => {
@@ -40,25 +42,6 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
 
-const setApplicationMenu = () => {
-  const menus = baseMenuTemplate;
-  if (IS_DEV) {
-    menus.push(devMenuTemplate);
-  }
-  menus.push(helpMenuTemplate);
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
-};
-
-/**
- * Save userData in separate folders for each environment.
- * Thanks to this you can use production and development versions of the app
- * on same machine like those are two separate apps.
- */
-if (IS_DEV) {
-  const userDataPath = app.getPath("userData");
-  app.setPath("userData", `${userDataPath}-(${process.env.NODE_ENV})`);
-}
-
 if (IS_WINDOWS) {
   app.setAppUserModelId("pw.kmr.android-messages-desktop");
   app.setAsDefaultProtocolClient("android-messages-desktop");
@@ -67,13 +50,7 @@ if (IS_WINDOWS) {
 app.on("ready", () => {
   trayManager = new TrayManager();
 
-  setApplicationMenu();
-
-  if (IS_MAC) {
-    app.on("activate", () => {
-      mainWindow.show();
-    });
-  }
+  new MenuManager();
 
   if (checkForUpdateOnLaunchEnabled.value && !IS_DEV) {
     checkForUpdate(true);
@@ -82,12 +59,13 @@ app.on("ready", () => {
   const { width, height } = savedWindowSize.value;
   const { x, y } = savedWindowPosition.value ?? {};
 
-  mainWindow = new CustomBrowserWindow("main", {
+  mainWindow = new BrowserWindow({
     width,
     height,
     x,
     y,
     autoHideMenuBar: autoHideMenuEnabled.value,
+    title: "Android Messages",
     show: false, //don't show window just yet (issue #229)
     icon: IS_LINUX
       ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
@@ -95,11 +73,17 @@ app.on("ready", () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
-      preload: path.resolve(app.getAppPath(), "bridge.js"),
+      preload: IS_DEV
+        ? path.resolve(app.getAppPath(), "bridge.js")
+        : path.resolve(app.getAppPath(), "app", "bridge.js"),
     },
   });
 
+  process.env.MAIN_WINDOW_ID = mainWindow.id.toString();
+
+  if (!(settings.trayEnabled.value && settings.startInTrayEnabled.value)) {
+    mainWindow.show();
+  }
   // set user agent to potentially make google fi work
   const userAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
@@ -114,14 +98,12 @@ app.on("ready", () => {
       })
   );
 
-  // Quick and dirty way for renderer process to access mainWindow for communication
-  app.mainWindow = mainWindow;
-  app.trayManager = trayManager;
-  app.settings = settings;
-
   mainWindow.loadURL("https://messages.google.com/web/");
 
   trayManager.startIfEnabled();
+  settings.showIconsInRecentConversationTrayEnabled.subscribe(() =>
+    trayManager.refreshTrayMenu()
+  );
 
   let quitViaContext = false;
   app.on("before-quit", () => {
@@ -173,3 +155,25 @@ app.on("ready", () => {
     }
   );
 }); //onready
+
+ipcMain.on("should-hide-notification-content", (event) => {
+  event.returnValue = settings.hideNotificationContentEnabled.value;
+});
+
+ipcMain.on("show-main-window", (event) => {
+  mainWindow.show();
+});
+
+ipcMain.on("flash-main-window-if-not-focused", (event) => {
+  if (!mainWindow.isFocused()) {
+    mainWindow.flashFrame(true);
+  }
+});
+
+ipcMain.on("set-unread-status", (event, unreadStatus: boolean) => {
+  trayManager.setUnread(unreadStatus);
+});
+
+ipcMain.on("set-recent-conversations", (event, data: Conversation[]) => {
+  trayManager.setRecentConversations(data);
+});

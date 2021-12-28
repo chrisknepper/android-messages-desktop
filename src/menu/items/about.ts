@@ -26,7 +26,7 @@ export const aboutMenuItem: MenuItemConstructorOptions = {
       copyright: `<div style="text-align: center">Copyright (c) 2020 Kyle Rosenberg${disclaimerText}${licenseText}</div>`,
       product_name: productName,
       description: descriptionWithLocale,
-      open_devtools: IS_DEV,
+      open_devtools: false,
       use_inner_html: true,
       win_options: {
         height: 500,

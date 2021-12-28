@@ -1,5 +1,6 @@
 import {
   app,
+  BrowserWindow,
   Menu,
   MenuItemConstructorOptions,
   nativeImage,
@@ -18,26 +19,27 @@ import {
 import { settings } from "./settings";
 import { v5 as uuidv5 } from "uuid";
 import { separator } from "../menu/items/separator";
+import { getMainWindow } from "./getMainWindow";
 
 // bring the settings into scoped
 const {
   trayEnabled,
-  startInTrayEnabled,
   seenMinimizeToTrayWarning,
   monochromeIconEnabled,
   showIconsInRecentConversationTrayEnabled,
 } = settings;
 
-interface Conversation {
+export interface Conversation {
   name: string | null | undefined;
   image: string | undefined;
   recentMessage: string | null | undefined;
-  click: () => void;
+  i: number;
 }
 
 export class TrayManager {
   public enabled = trayEnabled.value;
   private messagesAreUnread = false;
+  private recentConversations: Conversation[] = [];
 
   public tray: Tray | null = null;
 
@@ -83,8 +85,13 @@ export class TrayManager {
   }
 
   public setRecentConversations(data: Conversation[]): void {
-    const conversationMenuItems: MenuItemConstructorOptions[] = data.map(
-      ({ name, click, image, recentMessage }) => {
+    this.recentConversations = data;
+    this.refreshTrayMenu();
+  }
+
+  public refreshTrayMenu() {
+    const conversationMenuItems: MenuItemConstructorOptions[] = this.recentConversations.map(
+      ({ name, image, recentMessage, i }) => {
         const icon =
           image != null &&
           image != INITIAL_ICON_IMAGE &&
@@ -97,10 +104,8 @@ export class TrayManager {
           sublabel: recentMessage || undefined,
           icon,
           click: () => {
-            if (!app.mainWindow?.isVisible()) {
-              app.mainWindow?.show();
-            }
-            click();
+            getMainWindow()?.show();
+            getMainWindow()?.webContents.send("focus-conversation", i);
           },
         };
       }
@@ -140,7 +145,8 @@ export class TrayManager {
   }
 
   private handleTrayClick() {
-    app.mainWindow?.show();
+    const mainWindow = getMainWindow();
+    mainWindow?.show();
   }
 
   private destroy(): void {
@@ -172,10 +178,12 @@ export class TrayManager {
 
     if (newValue) {
       this.startIfEnabled();
+      this.refreshTrayMenu();
     } else {
       this.destroy();
-      if (!app.mainWindow?.isVisible()) {
-        app.mainWindow?.show();
+      const mainWindow = getMainWindow();
+      if (!mainWindow?.isVisible()) {
+        mainWindow?.show();
       }
     }
 
