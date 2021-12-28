@@ -13,7 +13,7 @@ jobs:
         os:
         - ubuntu-latest
         node-version:
-        - 15
+        - 17
 
     env:
       BRANCH_NAME: dependency-bump
