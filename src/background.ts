@@ -47,6 +47,14 @@ if (IS_WINDOWS) {
   app.setAsDefaultProtocolClient("android-messages-desktop");
 }
 
+if (IS_MAC) {
+  app.on("activate", () => {
+  if (mainWindow) {
+      mainWindow.show();
+      app.dock.setBadge('');
+    }
+  });  
+}
 app.on("ready", () => {
   trayManager = new TrayManager();
 
@@ -162,11 +170,17 @@ ipcMain.on("should-hide-notification-content", (event) => {
 
 ipcMain.on("show-main-window", (event) => {
   mainWindow.show();
+  if (IS_MAC) {
+    app.dock.setBadge('');
+  }
 });
 
 ipcMain.on("flash-main-window-if-not-focused", (event) => {
   if (!mainWindow.isFocused()) {
     mainWindow.flashFrame(true);
+    if (IS_MAC) {
+      app.dock.setBadge('•');
+    }
   }
 });
 
