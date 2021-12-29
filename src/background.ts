@@ -165,14 +165,14 @@ ipcMain.on("should-hide-notification-content", (event) => {
   event.returnValue = settings.hideNotificationContentEnabled.value;
 });
 
-ipcMain.on("show-main-window", (event) => {
+ipcMain.on("show-main-window", () => {
   mainWindow.show();
   if (IS_MAC) {
     app.dock.setBadge("");
   }
 });
 
-ipcMain.on("flash-main-window-if-not-focused", (event) => {
+ipcMain.on("flash-main-window-if-not-focused", () => {
   if (!mainWindow.isFocused()) {
     mainWindow.flashFrame(true);
     if (IS_MAC) {
@@ -181,10 +181,10 @@ ipcMain.on("flash-main-window-if-not-focused", (event) => {
   }
 });
 
-ipcMain.on("set-unread-status", (event, unreadStatus: boolean) => {
+ipcMain.on("set-unread-status", (_event, unreadStatus: boolean) => {
   trayManager.setUnread(unreadStatus);
 });
 
-ipcMain.on("set-recent-conversations", (event, data: Conversation[]) => {
+ipcMain.on("set-recent-conversations", (_event, data: Conversation[]) => {
   trayManager.setRecentConversations(data);
 });

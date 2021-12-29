@@ -90,8 +90,8 @@ export class TrayManager {
   }
 
   public refreshTrayMenu() {
-    const conversationMenuItems: MenuItemConstructorOptions[] = this.recentConversations.map(
-      ({ name, image, recentMessage, i }) => {
+    const conversationMenuItems: MenuItemConstructorOptions[] =
+      this.recentConversations.map(({ name, image, recentMessage, i }) => {
         const icon =
           image != null &&
           image != INITIAL_ICON_IMAGE &&
@@ -108,8 +108,7 @@ export class TrayManager {
             getMainWindow()?.webContents.send("focus-conversation", i);
           },
         };
-      }
-    );
+      });
     this.tray?.setContextMenu(
       Menu.buildFromTemplate([
         ...conversationMenuItems,

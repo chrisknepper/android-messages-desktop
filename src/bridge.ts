@@ -51,6 +51,7 @@ window.addEventListener("load", () => {
 
 const OldNotification = window.Notification;
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 window.Notification = function (title: string, options: NotificationOptions) {
   const icon = getProfileImg(title);
@@ -77,9 +78,10 @@ window.Notification = function (title: string, options: NotificationOptions) {
   return notification;
 };
 
-window.Notification.requestPermission = async () => "granted";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.Notification.permission = "granted";
+window.Notification.requestPermission = async () => "granted";
 
 ipcRenderer.on("focus-conversation", (event, i) => {
   focusFunctions[i]();

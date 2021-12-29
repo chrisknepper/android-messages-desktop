@@ -1,9 +1,4 @@
-import {
-  ContextMenuParams,
-  Menu,
-  MenuItemConstructorOptions,
-  app,
-} from "electron";
+import { ContextMenuParams, Menu, MenuItemConstructorOptions } from "electron";
 import { getMainWindow } from "../helpers/getMainWindow";
 import { separator } from "./items/separator";
 
@@ -56,7 +51,7 @@ export const popupContextMenu = (
   _event: Electron.Event,
   params: ContextMenuParams
 ) => {
-  let menu: any = Menu.buildFromTemplate(standardMenuTemplate);
+  let menu = Menu.buildFromTemplate(standardMenuTemplate);
   if (params.mediaType === "none" && params.isEditable) {
     const textMenuTemplateCopy = [...textMenuTemplate];
     if (params.misspelledWord) {

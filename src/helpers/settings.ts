@@ -83,6 +83,9 @@ if (!jetpack.exists(SETTINGS_FILE())) {
 }
 
 // temporary settings object during creation
+// This is ok because this object is holding stuff derived from the loop of defaultSettings
+// There may be an elegant way to express the type but I do not know it.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const settingsToExport: any = {};
 
 // loop through and create all the settings

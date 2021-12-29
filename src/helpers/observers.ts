@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import { RECENT_CONVERSATION_TRAY_COUNT } from "./constants";
 import { Conversation } from "./trayManager";
 
@@ -13,9 +13,7 @@ function unreadObserver() {
 export function createUnreadObserver(): MutationObserver {
   const observer = new MutationObserver(unreadObserver);
   observer.observe(
-    (document.body.querySelector(
-      "mws-conversations-list"
-    ) as unknown) as Element,
+    document.body.querySelector("mws-conversations-list") as unknown as Element,
     {
       subtree: true,
       attributes: true,
@@ -35,8 +33,9 @@ export function recentThreadObserver() {
   ).slice(0, RECENT_CONVERSATION_TRAY_COUNT);
 
   const data: Conversation[] = conversations.map((conversation, i) => {
-    const name = conversation.querySelector("a div.text-content h3.name span")
-      ?.textContent;
+    const name = conversation.querySelector(
+      "a div.text-content h3.name span"
+    )?.textContent;
     const canvas = conversation.querySelector(
       "a div.avatar-container canvas"
     ) as HTMLCanvasElement | null;
@@ -58,9 +57,7 @@ export function recentThreadObserver() {
 export function createRecentThreadObserver(): MutationObserver {
   const observer = new MutationObserver(recentThreadObserver);
   observer.observe(
-    (document.body.querySelector(
-      "mws-conversations-list"
-    ) as unknown) as Element,
+    document.body.querySelector("mws-conversations-list") as unknown as Element,
     {
       attributes: false,
       subtree: true,

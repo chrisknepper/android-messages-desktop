@@ -1,4 +1,4 @@
-import { app, BrowserWindow, MenuItemConstructorOptions } from "electron";
+import { app, MenuItemConstructorOptions } from "electron";
 import { IS_MAC } from "../helpers/constants";
 import { getMainWindow } from "../helpers/getMainWindow";
 import { separator } from "./items/separator";

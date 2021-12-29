@@ -19,7 +19,11 @@ export async function checkForUpdate(
   const results = await autoUpdater.checkForUpdates().catch(() => null);
   let isUpdate = false;
   if (results != null) {
-    console.log(results.updateInfo.version, app.getVersion(), results.updateInfo.version > app.getVersion());
+    console.log(
+      results.updateInfo.version,
+      app.getVersion(),
+      results.updateInfo.version > app.getVersion()
+    );
 
     isUpdate = results.updateInfo.version > app.getVersion();
     if (isUpdate && showNotification) {
@@ -33,7 +37,9 @@ export async function checkForUpdate(
       notification.show();
     }
   }
-  const installUpdateMenuItem = Menu.getApplicationMenu()?.getMenuItemById("installUpdateMenuItem");
+  const installUpdateMenuItem = Menu.getApplicationMenu()?.getMenuItemById(
+    "installUpdateMenuItem"
+  );
   if (installUpdateMenuItem != null) {
     installUpdateMenuItem.visible = isUpdate;
   }

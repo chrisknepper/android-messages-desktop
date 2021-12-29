@@ -1,9 +1,4 @@
-import {
-  BrowserWindow,
-  Menu,
-  MenuItem,
-  MenuItemConstructorOptions,
-} from "electron";
+import { BrowserWindow, MenuItem, MenuItemConstructorOptions } from "electron";
 import { IS_MAC } from "../helpers/constants";
 import { settings } from "../helpers/settings";
 import { separator } from "./items/separator";
