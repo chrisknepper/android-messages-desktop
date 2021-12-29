@@ -1,4 +1,4 @@
-import { app, Event as ElectronEvent, ipcMain, Menu, shell } from "electron";
+import { app, Event as ElectronEvent, ipcMain, shell } from "electron";
 import { BrowserWindow } from "electron/main";
 import path from "path";
 import process from "process";
@@ -13,12 +13,8 @@ import {
 import { MenuManager } from "./helpers/menuManager";
 import { settings } from "./helpers/settings";
 import { Conversation, TrayManager } from "./helpers/trayManager";
-import { baseMenuTemplate } from "./menu/baseMenu";
 import { popupContextMenu } from "./menu/contextMenu";
-import { devMenuTemplate } from "./menu/devMenu";
-import { helpMenuTemplate } from "./menu/helpMenu";
 
-// bring the settings into scope
 const {
   autoHideMenuEnabled,
   trayEnabled,
@@ -49,12 +45,13 @@ if (IS_WINDOWS) {
 
 if (IS_MAC) {
   app.on("activate", () => {
-  if (mainWindow) {
+    if (mainWindow) {
       mainWindow.show();
-      app.dock.setBadge('');
+      app.dock.setBadge("");
     }
   });
 }
+
 app.on("ready", () => {
   trayManager = new TrayManager();
 
@@ -171,7 +168,7 @@ ipcMain.on("should-hide-notification-content", (event) => {
 ipcMain.on("show-main-window", (event) => {
   mainWindow.show();
   if (IS_MAC) {
-    app.dock.setBadge('');
+    app.dock.setBadge("");
   }
 });
 
@@ -179,7 +176,7 @@ ipcMain.on("flash-main-window-if-not-focused", (event) => {
   if (!mainWindow.isFocused()) {
     mainWindow.flashFrame(true);
     if (IS_MAC) {
-      app.dock.setBadge('•');
+      app.dock.setBadge("•");
     }
   }
 });
