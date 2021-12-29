@@ -1,6 +1,5 @@
 import {
   app,
-  BrowserWindow,
   Menu,
   MenuItemConstructorOptions,
   nativeImage,
