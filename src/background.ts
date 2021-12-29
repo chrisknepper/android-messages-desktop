@@ -53,7 +53,7 @@ if (IS_MAC) {
       mainWindow.show();
       app.dock.setBadge('');
     }
-  });  
+  });
 }
 app.on("ready", () => {
   trayManager = new TrayManager();
