@@ -38,11 +38,6 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
 
-if (IS_WINDOWS) {
-  app.setAppUserModelId("pw.kmr.android-messages-desktop");
-  app.setAsDefaultProtocolClient("android-messages-desktop");
-}
-
 if (IS_MAC) {
   app.on("activate", () => {
     if (mainWindow) {
@@ -53,6 +48,11 @@ if (IS_MAC) {
 }
 
 app.on("ready", () => {
+  if (IS_WINDOWS) {
+    app.setAppUserModelId("pw.kmr.android-messages-desktop");
+    app.setAsDefaultProtocolClient("android-messages-desktop");
+  }
+
   trayManager = new TrayManager();
 
   new MenuManager();
