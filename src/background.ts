@@ -47,12 +47,8 @@ if (IS_MAC) {
   });
 }
 
+app.on("ready", () => app.setAppUserModelId("pw.kmr.amd"));
 app.on("ready", () => {
-  if (IS_WINDOWS) {
-    app.setAppUserModelId("pw.kmr.android-messages-desktop");
-    app.setAsDefaultProtocolClient("android-messages-desktop");
-  }
-
   trayManager = new TrayManager();
 
   new MenuManager();

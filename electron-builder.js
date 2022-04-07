@@ -1,5 +1,5 @@
 module.exports = {
-  appId: "pw.electron.android-messages",
+  appId: "pw.kmr.amd",
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}",
   productName: "AndroidMessages",
   copyright: "Copyright 2020 Kyle Rosenberg",
