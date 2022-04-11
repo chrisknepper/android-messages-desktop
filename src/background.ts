@@ -71,6 +71,7 @@ app.on("ready", () => {
     icon: IS_LINUX
       ? path.resolve(RESOURCES_PATH, "icons", "128x128.png")
       : undefined,
+    titleBarStyle: IS_MAC ? "hiddenInset" : "default",
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
