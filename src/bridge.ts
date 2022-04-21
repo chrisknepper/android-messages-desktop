@@ -1,6 +1,10 @@
 import { ipcRenderer } from "electron";
 import path from "path";
-import { INITIAL_ICON_IMAGE, RESOURCES_PATH } from "./helpers/constants";
+import {
+  INITIAL_ICON_IMAGE,
+  IS_MAC,
+  RESOURCES_PATH,
+} from "./helpers/constants";
 import {
   createRecentThreadObserver,
   createUnreadObserver,
@@ -10,6 +14,29 @@ import {
 import { getProfileImg } from "./helpers/profileImage";
 
 window.addEventListener("load", () => {
+  if (true) {
+    const titlebarStyle = `#amd-titlebar {
+      -webkit-app-region: drag;
+      position: fixed;
+      width: 100%;
+      height: 64px;
+      top: 0;
+      left: 0;
+      background: none;
+      pointer-events: none;
+    }`;
+
+    document.body.appendChild(
+      Object.assign(document.createElement("style"), {
+        textContent: titlebarStyle,
+      })
+    );
+
+    const titlebar = document.createElement("div");
+    titlebar.id = "amd-titlebar";
+    document.querySelector("mw-app")?.parentNode?.prepend(titlebar);
+  }
+
   const conversationListObserver = new MutationObserver(() => {
     if (document.querySelector("mws-conversations-list") != null) {
       createUnreadObserver();
