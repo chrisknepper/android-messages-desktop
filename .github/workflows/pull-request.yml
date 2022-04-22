@@ -13,37 +13,37 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-latest
-        - windows-latest
-        - ubuntu-latest
+          - macos-latest
+          - windows-latest
+          - ubuntu-latest
         node-version:
-        - 17
+          - 17
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Cache node_modules
-      uses: actions/cache@v2
-      with:
-        path: ./node_modules
-        key: ${{ matrix.os }}-${{ matrix.node-version }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-      env:
-        cache-name: node-modules
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: ${{ matrix.os }}-${{ matrix.node-version }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+        env:
+          cache-name: node-modules
 
-    - run: sudo apt-get update -y && sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
-      name: Install Linux Dependencies
-      if: (startsWith(matrix.os, 'ubuntu'))
+      - run: sudo apt-get update -y && sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
+        name: Install Linux Dependencies
+        if: (startsWith(matrix.os, 'ubuntu'))
 
-    - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile
 
-    - run: yarn dist --publish never
+      - run: yarn dist --publish never
 
-    - name: Upload Build
-      uses: actions/upload-artifact@v2.2.2
-      with:
-        name: ${{ matrix.os }}-${{ matrix.node-version }}
-        path: ./dist
+      - name: Upload Build
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.node-version }}
+          path: ./dist
