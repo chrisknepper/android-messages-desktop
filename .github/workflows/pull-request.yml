@@ -34,7 +34,7 @@ jobs:
       env:
         cache-name: node-modules
 
-    - run: sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
+    - run: sudo apt-get update -y && sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm libarchive-tools
       name: Install Linux Dependencies
       if: (startsWith(matrix.os, 'ubuntu'))
 
