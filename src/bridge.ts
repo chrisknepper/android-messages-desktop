@@ -14,7 +14,7 @@ import {
 import { getProfileImg } from "./helpers/profileImage";
 
 window.addEventListener("load", () => {
-  if (true) {
+  if (IS_MAC) {
     const titlebarStyle = `#amd-titlebar {
       -webkit-app-region: drag;
       position: fixed;
