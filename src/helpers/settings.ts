@@ -45,6 +45,8 @@ export interface JsonSettings {
   monochromeIconEnabled: boolean;
   showIconsInRecentConversationTrayEnabled: boolean;
   isUpdate: boolean;
+  taskbarFlashEnabled: boolean;
+  trayIconRedDotEnabled: boolean;
 }
 
 // wraps json settings in the setting type for export
@@ -75,6 +77,8 @@ const defaultSettings: JsonSettings = {
   monochromeIconEnabled: true,
   showIconsInRecentConversationTrayEnabled: true,
   isUpdate: false,
+  taskbarFlashEnabled: true,
+  trayIconRedDotEnabled: true,
 };
 
 // create default settings file if it doesnt exist
