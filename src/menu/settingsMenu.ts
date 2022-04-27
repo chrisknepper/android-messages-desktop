@@ -12,6 +12,8 @@ const {
   checkForUpdateOnLaunchEnabled,
   monochromeIconEnabled,
   showIconsInRecentConversationTrayEnabled,
+  trayIconRedDotEnabled,
+  taskbarFlashEnabled,
 } = settings;
 
 export const settingsMenu: MenuItemConstructorOptions = {
@@ -68,6 +70,14 @@ export const settingsMenu: MenuItemConstructorOptions = {
       click: (item) =>
         showIconsInRecentConversationTrayEnabled.next(item.checked),
     },
+    {
+      id: "trayIconRedDotEnabledMenuItem",
+      label: "Show Red Dot for Unread Messages",
+      type: "checkbox",
+      checked: trayIconRedDotEnabled.value,
+      enabled: trayEnabled.value,
+      click: (item) => trayIconRedDotEnabled.next(item.checked),
+    },
     separator,
     {
       id: "hideNotificationContentMenuItem",
@@ -75,6 +85,13 @@ export const settingsMenu: MenuItemConstructorOptions = {
       type: "checkbox",
       checked: hideNotificationContentEnabled.value,
       click: (item) => hideNotificationContentEnabled.next(item.checked),
+    },
+    {
+      id: "taskbarFlashEnabledMenuItem",
+      label: "Taskbar Flash on New Message",
+      type: "checkbox",
+      checked: taskbarFlashEnabled.value,
+      click: (item) => taskbarFlashEnabled.next(item.checked),
     },
     separator,
     {
