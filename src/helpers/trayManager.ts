@@ -26,6 +26,7 @@ const {
   seenMinimizeToTrayWarning,
   monochromeIconEnabled,
   showIconsInRecentConversationTrayEnabled,
+  trayIconRedDotEnabled,
 } = settings;
 
 export interface Conversation {
@@ -47,6 +48,9 @@ export class TrayManager {
     monochromeIconEnabled.subscribe(() =>
       this.tray?.setImage(this.getIconPath())
     );
+    trayIconRedDotEnabled.subscribe(() => {
+      this.tray?.setImage(this.getIconPath());
+    });
   }
 
   public startIfEnabled(): void {
@@ -125,7 +129,8 @@ export class TrayManager {
     if (IS_MAC) {
       filename = "icon_macTemplate.png";
     } else {
-      const unread = this.messagesAreUnread ? "unread_" : "";
+      const unread =
+        this.messagesAreUnread && trayIconRedDotEnabled.value ? "unread_" : "";
       const mono = monochromeIconEnabled.value ? "_mono" : "";
       filename = `${unread}icon${mono}.png`;
     }
@@ -172,6 +177,7 @@ export class TrayManager {
       "startInTrayMenuItem",
       "monochromeIconEnabledMenuItem",
       "showIconsInRecentConversationTrayEnabledMenuItem",
+      "trayIconRedDotEnabledMenuItem",
     ];
 
     if (newValue) {

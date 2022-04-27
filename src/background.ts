@@ -21,6 +21,7 @@ const {
   savedWindowSize,
   savedWindowPosition,
   checkForUpdateOnLaunchEnabled,
+  taskbarFlashEnabled,
 } = settings;
 
 let mainWindow: BrowserWindow;
@@ -170,7 +171,7 @@ ipcMain.on("show-main-window", () => {
 });
 
 ipcMain.on("flash-main-window-if-not-focused", () => {
-  if (!mainWindow.isFocused()) {
+  if (!mainWindow.isFocused() && taskbarFlashEnabled.value) {
     mainWindow.flashFrame(true);
     if (IS_MAC) {
       app.dock.setBadge("•");
