@@ -17,6 +17,9 @@ Head over to the [latest releases](https://github.com/OrangeDrangon/android-mess
 
 **Important Note 2:** Neither the MacOS nor the Windows binaries are signed right now. I am willing to add this but I do not have the certificates required at this time.
 
+# Install on MacOS via Homebrew
+`brew install --cask orangedrangon-android-messages`
+
 # Contributions
 
 The code is pretty ugly but getting better every day. Feel free to take a look.
