@@ -21,6 +21,10 @@ Head over to the [latest releases](https://github.com/OrangeDrangon/android-mess
 
 `brew install --cask orangedrangon-android-messages`
 
+# Install on Windows via Scoop
+
+`scoop bucket add extras && scoop install android-messages`
+
 # Contributions
 
 The code is pretty ugly but getting better every day. Feel free to take a look.
