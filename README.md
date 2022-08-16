@@ -9,13 +9,17 @@ Inspired by:
 - [Google Play Music Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
 - [a Reddit post on r/Android](https://www.reddit.com/r/Android/comments/8shv6q/web_messages/e106a8r/)
 
-# Download
-
-Head over to the [latest releases](https://github.com/OrangeDrangon/android-messages-desktop/releases/latest) page!
-
 **Important Note 1:** We currently have builds for Windows and macOS, and Linux. I test releases on Arch Linux and to a lesser degree Windows. I would love help testing in additional places.
 
 **Important Note 2:** Neither the MacOS nor the Windows binaries are signed right now. I am willing to add this but I do not have the certificates required at this time.
+
+# Install Anywhere
+
+Download your build from the [releases](https://github.com/OrangeDrangon/android-messages-desktop/releases/latest) page.
+
+# Install on Archlinux via AUR
+
+`yay -S android-messages-desktop-bin` or the relevant command in your aur helper.
 
 # Install on MacOS via Homebrew
 
