@@ -19,14 +19,10 @@ const base: Configuration = {
         exclude: /node_modules/,
         use: ["ts-loader"],
       },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
     ],
   },
   resolve: {
-    extensions: [".ts", ".js", ".css"],
+    extensions: [".ts", ".js"],
   },
 };
 
