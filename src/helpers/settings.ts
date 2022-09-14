@@ -102,6 +102,11 @@ for (const name in defaultSettings) {
 // We know this is safe because we are enumerating all of the settings in default settings
 // furthermore the `Settings` type is derived from the default settings type
 export const settings: Settings = settingsToExport as Settings;
+let settingsFlushEnabled = true;
+
+export const setSettingsFlushEnabled = (val: boolean) => {
+  settingsFlushEnabled = val;
+};
 
 // loop through and add all the event listeners
 // has to be done in this step because settings needs to exist
@@ -116,6 +121,8 @@ for (const name in settings) {
       seriazableSettings[name] = setting.value;
     });
     // write all the settings to the file from memory to avoid weird read write race conditions
-    jetpack.write(SETTINGS_FILE(), seriazableSettings);
+    if (settingsFlushEnabled) {
+      jetpack.write(SETTINGS_FILE(), seriazableSettings);
+    }
   });
 }
