@@ -110,6 +110,8 @@ window.Notification = function (title: string, options: NotificationOptions) {
 window.Notification.permission = "granted";
 window.Notification.requestPermission = async () => "granted";
 
+window.module.exports = null;
+
 ipcRenderer.on("focus-conversation", (event, i) => {
   focusFunctions[i]();
 });
