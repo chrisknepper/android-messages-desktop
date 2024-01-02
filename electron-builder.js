@@ -11,9 +11,13 @@ module.exports = {
   linux: {
     target: ["AppImage", "snap", "deb", "pacman", "rpm", "freebsd", "zip"],
     executableName: "AndroidMessages",
+    executableArgs: [
+      "--ozone-platform-hint=auto",
+      "--enable-features=WaylandWindowDecorations",
+    ],
     category: "Internet",
     desktop: {
-      StartupWMClass: "android-messages-desktop",
+      Name: "Android Messages Desktop",
     },
   },
   win: {
