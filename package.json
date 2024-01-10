@@ -1,115 +1,60 @@
 {
   "name": "android-messages-desktop",
-  "productName": "Android Messages",
   "description": "Messages for web, as a desktop app",
-  "version": "3.1.0",
-  "author": "Chris Knepper <chris82thekid@gmail.com>",
-  "copyright": "© 2018-2019 Chris Knepper",
-  "homepage": "https://github.com/chrisknepper/android-messages-desktop",
+  "version": "5.4.3",
+  "author": {
+    "name": "Kyle Rosenberg",
+    "email": "kyle@ekrosenberg.com"
+  },
+  "license": "MIT",
+  "copyright": "Copyright 2020 Kyle Rosenberg",
+  "homepage": "https://github.com/OrangeDrangon/android-messages-desktop",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chrisknepper/android-messages-desktop.git"
+    "url": "git+https://github.com/OrangeDrangon/android-messages-desktop.git"
   },
   "bugs": {
-    "url": "https://github.com/chrisknepper/android-messages-desktop/issues"
+    "url": "https://github.com/OrangeDrangon/android-messages-desktop/issues"
   },
   "main": "app/background.js",
-  "build": {
-    "appId": "com.knepper.android-messages-desktop",
-    "files": [
-      "app/**/*",
-      "resources/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "resources"
-    },
-    "extraResources": [
-      "resources/dictionaries"
-    ],
-    "afterSign": "config/packaging/notarize.js",
-    "mac": {
-      "category": "public.app-category.social-networking",
-      "target": [
-        "zip",
-        "dmg"
-      ],
-      "entitlements": "config/packaging/macosEntitlements.plist",
-      "entitlementsInherit": "config/packaging/macosEntitlements.plist"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
-        }
-      ]
-    },
-    "portable": {
-      "artifactName": "${productName} Portable ${version}.${ext}"
-    },
-    "linux": {
-      "category": "Chat",
-      "target": [
-        "deb",
-        "AppImage",
-        "snap",
-        "pacman"
-      ]
-    }
-  },
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
-    "preunit": "webpack --config=build/webpack.unit.config.js --env=test --display=none",
-    "unit": "electron-mocha temp/specs.js --renderer --require source-map-support/register",
-    "pree2e": "webpack --config=build/webpack.app.config.js --env=test --display=none && webpack --config=build/webpack.e2e.config.js --env=test --display=none",
-    "e2e": "mocha temp/e2e.js --require source-map-support/register",
-    "test": "npm run unit && npm run e2e",
-    "start": "node build/start.js",
-    "release": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
-    "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
-    "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
-    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
+    "start": "yarn build:dev && cross-env NODE_ENV=development electron ./app/background.js",
+    "dist": "yarn build && yarn package",
+    "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
+    "icons": "png2icons resources/icons/1024x1024.png resources/icon -all -i",
+    "lint": "eslint --fix --ext .ts,.js ./src",
+    "package": "yarn electron-builder --config electron-builder.js"
   },
   "dependencies": {
-    "about-window": "1.13.0",
-    "electron-hunspell": "1.0.0-beta.12",
-    "electron-settings": "3.2.0",
-    "electron-updater": "4.2.0",
-    "fs-jetpack": "^1.0.0"
+    "about-window": "1.15.2",
+    "electron-updater": "5.2.1",
+    "fs-jetpack": "^4.3.1",
+    "rxjs": "^7.5.6",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.5.5",
-    "@babel/preset-env": "7.5.5",
-    "babel-loader": "8.0.6",
-    "babel-plugin-transform-object-rest-spread": "^7.0.0-beta.3",
-    "chai": "^4.1.0",
-    "css-loader": "^0.28.7",
-    "electron": "7.0.1",
-    "electron-builder": "21.2.0",
-    "electron-mocha": "^6.0.4",
-    "electron-notarize": "^0.2.0",
-    "file-loader": "^1.1.11",
-    "friendly-errors-webpack-plugin": "^1.6.1",
-    "mocha": "^5.2.0",
-    "png2icons": "^1.0.1",
-    "source-map-support": "^0.5.0",
-    "spectron": "^3.7.2",
-    "style-loader": "^0.21.0",
-    "webpack": "^4.12.0",
-    "webpack-cli": "^3.0.4",
-    "webpack-merge": "^4.1.0",
-    "webpack-node-externals": "^1.6.0"
+    "@types/node": "18.7.18",
+    "@types/uuid": "^8.3.4",
+    "@types/webpack": "^5.28.0",
+    "@types/webpack-node-externals": "^2.5.3",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "cross-env": "^7.0.2",
+    "electron": "20.1.4",
+    "electron-builder": "^23.3.3",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "png2icons": "^2.0.1",
+    "prettier": "^2.7.1",
+    "source-map-support": "^0.5.21",
+    "ts-loader": "^9.3.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.3",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-merge": "^5.8.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }
