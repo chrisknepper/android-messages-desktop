@@ -1,0 +1,21 @@
+{
+  "$schema": "https://renovatebot.com",
+  "extends": [
+    "config:best-practices",
+    ":disableRateLimiting",
+    ":disableDependencyDashboard"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm minor and patch updates",
+      "groupSlug": "npm-minor-patch"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": null
+    }
+  ]
+}

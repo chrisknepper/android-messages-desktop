@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   data-name="Layer 1"
+   viewBox="0 0 194 194"
+   aria-labelledby="title"
+   role="img"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="blue_icon_unread.svg"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"
+   inkscape:export-filename="/home/kyle/repos/android-messages-desktop/resources/blue_icon_unread.png"
+   inkscape:export-xdpi="15.835052"
+   inkscape:export-ydpi="15.835052">
+  <metadata
+     id="metadata23">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Messages</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs21" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1054"
+     inkscape:window-height="1059"
+     id="namedview19"
+     showgrid="false"
+     inkscape:zoom="3.8814433"
+     inkscape:cx="61.317397"
+     inkscape:cy="82.15061"
+     inkscape:window-x="0"
+     inkscape:window-y="19"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g15"
+     inkscape:document-rotation="0" />
+  <title
+     id="title"
+     lang="en">Messages</title>
+  <g
+     data-name="art layer"
+     id="g15"
+     transform="matrix(1.4191309,0,0,1.4191309,-38.792862,-41.34726)">
+    <path
+       data-name="chat bubble"
+       d="M 132.3,57.3 H 39.7 c -3.7,0 -5.8,3.2 -3.3,6.6 l 12.1,21 v 37.5 c 0,9.6 7,17.6 16.5,17.6 h 67.2 a 17.89,17.89 0 0 0 17.6,-17.6 V 75 A 17.76,17.76 0 0 0 132.3,57.3 Z"
+       fill="#ffffff"
+       id="path11"
+       style="fill:#1a73e8;fill-opacity:1" />
+    <path
+       d="M 131.2,83.8 H 67.3 c -2.8,0 -5.5,-1.7 -5.5,-4.4 0,-2.7 2.7,-4.4 5.5,-4.4 h 63.9 c 2.8,0 5.5,1.7 5.5,4.4 0,2.7 -2.7,4.4 -5.5,4.4 z m 0,17.6 H 67.3 c -2.8,0 -5.5,-1.7 -5.5,-4.4 0,-2.7 2.7,-4.4 5.5,-4.4 h 63.9 c 2.8,0 5.5,1.7 5.5,4.4 0,2.7 -2.7,4.4 -5.5,4.4 z m -17.7,17.7 H 67.2 c -2.8,0 -5.5,-1.7 -5.5,-4.4 0,-2.7 2.7,-4.4 5.5,-4.4 h 46.3 c 2.8,0 5.5,1.7 5.5,4.4 0,2.7 -2.7,4.4 -5.5,4.4 z"
+       fill="#8ab4f8"
+       data-name="text lines"
+       id="path13"
+       style="fill:#ffffff;fill-opacity:1" />
+    <circle
+       style="fill:#ff0000;fill-opacity:1;stroke-width:0.704657"
+       id="path851"
+       cx="144.09781"
+       cy="60.782604"
+       r="14.064951" />
+  </g>
+</svg>
